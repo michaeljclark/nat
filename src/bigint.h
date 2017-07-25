@@ -44,7 +44,7 @@ struct bigint
 	bigint(limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	bigint(std::initializer_list<limb_t> limbs) : limbs(limbs) {}
+	bigint(std::initializer_list<limb_t> l) : limbs(l) {}
 
 	/*! copy constructor  */
 	bigint(const bigint &operand) : limbs(operand.limbs) {}
@@ -293,7 +293,7 @@ struct bigint
 			remainder <<= 1;
 			remainder |= test_bit(i - 1);
 			if (remainder >= divisor) {
-				remainder = remainder - divisor;
+				remainder -= divisor;
 				quotient.set_bit(i - 1);
 			}
 		}
@@ -310,7 +310,7 @@ struct bigint
 			remainder <<= 1;
 			remainder |= test_bit(i - 1);
 			if (remainder >= divisor) {
-				remainder = remainder - divisor;
+				remainder -= divisor;
 			}
 		}
 		remainder.contract();
