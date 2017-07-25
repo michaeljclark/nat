@@ -85,6 +85,13 @@ struct bigint
 
 	/* define self mutating operations */
 
+	/*! copy assignment operator */
+	bigint& operator=(const bigint &operand)
+	{
+		limbs = operand.limbs;
+		return *this;
+	}
+
 	/*! add with carry equals */
 	bigint& operator+=(const bigint &operand)
 	{
