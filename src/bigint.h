@@ -85,7 +85,15 @@ struct bigint
 
 	/* define self mutating operations */
 
-	/*! copy assignment operator */
+	/*! integral copy assignment operator */
+	bigint& operator=(const limb_t l)
+	{
+		limbs.resize(0);
+		limbs.push_back(l);
+		return *this;
+	}
+
+	/*! bigint copy assignment operator */
 	bigint& operator=(const bigint &operand)
 	{
 		limbs = operand.limbs;
@@ -298,7 +306,7 @@ struct bigint
 		bigint quotient(0), remainder(0);
 		for (size_t i = num_limbs() * limb_bits; i > 0; i--) {
 			remainder <<= 1;
-			remainder |= test_bit(i - 1);
+			remainder.limbs[0] |= test_bit(i - 1);
 			if (remainder >= divisor) {
 				remainder -= divisor;
 				quotient.set_bit(i - 1);
@@ -315,7 +323,7 @@ struct bigint
 		bigint remainder(0);
 		for (size_t i = num_limbs() * limb_bits; i > 0; i--) {
 			remainder <<= 1;
-			remainder |= test_bit(i - 1);
+			remainder.limbs[0] |= test_bit(i - 1);
 			if (remainder >= divisor) {
 				remainder -= divisor;
 			}
@@ -346,10 +354,12 @@ struct bigint
 	{
 		std::string s;
 		bigint val = *this;
+		bigint digit;
+		const bigint ten = 10;
 		do {
-			bigint digit = val % 10;
+			digit = val % ten;
 			s.insert(s.begin(), '0' + char(digit.limbs.front()));
-			val = val / 10;
+			val = val / ten;
 		} while (val != 0);
 		return s;
 	}
