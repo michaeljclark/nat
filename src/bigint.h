@@ -6,24 +6,18 @@
  * requires a C++11 compiler
  */
 
-class bigint
+struct bigint
 {
-public:
-
 	/*! limb type */
 	typedef unsigned long long limb_t;
 
 	/*! limb bit width and bit shift */
 	enum { limb_bits = 64, limb_shift = 6 };
 
-private:
-
 	/*!
 	 * limbs is a vector of words with the little end at offset 0
 	 */
 	std::vector<limb_t> limbs;
-
-protected:
 
 	/*! expand limbs to match operand */
 	void expand(const bigint &operand)
@@ -38,8 +32,6 @@ protected:
 			limbs.pop_back();
 		}
 	}
-
-public:
 
 	/*
 	 * constructors
