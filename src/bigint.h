@@ -300,10 +300,11 @@ struct bigint
 	}
 
 	/*! school book binary division quotient */
-	bigint operator/(const bigint &divisor)
+	void divmod(const bigint &divisor, bigint &quotient, bigint &remainder)
 	{
-		if (divisor == 0) return 0; /* divide by zero */
-		bigint quotient(0), remainder(0);
+		quotient = 0;
+		remainder = 0;
+		if (divisor == 0) return; /* divide by zero */
 		for (size_t i = num_limbs() * limb_bits; i > 0; i--) {
 			remainder <<= 1;
 			remainder.limbs[0] |= test_bit(i - 1);
@@ -313,22 +314,23 @@ struct bigint
 			}
 		}
 		quotient.contract();
+		remainder.contract();
+	}
+
+
+	/*! school book binary division quotient */
+	bigint operator/(const bigint &divisor)
+	{
+		bigint quotient(0), remainder(0);
+		divmod(divisor, quotient, remainder);
 		return quotient;
 	}
 
 	/*! school book binary division remainder */
 	bigint operator%(const bigint &divisor)
 	{
-		if (divisor == 0) return 0; /* divide by zero */
-		bigint remainder(0);
-		for (size_t i = num_limbs() * limb_bits; i > 0; i--) {
-			remainder <<= 1;
-			remainder.limbs[0] |= test_bit(i - 1);
-			if (remainder >= divisor) {
-				remainder -= divisor;
-			}
-		}
-		remainder.contract();
+		bigint quotient(0), remainder(0);
+		divmod(divisor, quotient, remainder);
 		return remainder;
 	}
 
@@ -354,12 +356,12 @@ struct bigint
 	{
 		std::string s;
 		bigint val = *this;
-		bigint digit;
 		const bigint ten = 10;
+		bigint q, r;
 		do {
-			digit = val % ten;
-			s.insert(s.begin(), '0' + char(digit.limbs.front()));
-			val = val / ten;
+			val.divmod(ten, q, r);
+			s.insert(s.begin(), '0' + char(r.limbs.front()));
+			val = q;
 		} while (val != 0);
 		return s;
 	}
