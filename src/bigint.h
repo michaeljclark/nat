@@ -97,6 +97,7 @@ struct bigint
 	bigint& operator=(const bigint &operand)
 	{
 		limbs = operand.limbs;
+		contract();
 		return *this;
 	}
 
@@ -129,6 +130,7 @@ struct bigint
 			borrow = new_val > old_val;
 		}
 		assert(borrow == 0); /* unsigned underflow */
+		contract();
 		return *this;
 	}
 
@@ -274,7 +276,7 @@ struct bigint
 	bool operator>(const bigint &operand) const { return !(*this <= operand); }
 
 	/*! less than or equal*/
-	bool operator>=(const bigint &operand) const { return *this > operand || *this == operand; }
+	bool operator>=(const bigint &operand) const { return !(*this < operand) || *this == operand; }
 
 
 	/*
