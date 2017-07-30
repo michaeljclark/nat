@@ -137,17 +137,22 @@ struct bigint
 	/*! left shift equals */
 	bigint& operator<<=(int shamt)
 	{
-		for (int i = 0; i < shamt; i++) {
-			limb_t carry = 0;
-			for (size_t j = 0; j < limbs.size(); j++) {
-				limb_t old_val = limbs[j];
-				limb_t new_val = (old_val << 1) | carry;
-				limbs[j] = new_val;
-				carry = new_val < old_val;
-			}
-			if (carry) {
-				limbs.push_back(1);
-			}
+		size_t limb_shamt = shamt >> limb_shift;
+		if (limb_shamt > 0) {
+			limbs.insert(limbs.begin(), limb_shamt, 0);
+			shamt -= limb_shamt;
+		}
+		if (!shamt) return *this;
+
+		limb_t carry = 0;
+		for (size_t j = 0; j < limbs.size(); j++) {
+			limb_t old_val = limbs[j];
+			limb_t new_val = (old_val << shamt) | carry;
+			limbs[j] = new_val;
+			carry = old_val >> (limb_bits - shamt);
+		}
+		if (carry) {
+			limbs.push_back(carry);
 		}
 		return *this;
 	}
@@ -155,14 +160,19 @@ struct bigint
 	/*! right shift equals */
 	bigint& operator>>=(int shamt)
 	{
-		for (int i = 0; i < shamt; i++) {
-			limb_t carry = 0;
-			for (size_t j = limbs.size(); j > 0; j--) {
-				limb_t old_val = limbs[j - 1];
-				limb_t new_val = (old_val >> 1) | carry;
-				limbs[j - 1] = new_val;
-				carry = (old_val & 1) << (limb_bits - 1);
-			}
+		size_t limb_shamt = shamt >> limb_shift;
+		if (limb_shamt > 0) {
+			limbs.erase(limbs.begin(), limbs.begin() + limb_shamt);
+			shamt -= limb_shamt;
+		}
+		if (!shamt) return *this;
+
+		limb_t carry = 0;
+		for (size_t j = limbs.size(); j > 0; j--) {
+			limb_t old_val = limbs[j - 1];
+			limb_t new_val = (old_val >> shamt) | carry;
+			limbs[j - 1] = new_val;
+			carry = old_val << (limb_bits - shamt);
 		}
 		contract();
 		return *this;

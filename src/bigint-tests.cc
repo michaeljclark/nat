@@ -62,6 +62,9 @@ int main(int argc, char const *argv[])
 	/* test right shift carry under limb contraction */
 	assert((bigint{0,1} >> 1).num_limbs() == 1);
 
+	/* test big right shift */
+	assert((bigint{0,1} >> 33) == bigint(1ULL << (bigint::limb_bits - 33)));
+
 	/* test logical and */
 	bigint b7 = bigint{0b101, 0b101} & bigint{0b100, 0};
 	assert(b7.num_limbs() == 1);
