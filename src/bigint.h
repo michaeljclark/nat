@@ -458,15 +458,20 @@ struct bigint
 	}
 
 	/*! raise to the power */
-	bigint pow(size_t exp)
+	bigint pow(size_t exp) const
 	{
-		/* 0 to the power of anything is 1 */
-		if (exp == 0) return bigint(1);
-		bigint result(*this);
-		for (size_t i = 1; i < exp; i++) {
-			result = result * *this;
+		if (exp == 0) return 1;
+		bigint x = *this, y = 1;
+		while (exp > 1) {
+			if ((exp & 1) == 0) {
+				exp >>= 1;
+			} else {
+		        y = x * y;
+				exp = (exp - 1) >> 1;
+			}
+			x = x * x;
 		}
-		return result;
+		return x * y;
 	}
 
 
