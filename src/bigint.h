@@ -300,7 +300,7 @@ struct bigint
 	 */
 
 	/*! base 2^limb_bits multiply */
-	void mult(const bigint &multiplicand, const bigint multiplier, bigint &result)
+	void mult(const bigint &multiplicand, const bigint multiplier, bigint &result) const
 	{
 		size_t m = multiplicand.limbs.size(), n = multiplier.limbs.size();
 		result.limbs.resize(m + n);
@@ -317,7 +317,7 @@ struct bigint
 	}
 
 	/*! base 2^limb_bits division */
-	void divmod(const bigint &divisor, bigint &quotient, bigint &remainder)
+	void divmod(const bigint &divisor, bigint &quotient, bigint &remainder) const
 	{
 		quotient = 0;
 		remainder = 0;
@@ -410,7 +410,7 @@ struct bigint
 	}
 
 	/*! multiply */
-	bigint operator*(const bigint &operand)
+	bigint operator*(const bigint &operand) const
 	{
 		bigint result(0);
 		mult(*this, operand, result);
@@ -418,7 +418,7 @@ struct bigint
 	}
 
 	/*! division quotient */
-	bigint operator/(const bigint &divisor)
+	bigint operator/(const bigint &divisor) const
 	{
 		bigint quotient(0), remainder(0);
 		divmod(divisor, quotient, remainder);
@@ -426,7 +426,7 @@ struct bigint
 	}
 
 	/*! division remainder */
-	bigint operator%(const bigint &divisor)
+	bigint operator%(const bigint &divisor) const
 	{
 		bigint quotient(0), remainder(0);
 		divmod(divisor, quotient, remainder);
@@ -458,12 +458,12 @@ struct bigint
 	}
 
 	/*! raise to the power */
-	bigint pow(size_t operand)
+	bigint pow(size_t exp)
 	{
 		/* 0 to the power of anything is 1 */
-		if (operand == 0) return bigint(1);
+		if (exp == 0) return bigint(1);
 		bigint result(*this);
-		for (size_t i = 1; i < operand; i++) {
+		for (size_t i = 1; i < exp; i++) {
 			result = result * *this;
 		}
 		return result;
