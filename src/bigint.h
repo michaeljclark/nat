@@ -45,10 +45,13 @@ struct bigint
 	bigint(limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	bigint(std::initializer_list<limb_t> l) : limbs(l) {}
+	bigint(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
 
 	/*! copy constructor  */
-	bigint(const bigint &operand) : limbs(operand.limbs) {}
+	bigint(const bigint &operand) : limbs(operand.limbs) { contract(); }
+
+	/*! move constructor  */
+	bigint(const bigint&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
 
 
 	/*
