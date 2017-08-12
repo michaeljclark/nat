@@ -317,7 +317,7 @@ struct bigint
 	}
 
 	/*! base 2^limb_bits division */
-	void divmod(const bigint &divisor, bigint &quotient, bigint &remainder) const
+	void divrem(const bigint &divisor, bigint &quotient, bigint &remainder) const
 	{
 		quotient = 0;
 		remainder = 0;
@@ -421,7 +421,7 @@ struct bigint
 	bigint operator/(const bigint &divisor) const
 	{
 		bigint quotient(0), remainder(0);
-		divmod(divisor, quotient, remainder);
+		divrem(divisor, quotient, remainder);
 		return quotient;
 	}
 
@@ -429,7 +429,7 @@ struct bigint
 	bigint operator%(const bigint &divisor) const
 	{
 		bigint quotient(0), remainder(0);
-		divmod(divisor, quotient, remainder);
+		divrem(divisor, quotient, remainder);
 		return remainder;
 	}
 
@@ -488,7 +488,7 @@ struct bigint
 		const bigint tenp9 = 1000000000;
 		bigint q, r;
 		do {
-			val.divmod(tenp9, q, r);
+			val.divrem(tenp9, q, r);
 			val = q;
 			limb_t v = r.limb_at(0);
 			if (q > 0) {
