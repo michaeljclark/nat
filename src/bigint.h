@@ -322,8 +322,8 @@ struct bigint
 		quotient = 0;
 		remainder = 0;
 		size_t m = limbs.size(), n = divisor.limbs.size();
-		quotient.limbs.resize(m);
-		remainder.limbs.resize(m);
+		quotient.limbs.resize(std::max(m - n + 1, size_t(1)));
+		remainder.limbs.resize(n);
 		limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 		const limb_t *u = limbs.data(), *v = divisor.limbs.data();
 
@@ -353,13 +353,13 @@ struct bigint
 		// digit on the dividend; we do that unconditionally.
 
 		int s = __builtin_clz(v[n-1]) - limb_bits; // 0 <= s <= limb_bits.
-		vn = (limb_t *)alloca(2*n);
+		vn = (limb_t *)alloca(sizeof(limb_t) * n);
 		for (int i = n - 1; i > 0; i--) {
 			vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
 		}
 		vn[0] = v[0] << s;
 
-		un = (limb_t *)alloca(2*(m + 1));
+		un = (limb_t *)alloca(sizeof(limb_t) * (m + 1));
 		un[m] = u[m-1] >> (limb_bits-s);
 		for (int i = m - 1; i > 0; i--) {
 			un[i] = (u[i] << s) | (u[i-1] >> (limb_bits-s));
