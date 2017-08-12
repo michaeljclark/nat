@@ -300,22 +300,20 @@ struct bigint
 	 */
 
 	/*! base 2^limb_bits multiply */
-	bigint operator*(const bigint &operand)
+	void mult(const bigint &multiplicand, const bigint multiplier, bigint &result)
 	{
-		bigint result(0);
-		size_t m = limbs.size(), n = operand.limbs.size();
+		size_t m = multiplicand.limbs.size(), n = multiplier.limbs.size();
 		result.limbs.resize(m + n);
 		for (size_t j = 0; j < n; j++) {
 			limb_t k = 0;
 			for (size_t i = 0; i < m; i++) {
-				limbw_t t = limbw_t(limbs[i]) * limbw_t(operand.limbs[j]) +
+				limbw_t t = limbw_t(multiplicand.limbs[i]) * limbw_t(multiplier.limbs[j]) +
 					limbw_t(result.limbs[i + j]) + limbw_t(k);
 				result.limbs[i + j] = t;
 				k = t >> limb_bits;
 			}
 			result.limbs[j + m] = k;
 		}
-		return result;
 	}
 
 	/*! base 2^limb_bits division */
@@ -409,6 +407,14 @@ struct bigint
 
 		quotient.contract();
 		remainder.contract();
+	}
+
+	/*! multiply */
+	bigint operator*(const bigint &operand)
+	{
+		bigint result(0);
+		mult(*this, operand, result);
+		return result;
 	}
 
 	/*! division quotient */
