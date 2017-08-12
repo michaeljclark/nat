@@ -487,22 +487,21 @@ struct bigint
 		const bigint ten = 10;
 		const bigint tenp9 = 1000000000;
 		bigint q, r;
+		size_t climit = 10 * limbs.size() + 1;
+		s.resize(climit, '0');
+		size_t offset = climit;
 		do {
 			val.divrem(tenp9, q, r);
 			val = q;
 			limb_t v = r.limb_at(0);
-			if (q > 0) {
-				for (size_t i = 0; i < 9; i++) {
-					s.insert(s.begin(), '0' + char(v % 10));
-					v /= 10;
-				}
-			} else {
-				do {
-					s.insert(s.begin(), '0' + char(v % 10));
-					v /= 10;
-				} while (v != 0);
-			}
+			size_t i = 9;
+			do {
+				s[--offset] = '0' + char(v % 10);
+				v /= 10;
+				i--;
+			} while (v != 0);
+			if (q > 0) offset -= i;
 		} while (val != 0);
-		return s;
+		return s.substr(offset);
 	}
 };
