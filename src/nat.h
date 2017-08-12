@@ -11,6 +11,7 @@ struct nat
 	/*! limb type */
 	typedef unsigned int limb_t;
 	typedef unsigned long long limb2_t;
+	typedef signed long long slimb2_t;
 
 	/*! limb bit width and bit shift */
 	enum { limb_bits = 32, limb_shift = 5 };
@@ -327,10 +328,10 @@ struct nat
 		limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 		const limb_t *u = limbs.data(), *v = divisor.limbs.data();
 
-		const unsigned long long b = (1ULL << limb_bits); // Number base
-		limb_t *un, *vn;                                  // Normalized form of u, v.
-		unsigned long long qhat;                          // Estimated quotient digit.
-		unsigned long long rhat;                          // A remainder.
+		const limb2_t b = (1ULL << limb_bits); // Number base
+		limb_t *un, *vn;                       // Normalized form of u, v.
+		limb2_t qhat;                          // Estimated quotient digit.
+		limb2_t rhat;                          // A remainder.
 
 		if (m < n || n <= 0 || v[n-1] == 0) {
 			return; // Return if invalid param.
@@ -338,12 +339,12 @@ struct nat
 
 		// Single digit divisor
 		if (n == 1) {
-			unsigned long long k = 0;
-			for (int j = m - 1; j >= 0; j--) {
-				q[j] = (k*b + u[j]) / v[0];
+			limb2_t k = 0;
+			for (ssize_t j = m - 1; j >= 0; j--) {
+				q[j] = limb_t((k*b + u[j]) / v[0]);
 				k = (k*b + u[j]) - q[j]*v[0];
 			}
-			r[0] = k;
+			r[0] = limb_t(k);
 			return;
 		}
 
@@ -354,18 +355,18 @@ struct nat
 
 		int s = __builtin_clz(v[n-1]) - limb_bits; // 0 <= s <= limb_bits.
 		vn = (limb_t *)alloca(sizeof(limb_t) * n);
-		for (int i = n - 1; i > 0; i--) {
+		for (size_t i = n - 1; i > 0; i--) {
 			vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
 		}
 		vn[0] = v[0] << s;
 
 		un = (limb_t *)alloca(sizeof(limb_t) * (m + 1));
 		un[m] = u[m-1] >> (limb_bits-s);
-		for (int i = m - 1; i > 0; i--) {
+		for (size_t i = m - 1; i > 0; i--) {
 			un[i] = (u[i] << s) | (u[i-1] >> (limb_bits-s));
 		}
 		un[0] = u[0] << s;
-		for (int j = m - n; j >= 0; j--) { // Main loop.
+		for (ssize_t j = m - n; j >= 0; j--) { // Main loop.
 			// Compute estimate qhat of q[j].
 			qhat = (un[j+n]*b + un[j+n-1]) / vn[n-1];
 			rhat = (un[j+n]*b + un[j+n-1]) - qhat * vn[n-1];
@@ -376,27 +377,27 @@ struct nat
 				if (rhat < b) goto again;
 			}
 			// Multiply and subtract.
-			unsigned long long k = 0;
-			signed long long t = 0;
+			limb2_t k = 0;
+			slimb2_t t = 0;
 			for (int i = 0; i < n; i++) {
 				unsigned long long p = qhat*vn[i];
 				t = un[i+j] - k - (p & 0xffffffff);
-				un[i+j] = t;
+				un[i+j] = limb_t(t);
 				k = (p >> limb_bits) - (t >> limb_bits);
 			}
 			t = un[j+n] - k;
-			un[j+n] = t;
+			un[j+n] = limb_t(t);
 
-			q[j] = qhat; // Store quotient digit.
-			if (t < 0) { // If we subtracted too
+			q[j] = limb_t(qhat); // Store quotient digit.
+			if (t < 0) {         // If we subtracted too
 				q[j] = q[j] - 1; // much, add back.
 				k = 0;
 				for (int i = 0; i < n; i++) {
 					t = un[i+j] + vn[i] + k;
-					un[i+j] = t;
+					un[i+j] = limb_t(t);
 					k = t >> limb_bits;
 				}
-				un[j+n] = un[j+n] + k;
+				un[j+n] = limb_t(un[j+n] + k);
 			}
 		}
 
@@ -466,7 +467,7 @@ struct nat
 			if ((exp & 1) == 0) {
 				exp >>= 1;
 			} else {
-		        y = x * y;
+				y = x * y;
 				exp = (exp - 1) >> 1;
 			}
 			x = x * x;
