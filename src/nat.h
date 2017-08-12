@@ -10,7 +10,7 @@ struct nat
 {
 	/*! limb type */
 	typedef unsigned int limb_t;
-	typedef unsigned long long limbw_t;
+	typedef unsigned long long limb2_t;
 
 	/*! limb bit width and bit shift */
 	enum { limb_bits = 32, limb_shift = 5 };
@@ -307,9 +307,9 @@ struct nat
 		for (size_t j = 0; j < n; j++) {
 			limb_t k = 0;
 			for (size_t i = 0; i < m; i++) {
-				limbw_t t = limbw_t(multiplicand.limbs[i]) * limbw_t(multiplier.limbs[j]) +
-					limbw_t(result.limbs[i + j]) + limbw_t(k);
-				result.limbs[i + j] = t;
+				limb2_t t = limb2_t(multiplicand.limbs[i]) * limb2_t(multiplier.limbs[j]) +
+					limb2_t(result.limbs[i + j]) + limb2_t(k);
+				result.limbs[i + j] = limb_t(t);
 				k = t >> limb_bits;
 			}
 			result.limbs[j + m] = k;
