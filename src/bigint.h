@@ -485,10 +485,10 @@ struct bigint
 		std::string s;
 		bigint val = *this;
 		const bigint ten = 10;
-		const bigint billion = 1000000000;
+		const bigint tenp9 = 1000000000;
 		bigint q, r;
 		do {
-			val.divmod(billion, q, r);
+			val.divmod(tenp9, q, r);
 			val = q;
 			limb_t v = r.limb_at(0);
 			if (q > 0) {
