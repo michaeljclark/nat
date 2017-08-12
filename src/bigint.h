@@ -484,7 +484,6 @@ struct bigint
 	{
 		std::string s;
 		bigint val = *this;
-		const bigint ten = 10;
 		const bigint tenp9 = 1000000000;
 		bigint q, r;
 		size_t climit = 10 * limbs.size() + 1;
