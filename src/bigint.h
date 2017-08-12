@@ -408,7 +408,6 @@ struct bigint
 		remainder.contract();
 	}
 
-
 	/*! school book binary division quotient */
 	bigint operator/(const bigint &divisor)
 	{
@@ -423,6 +422,30 @@ struct bigint
 		bigint quotient(0), remainder(0);
 		divmod(divisor, quotient, remainder);
 		return remainder;
+	}
+
+	/*! multiply equals */
+	bigint& operator*=(const bigint &operand)
+	{
+		bigint result = *this * operand;
+		limbs = result.limbs;
+		return *this;
+	}
+
+	/*! divide equals */
+	bigint& operator/=(const bigint &operand)
+	{
+		bigint result = *this / operand;
+		limbs = result.limbs;
+		return *this;
+	}
+
+	/*! modulus equals */
+	bigint& operator%=(const bigint &operand)
+	{
+		bigint result = *this % operand;
+		limbs = result.limbs;
+		return *this;
 	}
 
 	/*! raise to the power */
