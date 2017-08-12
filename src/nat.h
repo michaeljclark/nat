@@ -1,12 +1,12 @@
 /*
- * bigint header-only library
+ * unsigned natural number header implementation
  *
  * Michael Clark <michaeljclark@mac.com> 27/1/2017
  *
  * requires a C++11 compiler
  */
 
-struct bigint
+struct nat
 {
 	/*! limb type */
 	typedef unsigned int limb_t;
@@ -21,7 +21,7 @@ struct bigint
 	std::vector<limb_t> limbs;
 
 	/*! expand limbs to match operand */
-	void expand(const bigint &operand)
+	void expand(const nat &operand)
 	{
 		limbs.resize(std::max(limbs.size(), operand.limbs.size()));
 	}
@@ -39,19 +39,19 @@ struct bigint
 	 */
 
 	/*! default constructor */
-	bigint() : limbs{ 0 } {}
+	nat() : limbs{ 0 } {}
 
 	/*! integral constructor */
-	bigint(limb_t n) : limbs{ n } {}
+	nat(limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	bigint(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
+	nat(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
 
 	/*! copy constructor  */
-	bigint(const bigint &operand) : limbs(operand.limbs) { contract(); }
+	nat(const nat &operand) : limbs(operand.limbs) { contract(); }
 
 	/*! move constructor  */
-	bigint(const bigint&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
+	nat(const nat&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
 
 
 	/*
@@ -90,15 +90,15 @@ struct bigint
 	/* define self mutating operations */
 
 	/*! integral copy assignment operator */
-	bigint& operator=(const limb_t l)
+	nat& operator=(const limb_t l)
 	{
 		limbs.resize(0);
 		limbs.push_back(l);
 		return *this;
 	}
 
-	/*! bigint copy assignment operator */
-	bigint& operator=(const bigint &operand)
+	/*! nat copy assignment operator */
+	nat& operator=(const nat &operand)
 	{
 		limbs = operand.limbs;
 		contract();
@@ -106,7 +106,7 @@ struct bigint
 	}
 
 	/*! add with carry equals */
-	bigint& operator+=(const bigint &operand)
+	nat& operator+=(const nat &operand)
 	{
 		expand(operand);
 		limb_t carry = 0;
@@ -123,7 +123,7 @@ struct bigint
 	}
 
 	/*! subtract with borrow equals */
-	bigint& operator-=(const bigint &operand)
+	nat& operator-=(const nat &operand)
 	{
 		expand(operand);
 		limb_t borrow = 0;
@@ -139,7 +139,7 @@ struct bigint
 	}
 
 	/*! left shift equals */
-	bigint& operator<<=(int shamt)
+	nat& operator<<=(int shamt)
 	{
 		size_t limb_shamt = shamt >> limb_shift;
 		if (limb_shamt > 0) {
@@ -162,7 +162,7 @@ struct bigint
 	}
 
 	/*! right shift equals */
-	bigint& operator>>=(int shamt)
+	nat& operator>>=(int shamt)
 	{
 		size_t limb_shamt = shamt >> limb_shift;
 		if (limb_shamt > 0) {
@@ -183,7 +183,7 @@ struct bigint
 	}
 
 	/*! logical and equals */
-	bigint& operator&=(const bigint &operand)
+	nat& operator&=(const nat &operand)
 	{
 		expand(operand);
 		for (size_t i = 0; i < limbs.size(); i++) {
@@ -194,7 +194,7 @@ struct bigint
 	}
 
 	/*! logical or equals */
-	bigint& operator|=(const bigint &operand)
+	nat& operator|=(const nat &operand)
 	{
 		expand(operand);
 		for (size_t i = 0; i < limbs.size(); i++) {
@@ -208,44 +208,44 @@ struct bigint
 	/* const operations copy and use the mutating operations */
 
 	/*! add with carry */
-	bigint operator+(const bigint &operand) const
+	nat operator+(const nat &operand) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result += operand;
 	}
 
 	/*! subtract with borrow */
-	bigint operator-(const bigint &operand) const
+	nat operator-(const nat &operand) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result -= operand;
 	}
 
 	/*! left shift */
-	bigint operator<<(int shamt) const
+	nat operator<<(int shamt) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result <<= shamt;
 	}
 
 	/*! right shift */
-	bigint operator>>(int shamt) const
+	nat operator>>(int shamt) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result >>= shamt;
 	}
 
 	/*! logical and */
-	bigint operator&(const bigint &operand) const
+	nat operator&(const nat &operand) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result &= operand;
 	}
 
 	/*! logical or */
-	bigint operator|(const bigint &operand) const
+	nat operator|(const nat &operand) const
 	{
-		bigint result(*this);
+		nat result(*this);
 		return result |= operand;
 	}
 
@@ -255,7 +255,7 @@ struct bigint
 	 */
 
 	/*! equals */
-	bool operator==(const bigint &operand) const
+	bool operator==(const nat &operand) const
 	{
 		size_t max = std::max(num_limbs(), operand.num_limbs());
 		for (size_t i = 0; i < max; i++) {
@@ -265,7 +265,7 @@ struct bigint
 	}
 
 	/*! less than */
-	bool operator<(const bigint &operand) const
+	bool operator<(const nat &operand) const
 	{
 		size_t max = std::max(num_limbs(), operand.num_limbs());
 		for (size_t i = max; i > 0; i--) {
@@ -281,16 +281,16 @@ struct bigint
 	 */
 
 	/*! not equals */
-	bool operator!=(const bigint &operand) const { return !(*this == operand); }
+	bool operator!=(const nat &operand) const { return !(*this == operand); }
 
 	/*! less than or equal*/
-	bool operator<=(const bigint &operand) const { return *this < operand || *this == operand; }
+	bool operator<=(const nat &operand) const { return *this < operand || *this == operand; }
 
 	/*! greater than */
-	bool operator>(const bigint &operand) const { return !(*this <= operand); }
+	bool operator>(const nat &operand) const { return !(*this <= operand); }
 
 	/*! less than or equal*/
-	bool operator>=(const bigint &operand) const { return !(*this < operand) || *this == operand; }
+	bool operator>=(const nat &operand) const { return !(*this < operand) || *this == operand; }
 
 
 	/*
@@ -300,7 +300,7 @@ struct bigint
 	 */
 
 	/*! base 2^limb_bits multiply */
-	void mult(const bigint &multiplicand, const bigint multiplier, bigint &result) const
+	void mult(const nat &multiplicand, const nat multiplier, nat &result) const
 	{
 		size_t m = multiplicand.limbs.size(), n = multiplier.limbs.size();
 		result.limbs.resize(m + n);
@@ -317,7 +317,7 @@ struct bigint
 	}
 
 	/*! base 2^limb_bits division */
-	void divrem(const bigint &divisor, bigint &quotient, bigint &remainder) const
+	void divrem(const nat &divisor, nat &quotient, nat &remainder) const
 	{
 		quotient = 0;
 		remainder = 0;
@@ -410,58 +410,58 @@ struct bigint
 	}
 
 	/*! multiply */
-	bigint operator*(const bigint &operand) const
+	nat operator*(const nat &operand) const
 	{
-		bigint result(0);
+		nat result(0);
 		mult(*this, operand, result);
 		return result;
 	}
 
 	/*! division quotient */
-	bigint operator/(const bigint &divisor) const
+	nat operator/(const nat &divisor) const
 	{
-		bigint quotient(0), remainder(0);
+		nat quotient(0), remainder(0);
 		divrem(divisor, quotient, remainder);
 		return quotient;
 	}
 
 	/*! division remainder */
-	bigint operator%(const bigint &divisor) const
+	nat operator%(const nat &divisor) const
 	{
-		bigint quotient(0), remainder(0);
+		nat quotient(0), remainder(0);
 		divrem(divisor, quotient, remainder);
 		return remainder;
 	}
 
 	/*! multiply equals */
-	bigint& operator*=(const bigint &operand)
+	nat& operator*=(const nat &operand)
 	{
-		bigint result = *this * operand;
+		nat result = *this * operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! divide equals */
-	bigint& operator/=(const bigint &operand)
+	nat& operator/=(const nat &operand)
 	{
-		bigint result = *this / operand;
+		nat result = *this / operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! modulus equals */
-	bigint& operator%=(const bigint &operand)
+	nat& operator%=(const nat &operand)
 	{
-		bigint result = *this % operand;
+		nat result = *this % operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! raise to the power */
-	bigint pow(size_t exp) const
+	nat pow(size_t exp) const
 	{
 		if (exp == 0) return 1;
-		bigint x = *this, y = 1;
+		nat x = *this, y = 1;
 		while (exp > 1) {
 			if ((exp & 1) == 0) {
 				exp >>= 1;
@@ -476,16 +476,16 @@ struct bigint
 
 
 	/*
-	 * convert bigint to string
+	 * convert nat to string
 	 */
 
 	/*! convert big integer to string */
 	std::string to_string()
 	{
 		std::string s;
-		bigint val = *this;
-		const bigint tenp9 = 1000000000;
-		bigint q, r;
+		nat val = *this;
+		const nat tenp9 = 1000000000;
+		nat q, r;
 		size_t climit = 10 * limbs.size() + 1;
 		s.resize(climit, '0');
 		size_t offset = climit;
