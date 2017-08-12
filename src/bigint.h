@@ -411,7 +411,7 @@ struct bigint
 		remainder.contract();
 	}
 
-	/*! school book binary division quotient */
+	/*! division quotient */
 	bigint operator/(const bigint &divisor)
 	{
 		bigint quotient(0), remainder(0);
@@ -419,7 +419,7 @@ struct bigint
 		return quotient;
 	}
 
-	/*! school book binary division remainder */
+	/*! division remainder */
 	bigint operator%(const bigint &divisor)
 	{
 		bigint quotient(0), remainder(0);
