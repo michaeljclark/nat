@@ -379,9 +379,9 @@ struct nat
 			// Multiply and subtract.
 			limb2_t k = 0;
 			slimb2_t t = 0;
-			for (int i = 0; i < n; i++) {
+			for (size_t i = 0; i < n; i++) {
 				unsigned long long p = qhat*vn[i];
-				t = un[i+j] - k - (p & 0xffffffff);
+				t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));
 				un[i+j] = limb_t(t);
 				k = (p >> limb_bits) - (t >> limb_bits);
 			}
@@ -392,7 +392,7 @@ struct nat
 			if (t < 0) {         // If we subtracted too
 				q[j] = q[j] - 1; // much, add back.
 				k = 0;
-				for (int i = 0; i < n; i++) {
+				for (size_t i = 0; i < n; i++) {
 					t = un[i+j] + vn[i] + k;
 					un[i+j] = limb_t(t);
 					k = t >> limb_bits;
@@ -402,7 +402,7 @@ struct nat
 		}
 
 		// normalize remainder
-		for (int i = 0; i < n; i++) {
+		for (size_t i = 0; i < n; i++) {
 			r[i] = (un[i] >> s) | (un[i + 1] << (limb_bits - s));
 		}
 
