@@ -500,7 +500,7 @@ struct Nat
 	 * convert natural number to string
 	 */
 
-	 /*! convert Nat to string */
+	/*! convert Nat to string */
 	std::string to_string() const
 	{
 		static const Nat tenp18{0xa7640000, 0xde0b6b3};
