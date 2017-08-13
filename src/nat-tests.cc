@@ -168,10 +168,10 @@ int main(int argc, char const *argv[])
 
 	/* test division */
 	nat b19 = b15 / b14;
-	assert(b19.num_limbs() == 3);
+	assert(b19.num_limbs() == 2);
 	assert(b19.limb_at(0) == 1);
-	assert(b19.limb_at(1) == 1);
-	assert(b19.limb_at(2) == 1);
+	assert(b19.limb_at(1) == 1073741823);
+	assert(b19.to_string() == "4611686014132420609");
 
 	/* test set and test bit */
 	nat b20;
