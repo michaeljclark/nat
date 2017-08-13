@@ -480,28 +480,40 @@ struct nat
 	 * convert nat to string
 	 */
 
-	/*! convert big integer to string */
+	 /*! convert nat to string */
 	std::string to_string() const
 	{
+		static const nat tenp18{0xa7640000, 0xde0b6b3};
+
+		/* estimate string length */
 		std::string s;
-		nat val = *this;
-		const nat tenp9 = 1000000000;
-		nat q, r;
-		size_t climit = 10 * limbs.size() + 1;
+		size_t climit = 10 * limbs.size() + 1, offset = climit;
 		s.resize(climit, '0');
-		size_t offset = climit;
-		do {
-			val.divrem(tenp9, q, r);
+
+		/* print chunks of 18 digits */
+		nat q, r;
+		nat val = *this;
+		while (val > tenp18) {
+			val.divrem(tenp18, q, r);
 			val = q;
-			limb_t v = r.limb_at(0);
-			size_t i = 9;
+			limb2_t v = limb2_t(r.limb_at(0)) | (limb2_t(r.limb_at(1)) << limb_bits);
+			size_t i = 18;
 			do {
 				s[--offset] = '0' + char(v % 10);
 				v /= 10;
 				i--;
 			} while (v != 0);
-			if (q > 0) offset -= i;
-		} while (val != 0);
+			offset -= i;
+		}
+
+		/* remaining chunk */
+		limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
+		do {
+			s[--offset] = '0' + char(v % 10);
+			v /= 10;
+		} while (v != 0);
+
+		/* return less reserve */
 		return s.substr(offset);
 	}
 };
