@@ -6,7 +6,7 @@
  * requires a C++11 compiler
  */
 
-struct nat
+struct Nat
 {
 	/*! limb type */
 	typedef unsigned int limb_t;
@@ -22,7 +22,7 @@ struct nat
 	std::vector<limb_t> limbs;
 
 	/*! expand limbs to match operand */
-	void expand(const nat &operand)
+	void expand(const Nat &operand)
 	{
 		limbs.resize(std::max(limbs.size(), operand.limbs.size()));
 	}
@@ -40,19 +40,19 @@ struct nat
 	 */
 
 	/*! default constructor */
-	nat() : limbs{ 0 } {}
+	Nat() : limbs{ 0 } {}
 
 	/*! integral constructor */
-	nat(limb_t n) : limbs{ n } {}
+	Nat(limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	nat(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
+	Nat(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
 
 	/*! copy constructor  */
-	nat(const nat &operand) : limbs(operand.limbs) { contract(); }
+	Nat(const Nat &operand) : limbs(operand.limbs) { contract(); }
 
 	/*! move constructor  */
-	nat(const nat&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
+	Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
 
 
 	/*
@@ -91,15 +91,15 @@ struct nat
 	/* define self mutating operations */
 
 	/*! integral copy assignment operator */
-	nat& operator=(const limb_t l)
+	Nat& operator=(const limb_t l)
 	{
 		limbs.resize(0);
 		limbs.push_back(l);
 		return *this;
 	}
 
-	/*! nat copy assignment operator */
-	nat& operator=(const nat &operand)
+	/*! Nat copy assignment operator */
+	Nat& operator=(const Nat &operand)
 	{
 		limbs = operand.limbs;
 		contract();
@@ -107,7 +107,7 @@ struct nat
 	}
 
 	/*! add with carry equals */
-	nat& operator+=(const nat &operand)
+	Nat& operator+=(const Nat &operand)
 	{
 		expand(operand);
 		limb_t carry = 0;
@@ -124,7 +124,7 @@ struct nat
 	}
 
 	/*! subtract with borrow equals */
-	nat& operator-=(const nat &operand)
+	Nat& operator-=(const Nat &operand)
 	{
 		expand(operand);
 		limb_t borrow = 0;
@@ -140,7 +140,7 @@ struct nat
 	}
 
 	/*! left shift equals */
-	nat& operator<<=(int shamt)
+	Nat& operator<<=(int shamt)
 	{
 		size_t limb_shamt = shamt >> limb_shift;
 		if (limb_shamt > 0) {
@@ -163,7 +163,7 @@ struct nat
 	}
 
 	/*! right shift equals */
-	nat& operator>>=(int shamt)
+	Nat& operator>>=(int shamt)
 	{
 		size_t limb_shamt = shamt >> limb_shift;
 		if (limb_shamt > 0) {
@@ -184,7 +184,7 @@ struct nat
 	}
 
 	/*! logical and equals */
-	nat& operator&=(const nat &operand)
+	Nat& operator&=(const Nat &operand)
 	{
 		expand(operand);
 		for (size_t i = 0; i < limbs.size(); i++) {
@@ -195,7 +195,7 @@ struct nat
 	}
 
 	/*! logical or equals */
-	nat& operator|=(const nat &operand)
+	Nat& operator|=(const Nat &operand)
 	{
 		expand(operand);
 		for (size_t i = 0; i < limbs.size(); i++) {
@@ -209,44 +209,44 @@ struct nat
 	/* const operations copy and use the mutating operations */
 
 	/*! add with carry */
-	nat operator+(const nat &operand) const
+	Nat operator+(const Nat &operand) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result += operand;
 	}
 
 	/*! subtract with borrow */
-	nat operator-(const nat &operand) const
+	Nat operator-(const Nat &operand) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result -= operand;
 	}
 
 	/*! left shift */
-	nat operator<<(int shamt) const
+	Nat operator<<(int shamt) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result <<= shamt;
 	}
 
 	/*! right shift */
-	nat operator>>(int shamt) const
+	Nat operator>>(int shamt) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result >>= shamt;
 	}
 
 	/*! logical and */
-	nat operator&(const nat &operand) const
+	Nat operator&(const Nat &operand) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result &= operand;
 	}
 
 	/*! logical or */
-	nat operator|(const nat &operand) const
+	Nat operator|(const Nat &operand) const
 	{
-		nat result(*this);
+		Nat result(*this);
 		return result |= operand;
 	}
 
@@ -256,7 +256,7 @@ struct nat
 	 */
 
 	/*! equals */
-	bool operator==(const nat &operand) const
+	bool operator==(const Nat &operand) const
 	{
 		size_t max = std::max(num_limbs(), operand.num_limbs());
 		for (size_t i = 0; i < max; i++) {
@@ -266,7 +266,7 @@ struct nat
 	}
 
 	/*! less than */
-	bool operator<(const nat &operand) const
+	bool operator<(const Nat &operand) const
 	{
 		size_t max = std::max(num_limbs(), operand.num_limbs());
 		for (size_t i = max; i > 0; i--) {
@@ -282,16 +282,16 @@ struct nat
 	 */
 
 	/*! not equals */
-	bool operator!=(const nat &operand) const { return !(*this == operand); }
+	bool operator!=(const Nat &operand) const { return !(*this == operand); }
 
 	/*! less than or equal*/
-	bool operator<=(const nat &operand) const { return *this < operand || *this == operand; }
+	bool operator<=(const Nat &operand) const { return *this < operand || *this == operand; }
 
 	/*! greater than */
-	bool operator>(const nat &operand) const { return !(*this <= operand); }
+	bool operator>(const Nat &operand) const { return !(*this <= operand); }
 
 	/*! less than or equal*/
-	bool operator>=(const nat &operand) const { return !(*this < operand) || *this == operand; }
+	bool operator>=(const Nat &operand) const { return !(*this < operand) || *this == operand; }
 
 
 	/*
@@ -301,7 +301,7 @@ struct nat
 	 */
 
 	/*! base 2^limb_bits multiply */
-	void mult(const nat &multiplicand, const nat multiplier, nat &result) const
+	void mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const
 	{
 		size_t m = multiplicand.limbs.size(), n = multiplier.limbs.size();
 		result.limbs.resize(m + n);
@@ -318,7 +318,7 @@ struct nat
 	}
 
 	/*! base 2^limb_bits division */
-	void divrem(const nat &divisor, nat &quotient, nat &remainder) const
+	void divrem(const Nat &divisor, Nat &quotient, Nat &remainder) const
 	{
 		quotient = 0;
 		remainder = 0;
@@ -411,58 +411,58 @@ struct nat
 	}
 
 	/*! multiply */
-	nat operator*(const nat &operand) const
+	Nat operator*(const Nat &operand) const
 	{
-		nat result(0);
+		Nat result(0);
 		mult(*this, operand, result);
 		return result;
 	}
 
 	/*! division quotient */
-	nat operator/(const nat &divisor) const
+	Nat operator/(const Nat &divisor) const
 	{
-		nat quotient(0), remainder(0);
+		Nat quotient(0), remainder(0);
 		divrem(divisor, quotient, remainder);
 		return quotient;
 	}
 
 	/*! division remainder */
-	nat operator%(const nat &divisor) const
+	Nat operator%(const Nat &divisor) const
 	{
-		nat quotient(0), remainder(0);
+		Nat quotient(0), remainder(0);
 		divrem(divisor, quotient, remainder);
 		return remainder;
 	}
 
 	/*! multiply equals */
-	nat& operator*=(const nat &operand)
+	Nat& operator*=(const Nat &operand)
 	{
-		nat result = *this * operand;
+		Nat result = *this * operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! divide equals */
-	nat& operator/=(const nat &operand)
+	Nat& operator/=(const Nat &operand)
 	{
-		nat result = *this / operand;
+		Nat result = *this / operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! modulus equals */
-	nat& operator%=(const nat &operand)
+	Nat& operator%=(const Nat &operand)
 	{
-		nat result = *this % operand;
+		Nat result = *this % operand;
 		limbs = result.limbs;
 		return *this;
 	}
 
 	/*! raise to the power */
-	nat pow(size_t exp) const
+	Nat pow(size_t exp) const
 	{
 		if (exp == 0) return 1;
-		nat x = *this, y = 1;
+		Nat x = *this, y = 1;
 		while (exp > 1) {
 			if ((exp & 1) == 0) {
 				exp >>= 1;
@@ -477,13 +477,13 @@ struct nat
 
 
 	/*
-	 * convert nat to string
+	 * convert natural number to string
 	 */
 
-	 /*! convert nat to string */
+	 /*! convert Nat to string */
 	std::string to_string() const
 	{
-		static const nat tenp18{0xa7640000, 0xde0b6b3};
+		static const Nat tenp18{0xa7640000, 0xde0b6b3};
 
 		/* estimate string length */
 		std::string s;
@@ -491,8 +491,8 @@ struct nat
 		s.resize(climit, '0');
 
 		/* print chunks of 18 digits */
-		nat q, r;
-		nat val = *this;
+		Nat q, r;
+		Nat val = *this;
 		while (val > tenp18) {
 			val.divrem(tenp18, q, r);
 			val = q;
