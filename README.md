@@ -48,5 +48,5 @@ The `nat.h` header implements the following operators and methods:
 - nat operator*(const nat &operand) const
 - nat operator/(const nat &divisor) const
 - nat operator%(const nat &divisor) const
-- nat pow(size_t operand)
-- std::string to_string()
+- nat pow(size_t operand) const
+- std::string to_string() const

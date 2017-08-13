@@ -353,7 +353,7 @@ struct nat
 		// same amount. We may have to append a high-order
 		// digit on the dividend; we do that unconditionally.
 
-		int s = __builtin_clz(v[n-1]) - limb_bits; // 0 <= s <= limb_bits.
+		int s = __builtin_clz(v[n-1]); // 0 <= s <= limb_bits.
 		vn = (limb_t *)alloca(sizeof(limb_t) * n);
 		for (size_t i = n - 1; i > 0; i--) {
 			vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
@@ -481,7 +481,7 @@ struct nat
 	 */
 
 	/*! convert big integer to string */
-	std::string to_string()
+	std::string to_string() const
 	{
 		std::string s;
 		nat val = *this;
