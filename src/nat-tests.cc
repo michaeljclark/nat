@@ -155,7 +155,7 @@ int main(int argc, char const *argv[])
 	assert(b15.num_limbs() == 4);
 	assert(b15.limb_at(0) == 1);
 	assert(b15.limb_at(1) == 2147483646);
-	assert(b15.limb_at(2) == -2147483647);
+	assert(b15.limb_at(2) == 2147483649);
 	assert(b15.limb_at(3) == 268435455);
 
 	/* test subtraction */
