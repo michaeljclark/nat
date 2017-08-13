@@ -10,6 +10,7 @@ File        | Description
 :---        | :---
 nat.h       | natural number class
 nat-test.cc | unit tests for the nat class
+nat-demo.cc | multiply, pow, divide and to_string
 
 ## Testing
 
