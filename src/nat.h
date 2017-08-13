@@ -6,6 +6,8 @@
  * requires a C++11 compiler
  */
 
+#pragma once
+
 struct Nat
 {
 	/*! limb type */
