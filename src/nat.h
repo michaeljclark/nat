@@ -497,21 +497,18 @@ struct Nat
 			val.divrem(tenp18, q, r);
 			val = q;
 			limb2_t v = limb2_t(r.limb_at(0)) | (limb2_t(r.limb_at(1)) << limb_bits);
-			size_t i = 18;
+			size_t next = offset - 18;
 			do {
 				s[--offset] = '0' + char(v % 10);
-				v /= 10;
-				i--;
-			} while (v != 0);
-			offset -= i;
+			} while (v /= 10);
+			offset = next;
 		}
 
 		/* remaining chunk */
 		limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
 		do {
 			s[--offset] = '0' + char(v % 10);
-			v /= 10;
-		} while (v != 0);
+		} while (v /= 10);
 
 		/* return less reserve */
 		return s.substr(offset);
