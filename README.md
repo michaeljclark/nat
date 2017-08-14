@@ -25,29 +25,55 @@ The code has been tested with the following compilers:
 
 The `nat.h` header implements the following operators and methods:
 
-- operator+=(const nat &operand)
-- operator-=(const nat &operand)
-- nat& operator<<=(int shamt)
-- nat& operator>>=(int shamt)
-- nat& operator&=(const nat &operand)
-- nat& operator|=(const nat &operand)
-- nat operator+(const nat &operand) const
-- nat operator-(const nat &operand) const
-- nat operator<<(int shamt) const
-- nat operator>>(int shamt) const
-- nat operator&(const nat &operand) const
-- nat operator|(const nat &operand) const
-- bool operator==(const nat &operand) const
-- bool operator<(const nat &operand) const
-- bool operator!=(const nat &operand) const
-- bool operator<=(const nat &operand) const
-- bool operator>(const nat &operand) const
-- bool operator>=(const nat &operand) const
-- nat operator*=(const nat &operand) 
-- nat operator/=(const nat &divisor)
-- nat operator%=(const nat &divisor)
-- nat operator*(const nat &operand) const
-- nat operator/(const nat &divisor) const
-- nat operator%(const nat &divisor) const
-- nat pow(size_t operand) const
+**Nat**
+
+- Nat& operator+=(const Nat &operand)
+- Nat& operator-=(const Nat &operand)
+- Nat& operator<<=(int shamt)
+- Nat& operator>>=(int shamt)
+- Nat& operator&=(const Nat &operand)
+- Nat& operator|=(const Nat &operand)
+- Nat operator+(const Nat &operand) const
+- Nat operator-(const Nat &operand) const
+- Nat operator<<(int shamt) const
+- Nat operator>>(int shamt) const
+- Nat operator&(const Nat &operand) const
+- Nat operator|(const Nat &operand) const
+- bool operator==(const Nat &operand) const
+- bool operator<(const Nat &operand) const
+- bool operator!=(const Nat &operand) const
+- bool operator<=(const Nat &operand) const
+- bool operator>(const Nat &operand) const
+- bool operator>=(const Nat &operand) const
+- bool operator!() const
+- Nat operator*=(const Nat &operand) 
+- Nat operator/=(const Nat &divisor)
+- Nat operator%=(const Nat &divisor)
+- Nat operator*(const Nat &operand) const
+- Nat operator/(const Nat &divisor) const
+- Nat operator%(const Nat &divisor) const
+- Nat pow(size_t operand) const
+- std::string to_string() const
+
+The `int.h` header implements the following operators and methods:
+
+**Int**
+
+- bool operator==(const Int &operand) const
+- bool operator<(const Int &operand) const
+- bool operator!=(const Int &operand) const
+- bool operator<=(const Int &operand) const
+- bool operator>(const Int &operand) const
+- bool operator>=(const Int &operand) const
+- bool operator!() const
+- Int& operator+=(const Int &operand)
+- Int& operator-=(const Int &operand)
+- Int& operator*=(const Int &operand) 
+- Int& operator/=(const Int &divisor)
+- Int& operator%=(const Int &divisor)
+- Int operator+(const Int &operand) const
+- Int operator-(const Int &operand) const
+- Int operator*(const Int &operand) const
+- Int operator/(const Int &divisor) const
+- Int operator%(const Int &divisor) const
 - std::string to_string() const
