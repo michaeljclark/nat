@@ -44,15 +44,21 @@ struct Nat
 	/*! expand limbs to match operand */
 	void expand(const Nat &operand)
 	{
-		limbs.resize(std::max(limbs.size(), operand.limbs.size()));
+		limbs.resize(std::max(num_limbs(), operand.num_limbs()));
 	}
 
 	/*! contract zero big end limbs */
 	void contract()
 	{
-		while(limbs.size() > 1 && limbs.back() == 0) {
+		while(num_limbs() > 1 && limbs.back() == 0) {
 			limbs.pop_back();
 		}
+	}
+
+	/*! resize number of limbs */
+	void resize(size_t n)
+	{
+		limbs.resize(n);
 	}
 
 	/*
@@ -83,13 +89,13 @@ struct Nat
 	size_t num_limbs() const { return limbs.size(); }
 
 	/*! access word at limb offset */
-	limb_t limb_at(size_t n) const { return n < limbs.size() ? limbs[n] : 0; }
+	limb_t limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
 
 	/*! test bit at bit offset */
 	int test_bit(size_t n) const
 	{
 		size_t word = n >> limb_shift;
-		if (word < limbs.size()) return (limbs[word] >> (n & (limb_bits-1))) & 1;
+		if (word < num_limbs()) return (limbs[word] >> (n & (limb_bits-1))) & 1;
 		else return 0;
 	}
 
@@ -97,7 +103,7 @@ struct Nat
 	void set_bit(size_t n)
 	{
 		size_t word = n >> limb_shift;
-		if (word >= limbs.size()) limbs.resize(word + 1);
+		if (word >= num_limbs()) limbs.resize(word + 1);
 		limbs[word] |= (1ULL << (n & (limb_bits-1)));
 	}
 
@@ -113,8 +119,8 @@ struct Nat
 	/*! integral copy assignment operator */
 	Nat& operator=(const limb_t l)
 	{
-		limbs.resize(0);
-		limbs.push_back(l);
+		resize(1);
+		limbs[0] = l;
 		return *this;
 	}
 
@@ -131,7 +137,7 @@ struct Nat
 	{
 		expand(operand);
 		limb_t carry = 0;
-		for (size_t i = 0; i < limbs.size(); i++) {
+		for (size_t i = 0; i < num_limbs(); i++) {
 			limb_t old_val = limbs[i];
 			limb_t new_val = old_val + operand.limb_at(i) + carry;
 			limbs[i] = new_val;
@@ -148,7 +154,7 @@ struct Nat
 	{
 		expand(operand);
 		limb_t borrow = 0;
-		for (size_t i = 0; i < limbs.size(); i++) {
+		for (size_t i = 0; i < num_limbs(); i++) {
 			limb_t old_val = limbs[i];
 			limb_t new_val = old_val - operand.limb_at(i) - borrow;
 			limbs[i] = new_val;
@@ -170,7 +176,7 @@ struct Nat
 		if (!shamt) return *this;
 
 		limb_t carry = 0;
-		for (size_t j = 0; j < limbs.size(); j++) {
+		for (size_t j = 0; j < num_limbs(); j++) {
 			limb_t old_val = limbs[j];
 			limb_t new_val = (old_val << shamt) | carry;
 			limbs[j] = new_val;
@@ -193,7 +199,7 @@ struct Nat
 		if (!shamt) return *this;
 
 		limb_t carry = 0;
-		for (size_t j = limbs.size(); j > 0; j--) {
+		for (size_t j = num_limbs(); j > 0; j--) {
 			limb_t old_val = limbs[j - 1];
 			limb_t new_val = (old_val >> shamt) | carry;
 			limbs[j - 1] = new_val;
@@ -207,7 +213,7 @@ struct Nat
 	Nat& operator&=(const Nat &operand)
 	{
 		expand(operand);
-		for (size_t i = 0; i < limbs.size(); i++) {
+		for (size_t i = 0; i < num_limbs(); i++) {
 			limbs[i] = operand.limb_at(i) & limbs[i];
 		}
 		contract();
@@ -218,7 +224,7 @@ struct Nat
 	Nat& operator|=(const Nat &operand)
 	{
 		expand(operand);
-		for (size_t i = 0; i < limbs.size(); i++) {
+		for (size_t i = 0; i < num_limbs(); i++) {
 			limbs[i] = operand.limb_at(i) | limbs[i];
 		}
 		contract();
@@ -323,8 +329,8 @@ struct Nat
 	/*! base 2^limb_bits multiply */
 	void mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const
 	{
-		size_t m = multiplicand.limbs.size(), n = multiplier.limbs.size();
-		result.limbs.resize(m + n);
+		size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
+		result.resize(m + n);
 		for (size_t j = 0; j < n; j++) {
 			limb_t k = 0;
 			for (size_t i = 0; i < m; i++) {
@@ -342,9 +348,9 @@ struct Nat
 	{
 		quotient = 0;
 		remainder = 0;
-		size_t m = limbs.size(), n = divisor.limbs.size();
-		quotient.limbs.resize(std::max(m - n + 1, size_t(1)));
-		remainder.limbs.resize(n);
+		size_t m = num_limbs(), n = divisor.num_limbs();
+		quotient.resize(std::max(m - n + 1, size_t(1)));
+		remainder.resize(n);
 		limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 		const limb_t *u = limbs.data(), *v = divisor.limbs.data();
 
@@ -507,7 +513,7 @@ struct Nat
 
 		/* estimate string length */
 		std::string s;
-		size_t climit = 10 * limbs.size() + 1, offset = climit;
+		size_t climit = 10 * num_limbs() + 1, offset = climit;
 		s.resize(climit, '0');
 
 		/* print chunks of 18 digits */
