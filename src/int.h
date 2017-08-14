@@ -204,4 +204,18 @@ struct Int
 	/*! less than or equal*/
 	bool operator>=(const Int &operand) const { return !(*this < operand) || *this == operand; }
 
+	/*
+	 * convert natural number to string
+	 */
+
+	/*! convert Nat to string */
+	std::string to_string() const
+	{
+		if (sign) {
+			return std::string("-") + mag.to_string();
+		}
+		else {
+			return mag.to_string();
+		}
+	}
 };
