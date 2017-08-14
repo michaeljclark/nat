@@ -25,9 +25,9 @@ The code has been tested with the following compilers:
 
 ## Interface
 
-The `nat.h` header implements the following operators and methods:
-
 **Nat**
+
+The `nat.h` header implements the following operators and methods:
 
 - Nat& operator+=(const Nat &operand)
 - Nat& operator-=(const Nat &operand)
@@ -57,9 +57,9 @@ The `nat.h` header implements the following operators and methods:
 - Nat pow(size_t operand) const
 - std::string to_string() const
 
-The `int.h` header implements the following operators and methods:
-
 **Int**
+
+The `int.h` header implements the following operators and methods:
 
 - bool operator==(const Int &operand) const
 - bool operator<(const Int &operand) const
