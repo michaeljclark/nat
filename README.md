@@ -6,11 +6,13 @@ Simple arbitrary precision integer arithmetic header library implemented using C
 
 The project includes the following files:
 
-File        | Description
-:---        | :---
-nat.h       | natural number class
-nat-test.cc | unit tests for the nat class
-nat-demo.cc | multiply, pow, divide and to_string
+File         | Description
+:---         | :---
+nat.h        | unsigned natural number
+nat-tests.cc | unit tests for the Nat class
+nat-demo.cc  | multiply, pow, divide and to_string
+int.h        | integer with sign and magnitude
+int-tests.cc | unit tests for the Int class
 
 ## Testing
 
