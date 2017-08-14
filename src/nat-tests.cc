@@ -142,6 +142,10 @@ int main(int argc, char const *argv[])
 	assert((Nat{3,2,3,1} >= 0));
 	assert((Nat{3,2,3,1} >= 2147483648));
 
+	/* test not */
+	assert(!Nat(0));
+	assert(!!Nat(1));
+
 	/* test addition */
 	assert((Nat{1,1,1} + Nat{1,1,1} == Nat{2,2,2}));
 

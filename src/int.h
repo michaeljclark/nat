@@ -159,6 +159,11 @@ struct Int
 		return result;
 	}
 
+	/*! not */
+	bool operator!() const
+	{
+		return mag == 0;
+	}
 
 	/*
 	 * comparison are defined in terms of "equals" and "less than"

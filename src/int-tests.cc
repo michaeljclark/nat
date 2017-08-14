@@ -75,4 +75,8 @@ int main(int argc, char const *argv[])
 
     assert(-Int(2) == Int(-2));
     assert(-Int(-2) == Int(2));
+
+    assert(!Int(0));
+    assert(!!Int(1));
+    assert(!!Int(-1));
 }

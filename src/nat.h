@@ -319,6 +319,8 @@ struct Nat
 	/*! less than or equal*/
 	bool operator>=(const Nat &operand) const { return !(*this < operand) || *this == operand; }
 
+	/*! not */
+	bool operator!() const { return *this == 0; }
 
 	/*
 	 * multply, divide, modulus and pow
