@@ -85,7 +85,7 @@ struct Int
 				mag -= operand.mag;
 			} else {
 				mag = operand.mag - mag;
-				sign = ~operand.sign;
+				sign = !operand.sign;
 			}
 		}
 		return *this;
@@ -149,6 +149,14 @@ struct Int
 	{
 		Int result(*this);
 		return result %= operand;
+	}
+
+	/*! negate */
+	Int operator-() const
+	{
+		Int result(*this);
+		result.sign = !sign;
+		return result;
 	}
 
 

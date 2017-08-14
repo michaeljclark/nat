@@ -72,4 +72,7 @@ int main(int argc, char const *argv[])
     assert(Int(-2) * Int(-1) == Int(2));
     assert(Int(-2) * Int(1) == Int(-2));
     assert(Int(-2) * Int(3) == Int(-6));
+
+    assert(-Int(2) == Int(-2));
+    assert(-Int(-2) == Int(2));
 }
