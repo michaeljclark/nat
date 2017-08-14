@@ -36,47 +36,56 @@
 
 int main(int argc, char const *argv[])
 {
-    assert(Int(0) == Int(0));
-    assert(Int(1) == Int(1));
+	/* test equal */
+	assert(Int(0) == Int(0));
+	assert(Int(1) == Int(1));
 
-    assert(Int(1) != Int(0));
-    assert(Int(1) != Int(-1));
+	/* test not equal */
+	assert(Int(1) != Int(0));
+	assert(Int(1) != Int(-1));
 
-    assert(Int(2) > Int(1));
-    assert(Int(1) > Int(0));
-    assert(Int(1) > Int(-1));
-    assert(Int(-1) > Int(-2));
+	/* test greater than */
+	assert(Int(2) > Int(1));
+	assert(Int(1) > Int(0));
+	assert(Int(1) > Int(-1));
+	assert(Int(-1) > Int(-2));
 
-    assert(Int(1) < Int(2));
-    assert(Int(0) < Int(1));
-    assert(Int(-1) < Int(1));
-    assert(Int(-2) < Int(-1));
+	/* test less than */
+	assert(Int(1) < Int(2));
+	assert(Int(0) < Int(1));
+	assert(Int(-1) < Int(1));
+	assert(Int(-2) < Int(-1));
 
-    assert(Int(1) + Int(2) == Int(3));
-    assert(Int(3) + Int(-2) == Int(1));
-    assert(Int(1) + Int(-2) == Int(-1));
-    assert(Int(-2) + Int(-1) == Int(-3));
-    assert(Int(-2) + Int(1) == Int(-1));
-    assert(Int(-2) + Int(3) == Int(1));
+	/* test add */
+	assert(Int(1) + Int(2) == Int(3));
+	assert(Int(3) + Int(-2) == Int(1));
+	assert(Int(1) + Int(-2) == Int(-1));
+	assert(Int(-2) + Int(-1) == Int(-3));
+	assert(Int(-2) + Int(1) == Int(-1));
+	assert(Int(-2) + Int(3) == Int(1));
 
-    assert(Int(1) - Int(2) == Int(-1));
-    assert(Int(3) - Int(-2) == Int(5));
-    assert(Int(1) - Int(-2) == Int(3));
-    assert(Int(-2) - Int(-1) == Int(-1));
-    assert(Int(-2) - Int(1) == Int(-3));
-    assert(Int(-2) - Int(3) == Int(-5));
+	/* test subtract */
+	assert(Int(1) - Int(2) == Int(-1));
+	assert(Int(3) - Int(-2) == Int(5));
+	assert(Int(1) - Int(-2) == Int(3));
+	assert(Int(-2) - Int(-1) == Int(-1));
+	assert(Int(-2) - Int(1) == Int(-3));
+	assert(Int(-2) - Int(3) == Int(-5));
 
-    assert(Int(1) * Int(2) == Int(2));
-    assert(Int(3) * Int(-2) == Int(-6));
-    assert(Int(1) * Int(-2) == Int(-2));
-    assert(Int(-2) * Int(-1) == Int(2));
-    assert(Int(-2) * Int(1) == Int(-2));
-    assert(Int(-2) * Int(3) == Int(-6));
+	/* test multiply */
+	assert(Int(1) * Int(2) == Int(2));
+	assert(Int(3) * Int(-2) == Int(-6));
+	assert(Int(1) * Int(-2) == Int(-2));
+	assert(Int(-2) * Int(-1) == Int(2));
+	assert(Int(-2) * Int(1) == Int(-2));
+	assert(Int(-2) * Int(3) == Int(-6));
 
-    assert(-Int(2) == Int(-2));
-    assert(-Int(-2) == Int(2));
+	/* test negate */
+	assert(-Int(2) == Int(-2));
+	assert(-Int(-2) == Int(2));
 
-    assert(!Int(0));
-    assert(!!Int(1));
-    assert(!!Int(-1));
+	/* test not */
+	assert(!Int(0));
+	assert(!!Int(1));
+	assert(!!Int(-1));
 }
