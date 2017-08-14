@@ -1,7 +1,7 @@
 /*
  * nat.h
  *
- * unsigned natural number header implementation
+ * unsigned natural number
  *
  * Copyright (C) 2017, Michael Clark <michaeljclark@mac.com>
  *
