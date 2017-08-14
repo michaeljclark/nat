@@ -516,7 +516,7 @@ struct Nat
 		size_t climit = 10 * num_limbs() + 1, offset = climit;
 		s.resize(climit, '0');
 
-		/* print chunks of 18 digits */
+		/* output chunks of 18 digits */
 		Nat q, r;
 		Nat val = *this;
 		while (val > tenp18) {
