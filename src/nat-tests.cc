@@ -200,11 +200,25 @@ int main(int argc, char const *argv[])
 	assert(b20.test_bit(64) == 0);
 	assert(b20.test_bit(63) == 1);
 
-	/* string formatting */
+	/* decimal string formatting */
 	assert((Nat(9) * Nat(9)).to_string() == "81");
 	assert((Nat(255) * Nat(255)).to_string() == "65025");
 	assert((Nat(65535) * Nat(65535)).to_string() == "4294836225");
 	assert((Nat(2147483648) * Nat(2147483648)).to_string() == "4611686018427387904");
+
+	/* binary string formatting */
+	assert((Nat{0b101}).to_string(2) == "101");
+	assert((Nat{0b111100001111}).to_string(2) == "111100001111");
+	assert((Nat{0xff00ff,0xff}).to_string(2) == "1111111100000000111111110000000011111111");
+
+	/* hex string formatting */
+	assert((Nat{0x1}).to_string(16) == "1");
+	assert((Nat{0x7f}).to_string(16) == "7f");
+	assert((Nat{0x3ff}).to_string(16) == "3ff");
+	assert((Nat{0xffffffff,1}).to_string(16) == "1ffffffff");
+	assert((Nat{0xffffffff,0x80}).to_string(16) == "80ffffffff");
+	assert((Nat{0xffffffff,0x400}).to_string(16) == "400ffffffff");
+	assert((Nat{0x80000000,0x80000000}).to_string(16) == "8000000080000000");
 
 	/* pow */
 	assert(Nat(71).pow(0) == 1);

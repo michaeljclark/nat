@@ -509,36 +509,80 @@ struct Nat
 	 */
 
 	/*! convert Nat to string */
-	std::string to_string() const
+	std::string to_string(int radix = 10) const
 	{
+		static const char* hexdigits = "0123456789abcdef";
 		static const Nat tenp18{0xa7640000, 0xde0b6b3};
 
-		/* estimate string length */
-		std::string s;
-		size_t climit = 10 * num_limbs() + 1, offset = climit;
-		s.resize(climit, '0');
+		switch (radix) {
+			case 10: {
+				/* estimate string length */
+				std::string s;
+				size_t climit = 10 * num_limbs() + 1, offset = climit;
+				s.resize(climit, '0');
 
-		/* output chunks of 18 digits */
-		Nat q, r;
-		Nat val = *this;
-		while (val > tenp18) {
-			val.divrem(tenp18, q, r);
-			val = q;
-			limb2_t v = limb2_t(r.limb_at(0)) | (limb2_t(r.limb_at(1)) << limb_bits);
-			size_t next = offset - 18;
-			do {
-				s[--offset] = '0' + char(v % 10);
-			} while (v /= 10);
-			offset = next;
+				/* output chunks of 18 digits */
+				Nat q, r;
+				Nat val = *this;
+				while (val > tenp18) {
+					val.divrem(tenp18, q, r);
+					val = q;
+					limb2_t v = limb2_t(r.limb_at(0)) | (limb2_t(r.limb_at(1)) << limb_bits);
+					size_t next = offset - 18;
+					do {
+						s[--offset] = '0' + char(v % 10);
+					} while (v /= 10);
+					offset = next;
+				}
+
+				/* remaining chunk */
+				limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
+				do {
+					s[--offset] = '0' + char(v % 10);
+				} while (v /= 10);
+
+				/* return less reserve */
+				return s.substr(offset);
+			}
+			case 2: {
+				std::string s;
+				limb_t l1 = limbs.back();
+				size_t n = limb_bits - __builtin_clz(l1);
+				size_t t = n + ((num_limbs() - 1) << limb_shift);
+				s.resize(t);
+				auto i = s.begin();
+				for (ssize_t k = n - 1; k >= 0; k--) {
+					*(i++) = '0' + ((l1 >> k) & 1);
+				}
+				for (ssize_t j = num_limbs() - 2; j >= 0; j--) {
+					limb_t l = limbs[j];
+					for (ssize_t k = limb_bits - 1; k >= 0; k--) {
+						*(i++) = '0' + ((l >> k) & 1);
+					}
+				}
+				return s;
+			}
+			case 16: {
+				std::string s;
+				limb_t l1 = limbs.back();
+				size_t n = ((limb_bits >> 2) - (__builtin_clz(l1) >> 2));
+				size_t t = n + ((num_limbs() - 1) << (limb_shift - 2));
+				s.resize(t);
+				auto i = s.begin();
+				for (ssize_t k = n - 1; k >= 0; k--) {
+					*(i++) = hexdigits[(l1 >> (k << 2)) & 0xf];
+				}
+				for (ssize_t j = num_limbs() - 2; j >= 0; j--) {
+					limb_t l = limbs[j];
+					for (ssize_t k = (limb_bits >> 2) - 1; k >= 0; k--) {
+						*(i++) = hexdigits[(l >> (k << 2)) & 0xf];
+					}
+				}
+				return s;
+			}
+			default: {
+				return std::string();
+			}
 		}
-
-		/* remaining chunk */
-		limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
-		do {
-			s[--offset] = '0' + char(v % 10);
-		} while (v /= 10);
-
-		/* return less reserve */
-		return s.substr(offset);
 	}
 };
