@@ -208,18 +208,18 @@ int main(int argc, char const *argv[])
 	assert((Nat(2147483648) * Nat(2147483648)).to_string() == "4611686018427387904");
 
 	/* binary string formatting */
-	assert((Nat{0b101}).to_string(2) == "101");
-	assert((Nat{0b111100001111}).to_string(2) == "111100001111");
-	assert((Nat{0xff00ff,0xff}).to_string(2) == "1111111100000000111111110000000011111111");
+	assert((Nat{0b101}).to_string(2) == "0b101");
+	assert((Nat{0b111100001111}).to_string(2) == "0b111100001111");
+	assert((Nat{0xff00ff,0xff}).to_string(2) == "0b1111111100000000111111110000000011111111");
 
 	/* hex string formatting */
-	assert((Nat{0x1}).to_string(16) == "1");
-	assert((Nat{0x7f}).to_string(16) == "7f");
-	assert((Nat{0x3ff}).to_string(16) == "3ff");
-	assert((Nat{0xffffffff,1}).to_string(16) == "1ffffffff");
-	assert((Nat{0xffffffff,0x80}).to_string(16) == "80ffffffff");
-	assert((Nat{0xffffffff,0x400}).to_string(16) == "400ffffffff");
-	assert((Nat{0x80000000,0x80000000}).to_string(16) == "8000000080000000");
+	assert((Nat{0x1}).to_string(16) == "0x1");
+	assert((Nat{0x7f}).to_string(16) == "0x7f");
+	assert((Nat{0x3ff}).to_string(16) == "0x3ff");
+	assert((Nat{0xffffffff,1}).to_string(16) == "0x1ffffffff");
+	assert((Nat{0xffffffff,0x80}).to_string(16) == "0x80ffffffff");
+	assert((Nat{0xffffffff,0x400}).to_string(16) == "0x400ffffffff");
+	assert((Nat{0x80000000,0x80000000}).to_string(16) == "0x8000000080000000");
 
 	/* pow */
 	assert(Nat(71).pow(0) == 1);
@@ -227,12 +227,12 @@ int main(int argc, char const *argv[])
 	assert(Nat(71).pow(17).to_string() == "29606831241262271996845213307591");
 
 	/* from string */
-	assert(Nat("71", 10).to_string() == "71");
-	assert(Nat("29606831241262271996845213307591", 10).to_string() == "29606831241262271996845213307591");
-	assert(Nat("deadbeef", 16).to_string(16) == "deadbeef");
-	assert(Nat("deadbeef00ff00ff00ff00ff", 16).to_string(16) == "deadbeef00ff00ff00ff00ff");
-	assert(Nat("101", 2).to_string(2) == "101");
-	assert(Nat("11110000111100001111000011110000", 2).to_string(2) == "11110000111100001111000011110000");
+	assert(Nat("71").to_string() == "71");
+	assert(Nat("29606831241262271996845213307591").to_string() == "29606831241262271996845213307591");
+	assert(Nat("0xdeadbeef").to_string(16) == "0xdeadbeef");
+	assert(Nat("0xdeadbeef00ff00ff00ff00ff").to_string(16) == "0xdeadbeef00ff00ff00ff00ff");
+	assert(Nat("0b101").to_string(2) == "0b101");
+	assert(Nat("0b11110000111100001111000011110000").to_string(2) == "0b11110000111100001111000011110000");
 
 	return 0;
 }

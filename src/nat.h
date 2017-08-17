@@ -545,12 +545,12 @@ struct Nat
 				return s.substr(offset);
 			}
 			case 2: {
-				std::string s;
+				std::string s("0b");
 				limb_t l1 = limbs.back();
 				size_t n = limb_bits - __builtin_clz(l1);
 				size_t t = n + ((num_limbs() - 1) << limb_shift);
-				s.resize(t);
-				auto i = s.begin();
+				s.resize(t + 2);
+				auto i = s.begin() + 2;
 				for (ssize_t k = n - 1; k >= 0; k--) {
 					*(i++) = '0' + ((l1 >> k) & 1);
 				}
@@ -563,12 +563,12 @@ struct Nat
 				return s;
 			}
 			case 16: {
-				std::string s;
+				std::string s("0x");
 				limb_t l1 = limbs.back();
 				size_t n = ((limb_bits >> 2) - (__builtin_clz(l1) >> 2));
 				size_t t = n + ((num_limbs() - 1) << (limb_shift - 2));
-				s.resize(t);
-				auto i = s.begin();
+				s.resize(t + 2);
+				auto i = s.begin() + 2;
 				for (ssize_t k = n - 1; k >= 0; k--) {
 					*(i++) = hexdigits[(l1 >> (k << 2)) & 0xf];
 				}
@@ -586,15 +586,28 @@ struct Nat
 		}
 	}
 
-	void from_string(const char *str, size_t radix)
+	void from_string(const char *str, size_t len, size_t radix)
 	{
 		static const Nat tenp18{0xa7640000, 0xde0b6b3};
 		static const Nat twop64{0,0,1};
-		size_t l = strlen(str);
+		if (len > 2) {
+			if (strncmp(str, "0b", 2) == 0) {
+				radix = 2;
+				str += 2;
+				len -= 2;
+			} else if (strncmp(str, "0x", 2) == 0) {
+				radix = 16;
+				str += 2;
+				len -= 2;
+			}
+		}
+		if (radix == 0) {
+			radix = 10;
+		}
 		switch (radix) {
 			case 10: {
-				for (size_t i = 0; i < l; i += 18) {
-					size_t chunklen = i + 18 < l ? 18 : l - i;
+				for (size_t i = 0; i < len; i += 18) {
+					size_t chunklen = i + 18 < len ? 18 : len - i;
 					std::string chunk(str + i, chunklen);
 					limb2_t num = strtoull(chunk.c_str(), nullptr, 10);
 					if (chunklen == 18) {
@@ -607,8 +620,8 @@ struct Nat
 				break;
 			}
 			case 2: {
-				for (size_t i = 0; i < l; i += 64) {
-					size_t chunklen = i + 64 < l ? 64 : l - i;
+				for (size_t i = 0; i < len; i += 64) {
+					size_t chunklen = i + 64 < len ? 64 : len - i;
 					std::string chunk(str + i, chunklen);
 					limb2_t num = strtoull(chunk.c_str(), nullptr, 2);
 					if (chunklen == 64) {
@@ -621,8 +634,8 @@ struct Nat
 				break;
 			}
 			case 16: {
-				for (size_t i = 0; i < l; i += 16) {
-					size_t chunklen = i + 16 < l ? 16 : l - i;
+				for (size_t i = 0; i < len; i += 16) {
+					size_t chunklen = i + 16 < len ? 16 : len - i;
 					std::string chunk(str + i, chunklen);
 					limb2_t num = strtoull(chunk.c_str(), nullptr, 16);
 					if (chunklen == 16) {
@@ -642,8 +655,8 @@ struct Nat
 	}
 
 	/*! string constructor */
-	Nat(const char *str, size_t radix) : limbs{0}
+	Nat(std::string str, size_t radix = 0) : limbs{0}
 	{
-		from_string(str, radix);
+		from_string(str.c_str(), str.size(), radix);
 	}
 };
