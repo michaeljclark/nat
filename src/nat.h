@@ -509,7 +509,7 @@ struct Nat
 	 */
 
 	/*! convert Nat to string */
-	std::string to_string(int radix = 10) const
+	std::string to_string(size_t radix = 10) const
 	{
 		static const char* hexdigits = "0123456789abcdef";
 		static const Nat tenp18{0xa7640000, 0xde0b6b3};
@@ -584,5 +584,66 @@ struct Nat
 				return std::string();
 			}
 		}
+	}
+
+	void from_string(const char *str, size_t radix)
+	{
+		static const Nat tenp18{0xa7640000, 0xde0b6b3};
+		static const Nat twop64{0,0,1};
+		size_t l = strlen(str);
+		switch (radix) {
+			case 10: {
+				for (size_t i = 0; i < l; i += 18) {
+					size_t chunklen = i + 18 < l ? 18 : l - i;
+					std::string chunk(str + i, chunklen);
+					limb2_t num = strtoull(chunk.c_str(), nullptr, 10);
+					if (chunklen == 18) {
+						*this *= tenp18;
+					} else {
+						*this *= Nat(10).pow(chunklen);
+					}
+					*this += Nat{limb_t(num), limb_t(num >> limb_bits)};
+				}
+				break;
+			}
+			case 2: {
+				for (size_t i = 0; i < l; i += 64) {
+					size_t chunklen = i + 64 < l ? 64 : l - i;
+					std::string chunk(str + i, chunklen);
+					limb2_t num = strtoull(chunk.c_str(), nullptr, 2);
+					if (chunklen == 64) {
+						*this *= twop64;
+					} else {
+						*this *= Nat(2).pow(chunklen);
+					}
+					*this += Nat{limb_t(num), limb_t(num >> limb_bits)};
+				}
+				break;
+			}
+			case 16: {
+				for (size_t i = 0; i < l; i += 16) {
+					size_t chunklen = i + 16 < l ? 16 : l - i;
+					std::string chunk(str + i, chunklen);
+					limb2_t num = strtoull(chunk.c_str(), nullptr, 16);
+					if (chunklen == 16) {
+						*this *= twop64;
+					} else {
+						*this *= Nat(16).pow(chunklen);
+					}
+					*this += Nat{limb_t(num), limb_t(num >> limb_bits)};
+				}
+				break;
+			}
+			default: {
+				limbs.push_back(0);
+			}
+		}
+		contract();
+	}
+
+	/*! string constructor */
+	Nat(const char *str, size_t radix) : limbs{0}
+	{
+		from_string(str, radix);
 	}
 };

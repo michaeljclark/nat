@@ -25,6 +25,7 @@
  */
 
 #include <cassert>
+#include <cstdlib>
 #include <vector>
 #include <string>
 #include <limits>
@@ -224,6 +225,14 @@ int main(int argc, char const *argv[])
 	assert(Nat(71).pow(0) == 1);
 	assert(Nat(71).pow(1) == 71);
 	assert(Nat(71).pow(17).to_string() == "29606831241262271996845213307591");
+
+	/* from string */
+	assert(Nat("71", 10).to_string() == "71");
+	assert(Nat("29606831241262271996845213307591", 10).to_string() == "29606831241262271996845213307591");
+	assert(Nat("deadbeef", 16).to_string(16) == "deadbeef");
+	assert(Nat("deadbeef00ff00ff00ff00ff", 16).to_string(16) == "deadbeef00ff00ff00ff00ff");
+	assert(Nat("101", 2).to_string(2) == "101");
+	assert(Nat("11110000111100001111000011110000", 2).to_string(2) == "11110000111100001111000011110000");
 
 	return 0;
 }
