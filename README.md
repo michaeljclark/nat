@@ -27,7 +27,7 @@ The code has been tested with the following compilers:
 
 **Nat**
 
-The `nat.h` header implements the following operators and methods:
+struct Nat implements the following operators and methods:
 
 - Nat& operator+=(const Nat &operand)
 - Nat& operator-=(const Nat &operand)
@@ -59,7 +59,7 @@ The `nat.h` header implements the following operators and methods:
 
 **Int**
 
-The `int.h` header implements the following operators and methods:
+struct Int implements the following operators and methods:
 
 - bool operator==(const Int &operand) const
 - bool operator<(const Int &operand) const
