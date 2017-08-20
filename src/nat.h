@@ -284,8 +284,8 @@ struct Nat
 	/*! equals */
 	bool operator==(const Nat &operand) const
 	{
-		size_t max = std::max(num_limbs(), operand.num_limbs());
-		for (size_t i = 0; i < max; i++) {
+		if (num_limbs() != operand.num_limbs()) return false;
+		for (size_t i = 0; i < num_limbs(); i++) {
 			if (limb_at(i) != operand.limb_at(i)) return false;
 		}
 		return true;
@@ -294,8 +294,9 @@ struct Nat
 	/*! less than */
 	bool operator<(const Nat &operand) const
 	{
-		size_t max = std::max(num_limbs(), operand.num_limbs());
-		for (size_t i = max; i > 0; i--) {
+		if (num_limbs() > operand.num_limbs()) return false;
+		else if (num_limbs() < operand.num_limbs()) return true;
+		for (size_t i = num_limbs(); i > 0; i--) {
 			if (limb_at(i - 1) > operand.limb_at(i - 1)) return false;
 			else if (limb_at(i - 1) < operand.limb_at(i - 1)) return true;
 		}
@@ -343,6 +344,7 @@ struct Nat
 			}
 			result.limbs[j + m] = k;
 		}
+		result.contract();
 	}
 
 	/*! base 2^limb_bits division */
@@ -350,8 +352,8 @@ struct Nat
 	{
 		quotient = 0;
 		remainder = 0;
-		size_t m = num_limbs(), n = divisor.num_limbs();
-		quotient.resize(std::max(m - n + 1, size_t(1)));
+		ssize_t m = num_limbs(), n = divisor.num_limbs();
+		quotient.resize(std::max(m - n + 1, ssize_t(1)));
 		remainder.resize(n);
 		limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 		const limb_t *u = limbs.data(), *v = divisor.limbs.data();
@@ -652,7 +654,6 @@ struct Nat
 				limbs.push_back(0);
 			}
 		}
-		contract();
 	}
 
 	/*! string constructor */
