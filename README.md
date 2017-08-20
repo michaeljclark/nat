@@ -29,6 +29,8 @@ The code has been tested with the following compilers:
 
 struct Nat implements the following operators and methods:
 
+- Nat(unsigned n)
+- Nat(std::string str, size_t radix = 0 /*autodetect*/)
 - Nat& operator+=(const Nat &operand)
 - Nat& operator-=(const Nat &operand)
 - Nat& operator<<=(int shamt)
@@ -55,12 +57,14 @@ struct Nat implements the following operators and methods:
 - Nat operator/(const Nat &divisor) const
 - Nat operator%(const Nat &divisor) const
 - Nat pow(size_t operand) const
-- std::string to_string() const
+- void from_string(std::string, size_t radix = 0 /*autodetect*/)
+- std::string to_string(size_t radix = 10) const
 
 **Int**
 
 struct Int implements the following operators and methods:
 
+- Int(int n)
 - bool operator==(const Int &operand) const
 - bool operator<(const Int &operand) const
 - bool operator!=(const Int &operand) const
