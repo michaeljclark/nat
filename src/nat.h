@@ -364,7 +364,9 @@ struct Nat
 		limb2_t rhat;                          // A remainder.
 
 		if (m < n || n <= 0 || v[n-1] == 0) {
-			return; // Return if invalid param.
+			quotient = 0;
+			remainder = *this;
+			return;
 		}
 
 		// Single digit divisor
@@ -375,6 +377,8 @@ struct Nat
 				k = (k*b + u[j]) - q[j]*v[0];
 			}
 			r[0] = limb_t(k);
+			quotient.contract();
+			remainder.contract();
 			return;
 		}
 
