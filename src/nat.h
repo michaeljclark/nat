@@ -389,14 +389,14 @@ struct Nat
 
 		int s = __builtin_clz(v[n-1]); // 0 <= s <= limb_bits.
 		vn = (limb_t *)alloca(sizeof(limb_t) * n);
-		for (size_t i = n - 1; i > 0; i--) {
+		for (ssize_t i = n - 1; i > 0; i--) {
 			vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
 		}
 		vn[0] = v[0] << s;
 
 		un = (limb_t *)alloca(sizeof(limb_t) * (m + 1));
 		un[m] = u[m-1] >> (limb_bits-s);
-		for (size_t i = m - 1; i > 0; i--) {
+		for (ssize_t i = m - 1; i > 0; i--) {
 			un[i] = (u[i] << s) | (u[i-1] >> (limb_bits-s));
 		}
 		un[0] = u[0] << s;
@@ -413,7 +413,7 @@ struct Nat
 			// Multiply and subtract.
 			limb2_t k = 0;
 			slimb2_t t = 0;
-			for (size_t i = 0; i < n; i++) {
+			for (ssize_t i = 0; i < n; i++) {
 				unsigned long long p = qhat*vn[i];
 				t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));
 				un[i+j] = limb_t(t);
@@ -426,7 +426,7 @@ struct Nat
 			if (t < 0) {         // If we subtracted too
 				q[j] = q[j] - 1; // much, add back.
 				k = 0;
-				for (size_t i = 0; i < n; i++) {
+				for (ssize_t i = 0; i < n; i++) {
 					t = un[i+j] + vn[i] + k;
 					un[i+j] = limb_t(t);
 					k = t >> limb_bits;
@@ -436,7 +436,7 @@ struct Nat
 		}
 
 		// normalize remainder
-		for (size_t i = 0; i < n; i++) {
+		for (ssize_t i = 0; i < n; i++) {
 			r[i] = (un[i] >> s) | (un[i + 1] << (limb_bits - s));
 		}
 
