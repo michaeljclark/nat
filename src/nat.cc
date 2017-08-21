@@ -535,9 +535,9 @@ static inline ssize_t _to_string_c(const Nat &val, std::string &s, ssize_t offse
 static ssize_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
 	std::string &s, size_t digits, ssize_t offset)
 {
+	Nat q, r;
+	val.divrem(sq[level], q, r);
 	if (level > 0) {
-		Nat q, r;
-		val.divrem(sq[level], q, r);
 		if (r != 0) {
 			if (q != 0) {
 				_to_string_r(r, sq, level-1, s, digits >> 1, offset);
@@ -547,13 +547,10 @@ static ssize_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
 			}
 		}
 	} else {
-		Nat q, r;
-		val.divrem(sq[level], q, r);
 		if (r != 0) {
 			if (q != 0) {
 				_to_string_c(r, s, offset);
-				offset -= digits;
-				offset = _to_string_c(q, s, offset);
+				offset = _to_string_c(q, s, offset - digits);
 			} else {
 				offset = _to_string_c(r, s, offset);
 			}
