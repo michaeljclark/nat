@@ -1,6 +1,6 @@
 # nat
 
-Simple arbitrary precision integer arithmetic header library implemented using C++ operator overloads.
+Simple arbitrary precision natural number and signed integer arithmetic library.
 
 ## Project
 
