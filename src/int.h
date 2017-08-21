@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include "nat.h"
+
 struct Int
 {
 	bool sign;

@@ -26,6 +26,16 @@
 
 #pragma once
 
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <vector>
+#include <string>
+#include <limits>
+#include <iostream>
+#include <algorithm>
+#include <initializer_list>
+
 struct Nat
 {
 	/*! limb type */
