@@ -51,25 +51,6 @@ struct Nat
 	 */
 	std::vector<limb_t> limbs;
 
-	/*! expand limbs to match operand */
-	void expand(const Nat &operand)
-	{
-		limbs.resize(std::max(num_limbs(), operand.num_limbs()));
-	}
-
-	/*! contract zero big end limbs */
-	void contract()
-	{
-		while(num_limbs() > 1 && limbs.back() == 0) {
-			limbs.pop_back();
-		}
-	}
-
-	/*! resize number of limbs */
-	void resize(size_t n)
-	{
-		limbs.resize(n);
-	}
 
 	/*
 	 * constructors
@@ -82,13 +63,13 @@ struct Nat
 	Nat(const limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	Nat(const std::initializer_list<limb_t> l) : limbs(l) { contract(); }
+	Nat(const std::initializer_list<limb_t> l) : limbs(l) { _contract(); }
 
 	/*! copy constructor  */
-	Nat(const Nat &operand) : limbs(operand.limbs) { contract(); }
+	Nat(const Nat &operand) : limbs(operand.limbs) { _contract(); }
 
 	/*! move constructor  */
-	Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) { contract(); }
+	Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) { _contract(); }
 
 
 	/*
@@ -98,7 +79,7 @@ struct Nat
 	/*! integral copy assignment operator */
 	Nat& operator=(const limb_t l)
 	{
-		resize(1);
+		_resize(1);
 		limbs[0] = l;
 		return *this;
 	}
@@ -107,7 +88,7 @@ struct Nat
 	Nat& operator=(const Nat &operand)
 	{
 		limbs = operand.limbs;
-		contract();
+		_contract();
 		return *this;
 	}
 
@@ -115,8 +96,33 @@ struct Nat
 	Nat& operator=(Nat &&operand)
 	{
 		limbs = std::move(operand.limbs);
-		contract();
+		_contract();
 		return *this;
+	}
+
+
+	/*
+	 * internal methods
+	 */
+
+	/*! expand limbs to match operand */
+	void _expand(const Nat &operand)
+	{
+		limbs.resize(std::max(num_limbs(), operand.num_limbs()));
+	}
+
+	/*! contract zero big end limbs */
+	void _contract()
+	{
+		while(num_limbs() > 1 && limbs.back() == 0) {
+			limbs.pop_back();
+		}
+	}
+
+	/*! resize number of limbs */
+	void _resize(size_t n)
+	{
+		limbs.resize(n);
 	}
 
 
@@ -142,7 +148,7 @@ struct Nat
 	void set_bit(size_t n)
 	{
 		size_t word = n >> limb_shift;
-		if (word >= num_limbs()) limbs.resize(word + 1);
+		if (word >= num_limbs()) _resize(word + 1);
 		limbs[word] |= (1ULL << (n & (limb_bits-1)));
 	}
 
@@ -158,7 +164,7 @@ struct Nat
 	/*! add with carry equals */
 	Nat& operator+=(const Nat &operand)
 	{
-		expand(operand);
+		_expand(operand);
 		limb_t carry = 0;
 		for (size_t i = 0; i < num_limbs(); i++) {
 			limb_t old_val = limbs[i];
@@ -175,7 +181,7 @@ struct Nat
 	/*! subtract with borrow equals */
 	Nat& operator-=(const Nat &operand)
 	{
-		expand(operand);
+		_expand(operand);
 		limb_t borrow = 0;
 		for (size_t i = 0; i < num_limbs(); i++) {
 			limb_t old_val = limbs[i];
@@ -184,7 +190,7 @@ struct Nat
 			borrow = new_val > old_val;
 		}
 		assert(borrow == 0); /* unsigned underflow */
-		contract();
+		_contract();
 		return *this;
 	}
 
@@ -228,29 +234,29 @@ struct Nat
 			limbs[j - 1] = new_val;
 			carry = old_val << (limb_bits - shamt);
 		}
-		contract();
+		_contract();
 		return *this;
 	}
 
 	/*! logical and equals */
 	Nat& operator&=(const Nat &operand)
 	{
-		expand(operand);
+		_expand(operand);
 		for (size_t i = 0; i < num_limbs(); i++) {
 			limbs[i] = operand.limb_at(i) & limbs[i];
 		}
-		contract();
+		_contract();
 		return *this;
 	}
 
 	/*! logical or equals */
 	Nat& operator|=(const Nat &operand)
 	{
-		expand(operand);
+		_expand(operand);
 		for (size_t i = 0; i < num_limbs(); i++) {
 			limbs[i] = operand.limb_at(i) | limbs[i];
 		}
-		contract();
+		_contract();
 		return *this;
 	}
 
@@ -356,7 +362,7 @@ struct Nat
 	void mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const
 	{
 		size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
-		result.resize(m + n);
+		result._resize(m + n);
 		for (size_t j = 0; j < n; j++) {
 			limb_t k = 0;
 			for (size_t i = 0; i < m; i++) {
@@ -367,7 +373,7 @@ struct Nat
 			}
 			result.limbs[j + m] = k;
 		}
-		result.contract();
+		result._contract();
 	}
 
 	/*! base 2^limb_bits division */
@@ -376,8 +382,8 @@ struct Nat
 		quotient = 0;
 		remainder = 0;
 		ssize_t m = num_limbs(), n = divisor.num_limbs();
-		quotient.resize(std::max(m - n + 1, ssize_t(1)));
-		remainder.resize(n);
+		quotient._resize(std::max(m - n + 1, ssize_t(1)));
+		remainder._resize(n);
 		limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 		const limb_t *u = limbs.data(), *v = divisor.limbs.data();
 
@@ -400,8 +406,8 @@ struct Nat
 				k = (k*b + u[j]) - q[j]*v[0];
 			}
 			r[0] = limb_t(k);
-			quotient.contract();
-			remainder.contract();
+			quotient._contract();
+			remainder._contract();
 			return;
 		}
 
@@ -463,8 +469,8 @@ struct Nat
 			r[i] = (un[i] >> s) | (un[i + 1] << (limb_bits - s));
 		}
 
-		quotient.contract();
-		remainder.contract();
+		quotient._contract();
+		remainder._contract();
 	}
 
 	/*! multiply */
