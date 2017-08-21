@@ -501,7 +501,7 @@ struct Nat
 	Nat& operator*=(const Nat &operand)
 	{
 		Nat result = *this * operand;
-		limbs = result.limbs;
+		*this = std::move(result);
 		return *this;
 	}
 
@@ -509,7 +509,7 @@ struct Nat
 	Nat& operator/=(const Nat &operand)
 	{
 		Nat result = *this / operand;
-		limbs = result.limbs;
+		*this = std::move(result);
 		return *this;
 	}
 
@@ -517,7 +517,7 @@ struct Nat
 	Nat& operator%=(const Nat &operand)
 	{
 		Nat result = *this % operand;
-		limbs = result.limbs;
+		*this = std::move(result);
 		return *this;
 	}
 
