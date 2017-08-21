@@ -523,7 +523,7 @@ struct Nat
 		return offset;
 	}
 
-	static ssize_t _to_string_r(const Nat &val, std::vector<Nat> sq, size_t level,
+	static ssize_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
 		std::string &s, size_t digits, ssize_t offset)
 	{
 		if (level > 0) {
