@@ -6,13 +6,17 @@ Simple arbitrary precision integer arithmetic header library implemented using C
 
 The project includes the following files:
 
-File         | Description
-:---         | :---
-nat.h        | unsigned natural number
-nat-tests.cc | unit tests for the Nat class
-nat-demo.cc  | multiply, pow, divide and to_string
-int.h        | integer with sign and magnitude
-int-tests.cc | unit tests for the Int class
+File                   | Description
+:---                   | :---
+src/nat.h              | unsigned natural number header
+src/nat.cc             | unsigned natural number impl
+src/int.h              | integer with sign and magnitude header
+src/int.cc             | integer with sign and magnitude impl
+tests/nat-tests.cc     | unit tests for the Nat class
+tests/int-tests.cc     | unit tests for the Int class
+demos/nat-demo.cc      | tests pow, multiply, divide and to_string
+demos/gmp-demo.cc      | tests pow, multiply, divide and to_string
+demos/BigJavaDemo.java | tests pow, multiply, divide and to_string
 
 ## Testing
 
