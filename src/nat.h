@@ -309,7 +309,7 @@ struct Nat
 	{
 		if (num_limbs() != operand.num_limbs()) return false;
 		for (size_t i = 0; i < num_limbs(); i++) {
-			if (limb_at(i) != operand.limb_at(i)) return false;
+			if (limbs[i] != operand.limbs[i]) return false;
 		}
 		return true;
 	}
@@ -319,9 +319,9 @@ struct Nat
 	{
 		if (num_limbs() > operand.num_limbs()) return false;
 		else if (num_limbs() < operand.num_limbs()) return true;
-		for (size_t i = num_limbs(); i > 0; i--) {
-			if (limb_at(i - 1) > operand.limb_at(i - 1)) return false;
-			else if (limb_at(i - 1) < operand.limb_at(i - 1)) return true;
+		for (ssize_t i = num_limbs()-1; i >= 0; i--) {
+			if (limbs[i] > operand.limbs[i]) return false;
+			else if (limbs[i] < operand.limbs[i]) return true;
 		}
 		return false;
 	}
