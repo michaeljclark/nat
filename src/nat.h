@@ -511,6 +511,49 @@ struct Nat
 
 
 	/*
+	 * helpers for recursive divide and conquer conversion to string
+	 */
+
+	static inline ssize_t _to_string_c(const Nat &val, std::string &s, ssize_t offset)
+	{
+		limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
+		do {
+			s[--offset] = '0' + char(v % 10);
+		} while ((v /= 10) != 0);
+		return offset;
+	}
+
+	static ssize_t _to_string_r(const Nat &val, std::vector<Nat> sq, size_t level,
+		std::string &s, size_t digits, ssize_t offset)
+	{
+		if (level > 0) {
+			Nat q, r;
+			val.divrem(sq[level], q, r);
+			if (r != 0) {
+				if (q != 0) {
+					_to_string_r(r, sq, level-1, s, digits >> 1, offset);
+					return _to_string_r(q, sq, level-1, s, digits >> 1, offset - digits);
+				} else {
+					return _to_string_r(r, sq, level-1, s, digits >> 1, offset);
+				}
+			}
+		} else {
+			Nat q, r;
+			val.divrem(sq[level], q, r);
+			if (r != 0) {
+				if (q != 0) {
+					_to_string_c(r, s, offset);
+					offset -= digits;
+					offset = _to_string_c(q, s, offset);
+				} else {
+					offset = _to_string_c(r, s, offset);
+				}
+			}
+		}
+		return offset;
+	}
+
+	/*
 	 * convert natural number to string
 	 */
 
@@ -525,28 +568,21 @@ struct Nat
 			case 10: {
 				/* estimate string length */
 				std::string s;
-				size_t climit = ((num_limbs() << (limb_shift + 30)) / dgib) + 1, offset = climit;
+				size_t climit = ((num_limbs() << (limb_shift + 30)) / dgib) + 1;
 				s.resize(climit, '0');
 
-				/* output chunks of 18 digits */
-				Nat q, r;
-				Nat val = *this;
-				while (val > tenp18) {
-					val.divrem(tenp18, q, r);
-					val = q;
-					limb2_t v = limb2_t(r.limb_at(0)) | (limb2_t(r.limb_at(1)) << limb_bits);
-					size_t next = offset - 18;
-					do {
-						s[--offset] = '0' + char(v % 10);
-					} while (v /= 10);
-					offset = next;
-				}
-
-				/* remaining chunk */
-				limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << limb_bits);
+				/* square the chunk size until ~= sqrt(n) */
+				Nat chunk = tenp18;
+				size_t digits = 18;
+				std::vector<Nat> sq = { tenp18 };
 				do {
-					s[--offset] = '0' + char(v % 10);
-				} while (v /= 10);
+					chunk *= chunk;
+					digits <<= 1;
+					sq.push_back(chunk);
+				} while ((chunk.num_limbs() < (num_limbs() >> 1)));
+
+				/* recursively divide by chunk squares */
+				ssize_t offset = _to_string_r(*this, sq, sq.size() - 1, s, digits, climit);
 
 				/* return less reserve */
 				return s.substr(offset);
