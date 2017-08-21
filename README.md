@@ -22,8 +22,8 @@ demos/BigJavaDemo.java | tests pow, multiply, divide and to_string
 
 The code has been tested with the following compilers:
 
-- GCC 6.2.1 (Debian Linux)
-- Apple LLVM version 8.0.0 (clang-800.0.42.1)
+- GCC 6.3.0 (Debian Linux)
+- Apple LLVM version 8.1.0 (clang-802.0.42)
 - MSC 14.0 (Visual Studio Community 2015)
 
 
