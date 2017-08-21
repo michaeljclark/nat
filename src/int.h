@@ -34,190 +34,91 @@ struct Int
 	Nat mag;
 
 	/*! default constructor */
-	Int() : sign(0), mag(0) {}
+	Int();
 
 	/*! integral constructor */
-	Int(int n) : sign(n < 0), mag(n < 0 ? -n : n) {}
+	Int(int n);
 
 	/*! copy constructor  */
-	Int(const Int &o) : sign(o.sign), mag(o.mag) {}
+	Int(const Int &o);
 
 	/*! integral copy assignment operator */
-	Int& operator=(int n)
-	{
-		sign = n < 0;
-		mag = n < 0 ? -n : n;
-		return *this;
-	}
+	Int& operator=(int n);
 
 	/*! Nat copy assignment operator */
-	Int& operator=(const Int &operand)
-	{
-		sign = operand.sign;
-		mag = operand.mag;
-		return *this;
-	}
+	Int& operator=(const Int &operand);
 
 
 	/* define self mutating operations */
 
 	/*! add equals */
-	Int& operator+=(const Int &operand)
-	{
-		if (sign ^ operand.sign) {
-			if (this->mag > operand.mag) {
-				mag -= operand.mag;
-			} else {
-				mag = operand.mag - mag;
-				sign = operand.sign;
-			}
-		} else {
-			mag += operand.mag;
-		}
-		return *this;
-	}
+	Int& operator+=(const Int &operand);
 
 	/*! subtract equals */
-	Int& operator-=(const Int &operand)
-	{
-		if (sign ^ operand.sign) {
-			mag += operand.mag;
-		} else {
-			if (this->mag > operand.mag) {
-				mag -= operand.mag;
-			} else {
-				mag = operand.mag - mag;
-				sign = !operand.sign;
-			}
-		}
-		return *this;
-	}
+	Int& operator-=(const Int &operand);
 
 	/*! multiply equals */
-	Int& operator*=(const Int &operand)
-	{
-		mag *= operand.mag;
-		sign ^= operand.sign;
-		return *this;
-	}
+	Int& operator*=(const Int &operand);
 
 	/*! divide equals */
-	Int& operator/=(const Int &operand)
-	{
-		mag /= operand.mag;
-		sign ^= operand.sign;
-		return *this;
-	}
+	Int& operator/=(const Int &operand);
 
 	/*! remainder equals */
-	Int& operator%=(const Int &operand)
-	{
-		mag %= operand.mag;
-		return *this;
-	}
+	Int& operator%=(const Int &operand);
 
 	/* const operations copy and use the mutating operations */
 
 	/*! add */
-	Int operator+(const Int &operand) const
-	{
-		Int result(*this);
-		return result += operand;
-	}
+	Int operator+(const Int &operand) const;
 
 	/*! subtract */
-	Int operator-(const Int &operand) const
-	{
-		Int result(*this);
-		return result -= operand;
-	}
+	Int operator-(const Int &operand) const;
 
 	/*! multiply */
-	Int operator*(const Int &operand) const
-	{
-		Int result(*this);
-		return result *= operand;
-	}
+	Int operator*(const Int &operand) const;
 
 	/*! divide */
-	Int operator/(const Int &operand) const
-	{
-		Int result(*this);
-		return result /= operand;
-	}
+	Int operator/(const Int &operand) const;
 
 	/*! remainder */
-	Int operator%(const Int &operand) const
-	{
-		Int result(*this);
-		return result %= operand;
-	}
+	Int operator%(const Int &operand) const;
 
 	/*! negate */
-	Int operator-() const
-	{
-		Int result(*this);
-		result.sign = !sign;
-		return result;
-	}
+	Int operator-() const;
 
 	/*! not */
-	bool operator!() const
-	{
-		return mag == 0;
-	}
+	bool operator!() const;
 
 	/*
 	 * comparison are defined in terms of "equals" and "less than"
 	 */
 
 	/*! equals */
-	bool operator==(const Int &operand) const
-	{
-		return (sign == operand.sign && mag == operand.mag) || (mag == 0 && operand.mag == 0);
-	}
+	bool operator==(const Int &operand) const;
 
 	/*! less than */
-	bool operator<(const Int &operand) const
-	{
-		if (sign ^ operand.sign) {
-			return sign;
-		} else if (sign) {
-			return operand.mag < mag;
-		} else {
-			return mag < operand.mag;
-		}
-		return false;
-	}
+	bool operator<(const Int &operand) const;
 
 	/*
 	 * axiomatically define other comparisons in terms of "equals" and "less than"
 	 */
 
 	/*! not equals */
-	bool operator!=(const Int &operand) const { return !(*this == operand); }
+	bool operator!=(const Int &operand) const;
 
 	/*! less than or equal*/
-	bool operator<=(const Int &operand) const { return *this < operand || *this == operand; }
+	bool operator<=(const Int &operand) const;
 
 	/*! greater than */
-	bool operator>(const Int &operand) const { return !(*this <= operand); }
+	bool operator>(const Int &operand) const;
 
 	/*! less than or equal*/
-	bool operator>=(const Int &operand) const { return !(*this < operand) || *this == operand; }
+	bool operator>=(const Int &operand) const;
 
 	/*
 	 * convert natural number to string
 	 */
 
 	/*! convert Nat to string */
-	std::string to_string() const
-	{
-		if (sign) {
-			return std::string("-") + mag.to_string();
-		}
-		else {
-			return mag.to_string();
-		}
-	}
+	std::string to_string() const;
 };
