@@ -29,7 +29,7 @@ The code has been tested with the following compilers:
 
 struct Nat implements the following operators and methods:
 
-- Nat(unsigned n)
+- Nat(unsigned int n)
 - Nat(std::string str, size_t radix = 0 /*autodetect*/)
 - Nat& operator+=(const Nat &operand)
 - Nat& operator-=(const Nat &operand)
@@ -64,7 +64,7 @@ struct Nat implements the following operators and methods:
 
 struct Int implements the following operators and methods:
 
-- Int(int n)
+- Int(signed int n)
 - bool operator==(const Int &operand) const
 - bool operator<(const Int &operand) const
 - bool operator!=(const Int &operand) const
