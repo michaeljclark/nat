@@ -92,6 +92,35 @@ struct Nat
 
 
 	/*
+	 * assignment operators
+	 */
+
+	/*! integral copy assignment operator */
+	Nat& operator=(const limb_t l)
+	{
+		resize(1);
+		limbs[0] = l;
+		return *this;
+	}
+
+	/*! Nat copy assignment operator */
+	Nat& operator=(const Nat &operand)
+	{
+		limbs = operand.limbs;
+		contract();
+		return *this;
+	}
+
+	/*! Nat move assignment operator */
+	Nat& operator=(Nat &&operand)
+	{
+		limbs = std::move(operand.limbs);
+		contract();
+		return *this;
+	}
+
+
+	/*
 	 * handy limb and bit accessor methods
 	 */
 
@@ -125,30 +154,6 @@ struct Nat
 
 
 	/* define self mutating operations */
-
-	/*! integral copy assignment operator */
-	Nat& operator=(const limb_t l)
-	{
-		resize(1);
-		limbs[0] = l;
-		return *this;
-	}
-
-	/*! Nat copy assignment operator */
-	Nat& operator=(const Nat &operand)
-	{
-		limbs = operand.limbs;
-		contract();
-		return *this;
-	}
-
-	/*! Nat move assignment operator */
-	Nat& operator=(Nat &&operand)
-	{
-		limbs = std::move(operand.limbs);
-		contract();
-		return *this;
-	}
 
 	/*! add with carry equals */
 	Nat& operator+=(const Nat &operand)
