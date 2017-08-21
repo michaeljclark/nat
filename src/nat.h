@@ -79,10 +79,10 @@ struct Nat
 	Nat() : limbs{ 0 } {}
 
 	/*! integral constructor */
-	Nat(limb_t n) : limbs{ n } {}
+	Nat(const limb_t n) : limbs{ n } {}
 
 	/*! array constructor */
-	Nat(std::initializer_list<limb_t> l) : limbs(l) { contract(); }
+	Nat(const std::initializer_list<limb_t> l) : limbs(l) { contract(); }
 
 	/*! copy constructor  */
 	Nat(const Nat &operand) : limbs(operand.limbs) { contract(); }
