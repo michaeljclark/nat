@@ -142,6 +142,14 @@ struct Nat
 		return *this;
 	}
 
+	/*! Nat move assignment operator */
+	Nat& operator=(Nat &&operand)
+	{
+		limbs = std::move(operand.limbs);
+		contract();
+		return *this;
+	}
+
 	/*! add with carry equals */
 	Nat& operator+=(const Nat &operand)
 	{
