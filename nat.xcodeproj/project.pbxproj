@@ -545,7 +545,7 @@
 		65AB018E1F3FD8C7001AFCC5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_OPTIMIZATION_LEVEL = 1;
+				GCC_OPTIMIZATION_LEVEL = s;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -560,6 +560,7 @@
 				65583C111F4B8F9100ECFC9C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65583C1B1F4B906400ECFC9C /* Build configuration list for PBXNativeTarget "nat" */ = {
 			isa = XCConfigurationList;
@@ -568,6 +569,7 @@
 				65583C1D1F4B906400ECFC9C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		65A79FD31F40449900B1E4A0 /* Build configuration list for PBXNativeTarget "int-tests" */ = {
 			isa = XCConfigurationList;
