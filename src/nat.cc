@@ -31,6 +31,16 @@
 using limb_t = Nat::limb_t;
 using limb2_t = Nat::limb2_t;
 
+#if defined (__GNUC__)
+#define clz __builtin_clz
+#elif defined (_MSC_VER)
+#include <intrin.h>
+#define clz __lzcnt
+#else
+#error clz not defined
+#endif
+
+
 /*
  * constructors
  */
@@ -396,7 +406,7 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 	// same amount. We may have to append a high-order
 	// digit on the dividend; we do that unconditionally.
 
-	int s = __builtin_clz(v[n-1]); // 0 <= s <= limb_bits.
+	int s = clz(v[n-1]); // 0 <= s <= limb_bits.
 	vn = (limb_t *)alloca(sizeof(limb_t) * n);
 	for (ptrdiff_t i = n - 1; i > 0; i--) {
 		vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
@@ -602,7 +612,7 @@ std::string Nat::to_string(size_t radix) const
 		case 2: {
 			std::string s("0b");
 			limb_t l1 = limbs.back();
-			size_t n = limb_bits - __builtin_clz(l1);
+			size_t n = limb_bits - clz(l1);
 			size_t t = n + ((num_limbs() - 1) << limb_shift);
 			s.resize(t + 2);
 			auto i = s.begin() + 2;
@@ -620,7 +630,7 @@ std::string Nat::to_string(size_t radix) const
 		case 16: {
 			std::string s("0x");
 			limb_t l1 = limbs.back();
-			size_t n = ((limb_bits >> 2) - (__builtin_clz(l1) >> 2));
+			size_t n = ((limb_bits >> 2) - (clz(l1) >> 2));
 			size_t t = n + ((num_limbs() - 1) << (limb_shift - 2));
 			s.resize(t + 2);
 			auto i = s.begin() + 2;
