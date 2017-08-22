@@ -121,12 +121,8 @@ struct Nat
 
 
 	/* 
-	 * multiply and divide require add with carry, subtract  
-	 * with borrow, left and right shift logical operators
+	 * add, subtract, shifts and logical operators
 	 */
-
-
-	/* define self mutating operations */
 
 	/*! add with carry equals */
 	Nat& operator+=(const Nat &operand);
@@ -145,9 +141,6 @@ struct Nat
 
 	/*! logical or equals */
 	Nat& operator|=(const Nat &operand);
-
-
-	/* const operations copy and use the mutating operations */
 
 	/*! add with carry */
 	Nat operator+(const Nat &operand) const;
@@ -168,7 +161,7 @@ struct Nat
 
 
 	/*
-	 * comparison are defined in terms of "equals" and "less than"
+	 * comparison operators
 	 */
 
 	/*! equals */
@@ -176,11 +169,6 @@ struct Nat
 
 	/*! less than */
 	bool operator<(const Nat &operand) const;
-
-
-	/*
-	 * axiomatically define other comparisons in terms of "equals" and "less than"
-	 */
 
 	/*! not equals */
 	bool operator!=(const Nat &operand) const;
@@ -197,10 +185,9 @@ struct Nat
 	/*! not */
 	bool operator!() const;
 
+
 	/*
-	 * multply, divide, modulus and pow
-	 *
-	 * These routines are derived from Hacker's Delight
+	 * multply, divide and pow
 	 */
 
 	/*! base 2^limb_bits multiply */
@@ -238,6 +225,7 @@ struct Nat
 	/*! convert Nat to string */
 	std::string to_string(size_t radix = 10) const;
 
+	/*! convert Nat from string */
 	void from_string(const char *str, size_t len, size_t radix);
 
 };

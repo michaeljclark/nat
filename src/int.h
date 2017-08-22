@@ -49,7 +49,9 @@ struct Int
 	Int& operator=(const Int &operand);
 
 
-	/* define self mutating operations */
+	/* 
+	 * add, subtract, multiply, divide, negate and not
+	 */
 
 	/*! add equals */
 	Int& operator+=(const Int &operand);
@@ -65,8 +67,6 @@ struct Int
 
 	/*! remainder equals */
 	Int& operator%=(const Int &operand);
-
-	/* const operations copy and use the mutating operations */
 
 	/*! add */
 	Int operator+(const Int &operand) const;
@@ -89,8 +89,9 @@ struct Int
 	/*! not */
 	bool operator!() const;
 
+
 	/*
-	 * comparison are defined in terms of "equals" and "less than"
+	 * comparison operators
 	 */
 
 	/*! equals */
@@ -98,10 +99,6 @@ struct Int
 
 	/*! less than */
 	bool operator<(const Int &operand) const;
-
-	/*
-	 * axiomatically define other comparisons in terms of "equals" and "less than"
-	 */
 
 	/*! not equals */
 	bool operator!=(const Int &operand) const;
@@ -114,6 +111,7 @@ struct Int
 
 	/*! less than or equal*/
 	bool operator>=(const Int &operand) const;
+
 
 	/*
 	 * convert natural number to string
