@@ -25,13 +25,6 @@
  */
 
 #include <cassert>
-#include <cstdlib>
-#include <cstring>
-#include <vector>
-#include <string>
-#include <limits>
-#include <algorithm>
-#include <initializer_list>
 
 #include "nat.h"
 

@@ -24,6 +24,8 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <cassert>
+
 #include "nat.h"
 
 using limb_t = Nat::limb_t;
@@ -303,7 +305,7 @@ bool Nat::operator<(const Nat &operand) const
 {
 	if (num_limbs() > operand.num_limbs()) return false;
 	else if (num_limbs() < operand.num_limbs()) return true;
-	for (ssize_t i = num_limbs()-1; i >= 0; i--) {
+	for (ptrdiff_t i = num_limbs()-1; i >= 0; i--) {
 		if (limbs[i] > operand.limbs[i]) return false;
 		else if (limbs[i] < operand.limbs[i]) return true;
 	}
@@ -359,8 +361,8 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 {
 	quotient = 0;
 	remainder = 0;
-	ssize_t m = dividend.num_limbs(), n = divisor.num_limbs();
-	quotient._resize(std::max(m - n + 1, ssize_t(1)));
+	ptrdiff_t m = dividend.num_limbs(), n = divisor.num_limbs();
+	quotient._resize(std::max(m - n + 1, ptrdiff_t(1)));
 	remainder._resize(n);
 	limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
 	const limb_t *u = dividend.limbs.data(), *v = divisor.limbs.data();
@@ -379,7 +381,7 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 	// Single digit divisor
 	if (n == 1) {
 		limb2_t k = 0;
-		for (ssize_t j = m - 1; j >= 0; j--) {
+		for (ptrdiff_t j = m - 1; j >= 0; j--) {
 			q[j] = limb_t((k*b + u[j]) / v[0]);
 			k = (k*b + u[j]) - q[j]*v[0];
 		}
@@ -396,18 +398,18 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 
 	int s = __builtin_clz(v[n-1]); // 0 <= s <= limb_bits.
 	vn = (limb_t *)alloca(sizeof(limb_t) * n);
-	for (ssize_t i = n - 1; i > 0; i--) {
+	for (ptrdiff_t i = n - 1; i > 0; i--) {
 		vn[i] = (v[i] << s) | (v[i-1] >> (limb_bits-s));
 	}
 	vn[0] = v[0] << s;
 
 	un = (limb_t *)alloca(sizeof(limb_t) * (m + 1));
 	un[m] = u[m-1] >> (limb_bits-s);
-	for (ssize_t i = m - 1; i > 0; i--) {
+	for (ptrdiff_t i = m - 1; i > 0; i--) {
 		un[i] = (u[i] << s) | (u[i-1] >> (limb_bits-s));
 	}
 	un[0] = u[0] << s;
-	for (ssize_t j = m - n; j >= 0; j--) { // Main loop.
+	for (ptrdiff_t j = m - n; j >= 0; j--) { // Main loop.
 		// Compute estimate qhat of q[j].
 		qhat = (un[j+n]*b + un[j+n-1]) / vn[n-1];
 		rhat = (un[j+n]*b + un[j+n-1]) - qhat * vn[n-1];
@@ -420,7 +422,7 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 		// Multiply and subtract.
 		limb2_t k = 0;
 		slimb2_t t = 0;
-		for (ssize_t i = 0; i < n; i++) {
+		for (ptrdiff_t i = 0; i < n; i++) {
 			unsigned long long p = qhat*vn[i];
 			t = un[i+j] - k - (p & ((1ULL<<limb_bits)-1));
 			un[i+j] = limb_t(t);
@@ -433,7 +435,7 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 		if (t < 0) {         // If we subtracted too
 			q[j] = q[j] - 1; // much, add back.
 			k = 0;
-			for (ssize_t i = 0; i < n; i++) {
+			for (ptrdiff_t i = 0; i < n; i++) {
 				t = un[i+j] + vn[i] + k;
 				un[i+j] = limb_t(t);
 				k = t >> limb_bits;
@@ -443,7 +445,7 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 	}
 
 	// normalize remainder
-	for (ssize_t i = 0; i < n; i++) {
+	for (ptrdiff_t i = 0; i < n; i++) {
 		r[i] = (un[i] >> s) | (un[i + 1] << (limb_bits - s));
 	}
 
@@ -527,7 +529,7 @@ Nat Nat::pow(size_t exp) const
  * helpers for recursive divide and conquer conversion to string
  */
 
-static inline ssize_t _to_string_c(const Nat &val, std::string &s, ssize_t offset)
+static inline ptrdiff_t _to_string_c(const Nat &val, std::string &s, ptrdiff_t offset)
 {
 	limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << Nat::limb_bits);
 	do {
@@ -536,8 +538,8 @@ static inline ssize_t _to_string_c(const Nat &val, std::string &s, ssize_t offse
 	return offset;
 }
 
-static ssize_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
-	std::string &s, size_t digits, ssize_t offset)
+static ptrdiff_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
+	std::string &s, size_t digits, ptrdiff_t offset)
 {
 	Nat q, r;
 	Nat::divrem(val, sq[level], q, r);
@@ -592,7 +594,7 @@ std::string Nat::to_string(size_t radix) const
 			} while ((chunk.num_limbs() < (num_limbs() >> 1)));
 
 			/* recursively divide by chunk squares */
-			ssize_t offset = _to_string_r(*this, sq, sq.size() - 1, s, digits, climit);
+			ptrdiff_t offset = _to_string_r(*this, sq, sq.size() - 1, s, digits, climit);
 
 			/* return less reserve */
 			return s.substr(offset);
@@ -604,12 +606,12 @@ std::string Nat::to_string(size_t radix) const
 			size_t t = n + ((num_limbs() - 1) << limb_shift);
 			s.resize(t + 2);
 			auto i = s.begin() + 2;
-			for (ssize_t k = n - 1; k >= 0; k--) {
+			for (ptrdiff_t k = n - 1; k >= 0; k--) {
 				*(i++) = '0' + ((l1 >> k) & 1);
 			}
-			for (ssize_t j = num_limbs() - 2; j >= 0; j--) {
+			for (ptrdiff_t j = num_limbs() - 2; j >= 0; j--) {
 				limb_t l = limbs[j];
-				for (ssize_t k = limb_bits - 1; k >= 0; k--) {
+				for (ptrdiff_t k = limb_bits - 1; k >= 0; k--) {
 					*(i++) = '0' + ((l >> k) & 1);
 				}
 			}
@@ -622,12 +624,12 @@ std::string Nat::to_string(size_t radix) const
 			size_t t = n + ((num_limbs() - 1) << (limb_shift - 2));
 			s.resize(t + 2);
 			auto i = s.begin() + 2;
-			for (ssize_t k = n - 1; k >= 0; k--) {
+			for (ptrdiff_t k = n - 1; k >= 0; k--) {
 				*(i++) = hexdigits[(l1 >> (k << 2)) & 0xf];
 			}
-			for (ssize_t j = num_limbs() - 2; j >= 0; j--) {
+			for (ptrdiff_t j = num_limbs() - 2; j >= 0; j--) {
 				limb_t l = limbs[j];
-				for (ssize_t k = (limb_bits >> 2) - 1; k >= 0; k--) {
+				for (ptrdiff_t k = (limb_bits >> 2) - 1; k >= 0; k--) {
 					*(i++) = hexdigits[(l >> (k << 2)) & 0xf];
 				}
 			}
