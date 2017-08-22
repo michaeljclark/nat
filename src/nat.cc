@@ -46,10 +46,10 @@ Nat::Nat(const std::initializer_list<limb_t> l) : limbs(l) { _contract(); }
 Nat::Nat(std::string str, size_t radix) : limbs{0} { from_string(str.c_str(), str.size(), radix); }
 
 /*! copy constructor  */
-Nat::Nat(const Nat &operand) : limbs(operand.limbs) { _contract(); }
+Nat::Nat(const Nat &operand) : limbs(operand.limbs) {}
 
 /*! move constructor  */
-Nat::Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) { _contract(); }
+Nat::Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) {}
 
 
 /*
@@ -68,7 +68,6 @@ Nat& Nat::operator=(const limb_t l)
 Nat& Nat::operator=(const Nat &operand)
 {
 	limbs = operand.limbs;
-	_contract();
 	return *this;
 }
 
@@ -76,7 +75,6 @@ Nat& Nat::operator=(const Nat &operand)
 Nat& Nat::operator=(Nat &&operand)
 {
 	limbs = std::move(operand.limbs);
-	_contract();
 	return *this;
 }
 
