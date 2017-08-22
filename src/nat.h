@@ -204,10 +204,10 @@ struct Nat
 	 */
 
 	/*! base 2^limb_bits multiply */
-	void mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const;
+	static void mult(const Nat &multiplicand, const Nat multiplier, Nat &result);
 
 	/*! base 2^limb_bits division */
-	void divrem(const Nat &divisor, Nat &quotient, Nat &remainder) const;
+	static void divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &remainder);
 
 	/*! multiply */
 	Nat operator*(const Nat &operand) const;

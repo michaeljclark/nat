@@ -331,13 +331,13 @@ bool Nat::operator>=(const Nat &operand) const { return !(*this < operand) || *t
 bool Nat::operator!() const { return *this == 0; }
 
 /*
- * multply, divide, modulus and pow
+ * multply and divide
  *
  * These routines are derived from Hacker's Delight
  */
 
 /*! base 2^limb_bits multiply */
-void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const
+void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result)
 {
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
 	result._resize(m + n);
@@ -355,15 +355,15 @@ void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result) const
 }
 
 /*! base 2^limb_bits division */
-void Nat::divrem(const Nat &divisor, Nat &quotient, Nat &remainder) const
+void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &remainder)
 {
 	quotient = 0;
 	remainder = 0;
-	ssize_t m = num_limbs(), n = divisor.num_limbs();
+	ssize_t m = dividend.num_limbs(), n = divisor.num_limbs();
 	quotient._resize(std::max(m - n + 1, ssize_t(1)));
 	remainder._resize(n);
 	limb_t *q = quotient.limbs.data(), *r = remainder.limbs.data();
-	const limb_t *u = limbs.data(), *v = divisor.limbs.data();
+	const limb_t *u = dividend.limbs.data(), *v = divisor.limbs.data();
 
 	const limb2_t b = (1ULL << limb_bits); // Number base
 	limb_t *un, *vn;                       // Normalized form of u, v.
@@ -372,7 +372,7 @@ void Nat::divrem(const Nat &divisor, Nat &quotient, Nat &remainder) const
 
 	if (m < n || n <= 0 || v[n-1] == 0) {
 		quotient = 0;
-		remainder = *this;
+		remainder = dividend;
 		return;
 	}
 
@@ -463,7 +463,7 @@ Nat Nat::operator*(const Nat &operand) const
 Nat Nat::operator/(const Nat &divisor) const
 {
 	Nat quotient(0), remainder(0);
-	divrem(divisor, quotient, remainder);
+	divrem(*this, divisor, quotient, remainder);
 	return quotient;
 }
 
@@ -471,7 +471,7 @@ Nat Nat::operator/(const Nat &divisor) const
 Nat Nat::operator%(const Nat &divisor) const
 {
 	Nat quotient(0), remainder(0);
-	divrem(divisor, quotient, remainder);
+	divrem(*this, divisor, quotient, remainder);
 	return remainder;
 }
 
@@ -498,6 +498,12 @@ Nat& Nat::operator%=(const Nat &operand)
 	*this = std::move(result);
 	return *this;
 }
+
+/*
+ * pow
+ *
+ * power via squaring
+ */
 
 /*! raise to the power */
 Nat Nat::pow(size_t exp) const
@@ -534,7 +540,7 @@ static ssize_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
 	std::string &s, size_t digits, ssize_t offset)
 {
 	Nat q, r;
-	val.divrem(sq[level], q, r);
+	Nat::divrem(val, sq[level], q, r);
 	if (level > 0) {
 		if (r != 0) {
 			if (q != 0) {
