@@ -35,7 +35,11 @@ using limb2_t = Nat::limb2_t;
 #define clz __builtin_clz
 #elif defined (_MSC_VER)
 #include <intrin.h>
-#define clz __lzcnt
+inline static unsigned long clz(unsigned int val)
+{
+	unsigned long count;
+	return _BitScanReverse(&count, val) ? 31 - count : 0;
+}
 #else
 #error clz not defined
 #endif
