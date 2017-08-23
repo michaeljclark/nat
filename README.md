@@ -24,6 +24,7 @@ The code has been tested with the following compilers:
 
 - GCC 6.3.0 (Debian Linux)
 - Apple LLVM version 8.1.0 (clang-802.0.42)
+- MSC 15.0 (Visual Studio 2017)
 
 
 ## Interface
