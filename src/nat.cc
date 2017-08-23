@@ -189,7 +189,7 @@ Nat& Nat::operator-=(const Nat &operand)
 }
 
 /*! left shift equals */
-Nat& Nat::operator<<=(int shamt)
+Nat& Nat::operator<<=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
@@ -212,7 +212,7 @@ Nat& Nat::operator<<=(int shamt)
 }
 
 /*! right shift equals */
-Nat& Nat::operator>>=(int shamt)
+Nat& Nat::operator>>=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
@@ -272,14 +272,14 @@ Nat Nat::operator-(const Nat &operand) const
 }
 
 /*! left shift */
-Nat Nat::operator<<(int shamt) const
+Nat Nat::operator<<(size_t shamt) const
 {
 	Nat result(*this);
 	return result <<= shamt;
 }
 
 /*! right shift */
-Nat Nat::operator>>(int shamt) const
+Nat Nat::operator>>(size_t shamt) const
 {
 	Nat result(*this);
 	return result >>= shamt;

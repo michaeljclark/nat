@@ -131,10 +131,10 @@ struct Nat
 	Nat& operator-=(const Nat &operand);
 
 	/*! left shift equals */
-	Nat& operator<<=(int shamt);
+	Nat& operator<<=(size_t shamt);
 
 	/*! right shift equals */
-	Nat& operator>>=(int shamt);
+	Nat& operator>>=(size_t shamt);
 
 	/*! logical and equals */
 	Nat& operator&=(const Nat &operand);
@@ -148,10 +148,10 @@ struct Nat
 	/*! subtract with borrow */
 	Nat operator-(const Nat &operand) const;
 	/*! left shift */
-	Nat operator<<(int shamt) const;
+	Nat operator<<(size_t shamt) const;
 
 	/*! right shift */
-	Nat operator>>(int shamt) const;
+	Nat operator>>(size_t shamt) const;
 
 	/*! logical and */
 	Nat operator&(const Nat &operand) const;
