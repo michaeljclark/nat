@@ -588,13 +588,13 @@ std::string Nat::to_string(size_t radix) const
 {
 	static const char* hexdigits = "0123456789abcdef";
 	static const Nat tenp18{0xa7640000, 0xde0b6b3};
-	static const size_t dgib = 3402; /* log2(10) * 1024 */
+	static const size_t dgib = 3566893131; /* log2(10) * 1024^3 */
 
 	switch (radix) {
 		case 10: {
 			/* estimate string length */
 			std::string s;
-			size_t climit = (((num_limbs() + 1) << (limb_shift + 10)) / dgib);
+			size_t climit = ((num_limbs() << (limb_shift + 30)) / dgib) + 1;
 			s.resize(climit, '0');
 
 			/* square the chunk size until ~= sqrt(n) */
