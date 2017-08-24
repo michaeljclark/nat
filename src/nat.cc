@@ -594,7 +594,7 @@ std::string Nat::to_string(size_t radix) const
 		case 10: {
 			/* estimate string length */
 			std::string s;
-			size_t climit = ((num_limbs() << (limb_shift + 30)) / dgib) + 1;
+			size_t climit = (size_t)(((long long)(num_limbs()) << (limb_shift + 30)) / (long long)dgib) + 1;
 			s.resize(climit, '0');
 
 			/* square the chunk size until ~= sqrt(n) */
