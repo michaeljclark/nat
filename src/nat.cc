@@ -538,10 +538,10 @@ Nat Nat::pow(size_t exp) const
 		if ((exp & 1) == 0) {
 			exp >>= 1;
 		} else {
-			y = x * y;
+			y *= x;
 			exp = (exp - 1) >> 1;
 		}
-		x = x * x;
+		x *= x;
 	}
 	return x * y;
 }
