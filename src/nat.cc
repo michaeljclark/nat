@@ -357,15 +357,23 @@ void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result)
 {
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
 	result._resize(m + n);
-	for (size_t j = 0; j < n; j++) {
-		limb_t k = 0;
+	limb_t carry = 0;
+	limb2_t mj = multiplier.limbs[0];
+	for (size_t i = 0; i < m; i++) {
+		limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + carry;
+		result.limbs[i] = limb_t(t);
+		carry = t >> limb_bits;
+	}
+	result.limbs[m] = carry;
+	for (size_t j = 1; j < n; j++) {
+		carry = 0;
+		mj = multiplier.limbs[j];
 		for (size_t i = 0; i < m; i++) {
-			limb2_t t = limb2_t(multiplicand.limbs[i]) * limb2_t(multiplier.limbs[j]) +
-				limb2_t(result.limbs[i + j]) + limb2_t(k);
+			limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + limb2_t(result.limbs[i + j]) + carry;
 			result.limbs[i + j] = limb_t(t);
-			k = t >> limb_bits;
+			carry = t >> limb_bits;
 		}
-		result.limbs[j + m] = k;
+		result.limbs[j + m] = carry;
 	}
 	result._contract();
 }
