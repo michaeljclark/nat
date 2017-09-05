@@ -92,6 +92,9 @@ struct Int
 	/*! not */
 	bool operator!() const;
 
+	/*! raise to the power */
+	Int pow(size_t exp) const;
+
 
 	/*
 	 * comparison operators

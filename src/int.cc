@@ -163,6 +163,15 @@ bool Int::operator!() const
 	return mag == 0;
 }
 
+/*! raise to the power */
+Int Int::pow(size_t exp) const
+{
+	Int result;
+	result.mag = mag.pow(exp);
+	return result;
+}
+
+
 /*
  * comparison are defined in terms of "equals" and "less than"
  */
