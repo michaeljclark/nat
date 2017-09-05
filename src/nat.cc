@@ -613,7 +613,7 @@ std::string Nat::to_string(size_t radix) const
 				chunk *= chunk;
 				digits <<= 1;
 				sq.push_back(chunk);
-			} while ((chunk.num_limbs() < (num_limbs() >> 1)));
+			} while ((chunk.num_limbs() < ((num_limbs() >> 1) + 1)));
 
 			/* recursively divide by chunk squares */
 			ptrdiff_t offset = _to_string_r(*this, sq, sq.size() - 1, s, digits, climit);
