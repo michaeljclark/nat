@@ -1,9 +1,7 @@
 %{
-#include <cerrno>
-#include <climits>
-#include <cstdlib>
-#include <string>
 #include <map>
+#include <memory>
+#include <string>
 
 #include "int.h"
 #include "calc-parser.hh"

@@ -11,7 +11,6 @@
 
 %code requires
 {
-#include "int.h"
 struct calc_scanner;
 struct calc_driver;
 struct node;
@@ -26,9 +25,12 @@ struct node;
 %code
 {
 #include <map>
+#include <memory>
+#include <string>
+
 #include "int.h"
-#include "calc-driver.h"
 #include "FlexLexer.h"
+#include "calc-driver.h"
 #include "calc-scanner.h"
 
 #undef yylex

@@ -1,7 +1,7 @@
-#include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
 #include <map>
+#include <memory>
+#include <string>
+#include <iostream>
 
 #include "int.h"
 #include "calc-parser.hh"
