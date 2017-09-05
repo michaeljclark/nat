@@ -42,6 +42,9 @@ struct Int
 	/*! copy constructor  */
 	Int(const Int &o);
 
+	/*! string constructor */
+	Int(std::string str);
+
 	/*! integral copy assignment operator */
 	Int& operator=(int n);
 
@@ -119,4 +122,7 @@ struct Int
 
 	/*! convert Nat to string */
 	std::string to_string() const;
+
+	/*! convert Nat from string */
+	void from_string(const char *str, size_t len);
 };

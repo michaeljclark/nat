@@ -32,6 +32,9 @@ Int::Int() : sign(0), mag(0) {}
 /*! integral constructor */
 Int::Int(int n) : sign(n < 0), mag(n < 0 ? -n : n) {}
 
+/*! string constructor */
+Int::Int(std::string str) : sign(0), mag(0) { from_string(str.c_str(), str.size()); }
+
 /*! copy constructor  */
 Int::Int(const Int &o) : sign(o.sign), mag(o.mag) {}
 
@@ -213,3 +216,16 @@ std::string Int::to_string() const
 		return mag.to_string();
 	}
 }
+
+/*! convert Nat from string */
+void Int::from_string(const char *str, size_t len)
+{
+	if (len == 0) return;
+	if (*str == '-') {
+		sign = true;
+		mag = Nat(std::string(str + 1, len - 1));
+	} else {
+		mag = Nat(std::string(str, len));
+	}
+}
+
