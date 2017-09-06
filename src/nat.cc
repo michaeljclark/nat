@@ -299,6 +299,22 @@ Nat Nat::operator|(const Nat &operand) const
 	return result |= operand;
 }
 
+/*! logical not */
+Nat Nat::operator~() const
+{
+	Nat result(*this);
+	for (auto &n : result.limbs) {
+		n = ~n;
+	}
+	return result;
+}
+
+/*! negate */
+Nat Nat::operator-() const
+{
+	return ~*this + 1;
+}
+
 
 /*
  * comparison are defined in terms of "equals" and "less than"

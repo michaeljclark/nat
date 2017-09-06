@@ -160,6 +160,12 @@ struct Nat
 	/*! logical or */
 	Nat operator|(const Nat &operand) const;
 
+	/*! logical not */
+	Nat operator~() const;
+
+	/*! negate */
+	Nat operator-() const;
+
 
 	/*
 	 * comparison operators
