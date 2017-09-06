@@ -75,7 +75,7 @@ expr:
 	| expr "*" expr  { $$ = driver.newbinop('*', $1, $3); }
 	| expr "/" expr  { $$ = driver.newbinop('/', $1, $3); }
 	| "(" expr ")"   { $$ = std::move($2); }
-	| "identifier"   { $$ = driver.variables[$1]; }
+	| "identifier"   { $$ = driver.lookup($1); }
 	| "-" expr       { $$ = driver.newunop('M', $2); }
 	| expr "^" expr  { $$ = driver.newbinop('^', $1, $3); }
 	| "number"       { $$ = driver.newnum($1); }

@@ -66,6 +66,15 @@ node* calc_driver::newnum(std::string str)
 	return a;
 }
 
+node* calc_driver::lookup(std::string var)
+{
+	node *n = variables[var];
+	if (!n) {
+		error("unknown symbol: " + var);
+	}
+	return n;
+}
+
 int calc_driver::parse()
 {
 	calc_scanner scanner;

@@ -39,6 +39,7 @@ struct calc_driver
 	node* newunop(int nodetype, node *l);
 	node* newbinop(int nodetype, node *l, node *r);
 	node* newnum(std::string str);
+	node* lookup(std::string var);
 
 	int parse();
 	void error(const yy::location& l, const std::string& m);
