@@ -232,7 +232,7 @@ Nat& Nat::operator>>=(size_t shamt)
 	return *this;
 }
 
-/*! logical and equals */
+/*! bitwise and equals */
 Nat& Nat::operator&=(const Nat &operand)
 {
 	_expand(operand);
@@ -243,7 +243,7 @@ Nat& Nat::operator&=(const Nat &operand)
 	return *this;
 }
 
-/*! logical or equals */
+/*! bitwise or equals */
 Nat& Nat::operator|=(const Nat &operand)
 {
 	_expand(operand);
@@ -254,7 +254,7 @@ Nat& Nat::operator|=(const Nat &operand)
 	return *this;
 }
 
-/*! logical xor equals */
+/*! bitwise xor equals */
 Nat& Nat::operator^=(const Nat &operand)
 {
 	_expand(operand);
@@ -296,28 +296,28 @@ Nat Nat::operator>>(size_t shamt) const
 	return result >>= shamt;
 }
 
-/*! logical and */
+/*! bitwise and */
 Nat Nat::operator&(const Nat &operand) const
 {
 	Nat result(*this);
 	return result &= operand;
 }
 
-/*! logical or */
+/*! bitwise or */
 Nat Nat::operator|(const Nat &operand) const
 {
 	Nat result(*this);
 	return result |= operand;
 }
 
-/*! logical xor */
+/*! bitwise xor */
 Nat Nat::operator^(const Nat &operand) const
 {
 	Nat result(*this);
 	return result ^= operand;
 }
 
-/*! logical not */
+/*! bitwise not */
 Nat Nat::operator~() const
 {
 	Nat result(*this);

@@ -136,13 +136,13 @@ struct Nat
 	/*! right shift equals */
 	Nat& operator>>=(size_t shamt);
 
-	/*! logical and equals */
+	/*! bitwise and equals */
 	Nat& operator&=(const Nat &operand);
 
-	/*! logical or equals */
+	/*! bitwise or equals */
 	Nat& operator|=(const Nat &operand);
 
-	/*! logical xor equals */
+	/*! bitwise xor equals */
 	Nat& operator^=(const Nat &operand);
 
 	/*! add with carry */
@@ -157,16 +157,16 @@ struct Nat
 	/*! right shift */
 	Nat operator>>(size_t shamt) const;
 
-	/*! logical and */
+	/*! bitwise and */
 	Nat operator&(const Nat &operand) const;
 
-	/*! logical or */
+	/*! bitwise or */
 	Nat operator|(const Nat &operand) const;
 
-	/*! logical xor */
+	/*! bitwise xor */
 	Nat operator^(const Nat &operand) const;
 
-	/*! logical not */
+	/*! bitwise not */
 	Nat operator~() const;
 
 	/*! negate */
