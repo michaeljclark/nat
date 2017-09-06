@@ -31,7 +31,6 @@ enum op
 struct node
 {
 	op opcode;
-
 	virtual ~node() {}
 	virtual Nat eval() = 0;
 };
@@ -39,21 +38,18 @@ struct node
 struct unop : node
 {
 	std::unique_ptr<node> l;
-
 	virtual Nat eval();
 };
 
 struct binop : node
 {
 	std::unique_ptr<node> l, r;
-
 	virtual Nat eval();
 };
 
 struct natural : node
 {
 	std::unique_ptr<Nat> number;
-
 	virtual Nat eval();
 };
 
