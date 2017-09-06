@@ -10,7 +10,18 @@
 #include "calc-scanner.h"
 
 
-Nat binop::eval()
+Nat unaryop::eval()
+{
+	Nat v = 0;
+	switch(opcode) {
+		case op_not: v = ~l->eval(); break;
+		case op_neg: v = -l->eval(); break;
+		default: break;
+	}
+	return v;
+}
+
+Nat binaryop::eval()
 {
 	Nat v = 0;
 	switch(opcode) {
@@ -36,40 +47,29 @@ Nat binop::eval()
 	return v;
 }
 
-Nat unop::eval()
-{
-	Nat v = 0;
-	switch(opcode) {
-		case op_not: v = ~l->eval(); break;
-		case op_neg: v = -l->eval(); break;
-		default: break;
-	}
-	return v;
-}
-
 Nat natural::eval()
 {
 	return *number;
 }
 
-node* calc_driver::newunop(op opcode, node *l)
+node* calc_driver::new_unary(op opcode, node *l)
 {
-	unop *a = new unop;
+	unaryop *a = new unaryop;
 	a->opcode = opcode;
 	a->l = std::unique_ptr<node>(l);
 	return a;
 }
 
-node* calc_driver::newbinop(op opcode, node *l, node *r)
+node* calc_driver::new_binary(op opcode, node *l, node *r)
 {
-	binop *a = new binop;
+	binaryop *a = new binaryop;
 	a->opcode = opcode;
 	a->l = std::unique_ptr<node>(l);
 	a->r = std::unique_ptr<node>(r);
 	return a;
 }
 
-node* calc_driver::newnat(std::string str)
+node* calc_driver::new_natural(std::string str)
 {
 	natural *a = new natural;
 	a->opcode = op_li;

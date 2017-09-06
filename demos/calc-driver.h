@@ -35,13 +35,13 @@ struct node
 	virtual Nat eval() = 0;
 };
 
-struct unop : node
+struct unaryop : node
 {
 	std::unique_ptr<node> l;
 	virtual Nat eval();
 };
 
-struct binop : node
+struct binaryop : node
 {
 	std::unique_ptr<node> l, r;
 	virtual Nat eval();
@@ -57,9 +57,9 @@ struct calc_driver
 {
 	std::map<std::string,node*> variables;
 
-	node* newunop(op opcode, node *l);
-	node* newbinop(op opcode, node *l, node *r);
-	node* newnat(std::string str);
+	node* new_unary(op opcode, node *l);
+	node* new_binary(op opcode, node *l, node *r);
+	node* new_natural(std::string str);
 	node* lookup(std::string var);
 
 	void eval(node *n);
