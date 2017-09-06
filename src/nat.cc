@@ -634,6 +634,8 @@ std::string Nat::to_string(size_t radix) const
 
 	switch (radix) {
 		case 10: {
+			if (*this == 0) return "0";
+
 			/* estimate string length */
 			std::string s;
 			size_t climit = (size_t)(((long long)(num_limbs()) << (limb_shift + 30)) / (long long)dgib) + 1;
