@@ -38,7 +38,7 @@ struct node;
 }
 
 %token
-  EOL  0  "end of file"
+  END  0  "end of file"
   NEWLINE "\n"
   ASSIGN  "="
   AND     "&"

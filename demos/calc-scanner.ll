@@ -43,6 +43,6 @@ int   [0-9]+
 {id}    return yy::calc_parser::make_IDENTIFIER(yytext, loc);
 [ \t]+  loc.step();
 \n      loc.lines(yyleng); loc.step(); return yy::calc_parser::make_NEWLINE(loc);
-<<EOF>> return yy::calc_parser::make_EOL(loc);
+<<EOF>> return yy::calc_parser::make_END(loc);
 .       driver.error (loc, "invalid character");
 %%
