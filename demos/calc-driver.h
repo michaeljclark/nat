@@ -66,6 +66,7 @@ struct calc_driver
 	node* newnat(std::string str);
 	node* lookup(std::string var);
 
+	void eval(node *n);
 	int parse();
 	void error(const yy::location& l, const std::string& m);
 	void error(const std::string& m);

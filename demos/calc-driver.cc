@@ -84,6 +84,11 @@ node* calc_driver::lookup(std::string var)
 	return n;
 }
 
+void calc_driver::eval(node *n)
+{
+	std::cout << "= " << n->eval().to_string() << std::endl;
+}
+
 int calc_driver::parse()
 {
 	calc_scanner scanner;

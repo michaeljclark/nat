@@ -70,7 +70,7 @@ struct node;
 %%
 
 unit:
-	| unit expr "\n" { printf("= %s\n", $2->eval().to_string().c_str()); };
+	| unit expr "\n"  { driver.eval($2); };
 	| unit assignment "\n"
 	| unit "\n"
 	;
