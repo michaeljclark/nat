@@ -10,7 +10,8 @@ enum op
 	op_and,
 	op_or,
 	op_xor,
-	op_not,
+	op_eq,
+	op_ne,
 	op_lt,
 	op_lte,
 	op_gt,
@@ -22,6 +23,7 @@ enum op
 	op_mul,
 	op_div,
 	op_rem,
+	op_not,
 	op_neg,
 	op_pow,
 };

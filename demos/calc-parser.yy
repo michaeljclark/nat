@@ -45,6 +45,8 @@ struct node;
   OR      "|"
   XOR     "^"
   NOT     "~"
+  EQ      "=="
+  NE      "!="
   LT      "<"
   LTE     "<="
   GT      ">"
@@ -79,6 +81,7 @@ assignment:
 %left "|";
 %left "^";
 %left "&";
+%left "==" "!=";
 %left "<" "<=" ">" ">=";
 %left "<<" ">>";
 %left "+" "-";
@@ -90,6 +93,8 @@ expr:
 	  expr "|" expr  { $$ = driver.newbinop(op_or,  $1, $3); }
 	| expr "&" expr  { $$ = driver.newbinop(op_and, $1, $3); }
 	| expr "^" expr  { $$ = driver.newbinop(op_xor, $1, $3); }
+	| expr "==" expr { $$ = driver.newbinop(op_eq,  $1, $3); }
+	| expr "!=" expr { $$ = driver.newbinop(op_ne,  $1, $3); }
 	| expr "<" expr  { $$ = driver.newbinop(op_lt,  $1, $3); }
 	| expr "<=" expr { $$ = driver.newbinop(op_lte, $1, $3); }
 	| expr ">" expr  { $$ = driver.newbinop(op_gt,  $1, $3); }

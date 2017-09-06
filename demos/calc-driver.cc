@@ -17,6 +17,8 @@ Nat binop::eval()
 		case op_and: v = this->l->eval() & this->r->eval(); break;
 		case op_or:  v = this->l->eval() | this->r->eval(); break;
 		case op_xor: v = this->l->eval() ^ this->r->eval(); break;
+		case op_eq:  v = this->l->eval() == this->r->eval(); break;
+		case op_ne:  v = this->l->eval() != this->r->eval(); break;
 		case op_lt:  v = this->l->eval() < this->r->eval(); break;
 		case op_lte: v = this->l->eval() <= this->r->eval(); break;
 		case op_gt:  v = this->l->eval() > this->r->eval(); break;
