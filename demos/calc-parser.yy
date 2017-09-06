@@ -41,6 +41,14 @@ struct node;
   EOL  0  "end of file"
   NEWLINE "\n"
   ASSIGN  "="
+  AND     "&"
+  OR      "|"
+  XOR     "^"
+  NOT     "~"
+  LT      "<"
+  LTE     "<="
+  GT      ">"
+  GTE     ">="
   RSHIFT  ">>"
   LSHIFT  "<<"
   MINUS   "-"
@@ -49,7 +57,7 @@ struct node;
   SLASH   "/"
   LPAREN  "("
   RPAREN  ")"
-  CARAT   "^"
+  POW     "**"
 ;
 
 %token <std::string> NUMBER "number"
@@ -67,12 +75,25 @@ unit:
 assignment:
 	  "identifier" "=" expr { driver.variables[$1] = $3; };
 
+%left "|";
+%left "^";
+%left "&";
+%left "<" "<=" ">" ">=";
+%left "<<" ">>";
 %left "+" "-";
 %left "*" "/";
-%left "^";
+%left "~";
+%left "**";
 
 expr:
-	  expr ">>" expr { $$ = driver.newbinop(op_srl, $1, $3); }
+	  expr "|" expr  { $$ = driver.newbinop(op_or,  $1, $3); }
+	| expr "&" expr  { $$ = driver.newbinop(op_and, $1, $3); }
+	| expr "^" expr  { $$ = driver.newbinop(op_xor, $1, $3); }
+	| expr "<" expr  { $$ = driver.newbinop(op_lt,  $1, $3); }
+	| expr "<=" expr { $$ = driver.newbinop(op_lte, $1, $3); }
+	| expr ">" expr  { $$ = driver.newbinop(op_gt,  $1, $3); }
+	| expr ">=" expr { $$ = driver.newbinop(op_gte, $1, $3); }
+	| expr ">>" expr { $$ = driver.newbinop(op_srl, $1, $3); }
 	| expr "<<" expr { $$ = driver.newbinop(op_sll, $1, $3); }
 	| expr "+" expr  { $$ = driver.newbinop(op_add, $1, $3); }
 	| expr "-" expr  { $$ = driver.newbinop(op_sub, $1, $3); }
@@ -80,8 +101,9 @@ expr:
 	| expr "/" expr  { $$ = driver.newbinop(op_div, $1, $3); }
 	| "(" expr ")"   { $$ = std::move($2); }
 	| "identifier"   { $$ = driver.lookup($1); }
+	| "~" expr       { $$ = driver.newunop(op_not, $2); }
 	| "-" expr       { $$ = driver.newunop(op_neg, $2); }
-	| expr "^" expr  { $$ = driver.newbinop(op_pow, $1, $3); }
+	| expr "**" expr { $$ = driver.newbinop(op_pow, $1, $3); }
 	| "number"       { $$ = driver.newnat($1); }
 	;
 

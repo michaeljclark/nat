@@ -14,6 +14,13 @@ Nat binop::eval()
 {
 	Nat v = 0;
 	switch(opcode) {
+		case op_and: v = this->l->eval() & this->r->eval(); break;
+		case op_or:  v = this->l->eval() | this->r->eval(); break;
+		case op_xor: v = this->l->eval() ^ this->r->eval(); break;
+		case op_lt:  v = this->l->eval() < this->r->eval(); break;
+		case op_lte: v = this->l->eval() <= this->r->eval(); break;
+		case op_gt:  v = this->l->eval() > this->r->eval(); break;
+		case op_gte: v = this->l->eval() >= this->r->eval(); break;
 		case op_srl: v = this->l->eval() >> this->r->eval().limb_at(0); break;
 		case op_sll: v = this->l->eval() << this->r->eval().limb_at(0); break;
 		case op_add: v = this->l->eval() + this->r->eval(); break;
@@ -30,6 +37,7 @@ Nat unop::eval()
 {
 	Nat v = 0;
 	switch(opcode) {
+		case op_not: v = ~l->eval(); break;
 		case op_neg: v = -l->eval(); break;
 		default: break;
 	}

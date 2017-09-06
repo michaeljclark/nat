@@ -19,6 +19,14 @@ int   [0-9]+
 
 %%
 "="     return yy::calc_parser::make_ASSIGN(loc);
+"&"     return yy::calc_parser::make_AND(loc);
+"|"     return yy::calc_parser::make_OR(loc);
+"^"     return yy::calc_parser::make_XOR(loc);
+"~"     return yy::calc_parser::make_NOT(loc);
+"<"     return yy::calc_parser::make_LT(loc);
+"<="    return yy::calc_parser::make_LTE(loc);
+">"     return yy::calc_parser::make_GT(loc);
+">="    return yy::calc_parser::make_GTE(loc);
 ">>"    return yy::calc_parser::make_RSHIFT(loc);
 "<<"    return yy::calc_parser::make_LSHIFT(loc);
 "+"     return yy::calc_parser::make_PLUS(loc);
@@ -27,7 +35,7 @@ int   [0-9]+
 "/"     return yy::calc_parser::make_SLASH(loc);
 "("     return yy::calc_parser::make_LPAREN(loc);
 ")"     return yy::calc_parser::make_RPAREN(loc);
-"^"     return yy::calc_parser::make_CARAT(loc);
+"**"    return yy::calc_parser::make_POW(loc);
 {int}   return yy::calc_parser::make_NUMBER(yytext, loc);
 {id}    return yy::calc_parser::make_IDENTIFIER(yytext, loc);
 [ \t]+  loc.step();
