@@ -19,6 +19,8 @@ int   [0-9]+
 
 %%
 "="     return yy::calc_parser::make_ASSIGN(loc);
+">>"    return yy::calc_parser::make_RSHIFT(loc);
+"<<"    return yy::calc_parser::make_LSHIFT(loc);
 "+"     return yy::calc_parser::make_PLUS(loc);
 "-"     return yy::calc_parser::make_MINUS(loc);
 "*"     return yy::calc_parser::make_STAR(loc);

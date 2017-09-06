@@ -10,59 +10,59 @@
 #include "calc-scanner.h"
 
 
-Int binop::eval()
+Nat binop::eval()
 {
-	Int v = 0;
-	switch(this->nodetype) {
-		case '+': v = this->l->eval() + this->r->eval(); break;
-		case '-': v = this->l->eval() - this->r->eval(); break;
-		case '*': v = this->l->eval() * this->r->eval(); break;
-		case '/': v = this->l->eval() / this->r->eval(); break;
-		case '^': v = this->l->eval().pow(this->r->eval().mag.limb_at(0)); break;
+	Nat v = 0;
+	switch(opcode) {
+		case op_srl: v = this->l->eval() >> this->r->eval().limb_at(0); break;
+		case op_sll: v = this->l->eval() << this->r->eval().limb_at(0); break;
+		case op_add: v = this->l->eval() + this->r->eval(); break;
+		case op_sub: v = this->l->eval() - this->r->eval(); break;
+		case op_mul: v = this->l->eval() * this->r->eval(); break;
+		case op_div: v = this->l->eval() / this->r->eval(); break;
+		case op_pow: v = this->l->eval().pow(this->r->eval().limb_at(0)); break;
+		default: break;
 	}
 	return v;
 }
 
-Int unop::eval()
+Nat unop::eval()
 {
-	Int v = 0;
-	switch(this->nodetype) {
-		case 'M': v = -l->eval(); break;
+	Nat v = 0;
+	switch(opcode) {
+		case op_neg: v = -l->eval(); break;
+		default: break;
 	}
 	return v;
 }
 
-Int numval::eval()
+Nat natural::eval()
 {
-	Int v = 0;
-	switch(this->nodetype) {
-		case 'K': v = *number; break;
-	}
-	return v;
+	return *number;
 }
 
-node* calc_driver::newunop(int nodetype, node *l)
+node* calc_driver::newunop(op opcode, node *l)
 {
 	unop *a = new unop;
-	a->nodetype = nodetype;
+	a->opcode = opcode;
 	a->l = std::unique_ptr<node>(l);
 	return a;
 }
 
-node* calc_driver::newbinop(int nodetype, node *l, node *r)
+node* calc_driver::newbinop(op opcode, node *l, node *r)
 {
 	binop *a = new binop;
-	a->nodetype = nodetype;
+	a->opcode = opcode;
 	a->l = std::unique_ptr<node>(l);
 	a->r = std::unique_ptr<node>(r);
 	return a;
 }
 
-node* calc_driver::newnum(std::string str)
+node* calc_driver::newnat(std::string str)
 {
-	numval *a = new numval;
-	a->nodetype = 'K';
-	a->number = std::unique_ptr<Int>(new Int(str));
+	natural *a = new natural;
+	a->opcode = op_li;
+	a->number = std::unique_ptr<Nat>(new Nat(str));
 	return a;
 }
 
