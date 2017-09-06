@@ -194,7 +194,7 @@ Nat& Nat::operator<<=(size_t shamt)
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
 		limbs.insert(limbs.begin(), limb_shamt, 0);
-		shamt -= limb_shamt;
+		shamt -= (limb_shamt << limb_shift);
 	}
 	if (!shamt) return *this;
 
@@ -217,7 +217,7 @@ Nat& Nat::operator>>=(size_t shamt)
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
 		limbs.erase(limbs.begin(), limbs.begin() + limb_shamt);
-		shamt -= limb_shamt;
+		shamt -= (limb_shamt << limb_shift);
 	}
 	if (!shamt) return *this;
 
