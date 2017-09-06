@@ -55,6 +55,7 @@ struct node;
   PLUS    "+"
   MUL     "*"
   DIV     "/"
+  REM     "%"
   LPAREN  "("
   RPAREN  ")"
   POW     "**"
@@ -81,7 +82,7 @@ assignment:
 %left "<" "<=" ">" ">=";
 %left "<<" ">>";
 %left "+" "-";
-%left "*" "/";
+%left "*" "/" "%";
 %left "~";
 %left "**";
 
@@ -99,6 +100,7 @@ expr:
 	| expr "-" expr  { $$ = driver.newbinop(op_sub, $1, $3); }
 	| expr "*" expr  { $$ = driver.newbinop(op_mul, $1, $3); }
 	| expr "/" expr  { $$ = driver.newbinop(op_div, $1, $3); }
+	| expr "%" expr  { $$ = driver.newbinop(op_rem, $1, $3); }
 	| "(" expr ")"   { $$ = std::move($2); }
 	| "identifier"   { $$ = driver.lookup($1); }
 	| "~" expr       { $$ = driver.newunop(op_not, $2); }

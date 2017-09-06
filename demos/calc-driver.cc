@@ -27,6 +27,7 @@ Nat binop::eval()
 		case op_sub: v = this->l->eval() - this->r->eval(); break;
 		case op_mul: v = this->l->eval() * this->r->eval(); break;
 		case op_div: v = this->l->eval() / this->r->eval(); break;
+		case op_rem: v = this->l->eval() % this->r->eval(); break;
 		case op_pow: v = this->l->eval().pow(this->r->eval().limb_at(0)); break;
 		default: break;
 	}

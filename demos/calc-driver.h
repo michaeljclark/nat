@@ -21,6 +21,7 @@ enum op
 	op_sub,
 	op_mul,
 	op_div,
+	op_rem,
 	op_neg,
 	op_pow,
 };

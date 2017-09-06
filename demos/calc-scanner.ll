@@ -33,6 +33,7 @@ int   [0-9]+
 "-"     return yy::calc_parser::make_MINUS(loc);
 "*"     return yy::calc_parser::make_MUL(loc);
 "/"     return yy::calc_parser::make_DIV(loc);
+"%"     return yy::calc_parser::make_REM(loc);
 "("     return yy::calc_parser::make_LPAREN(loc);
 ")"     return yy::calc_parser::make_RPAREN(loc);
 "**"    return yy::calc_parser::make_POW(loc);
