@@ -142,6 +142,9 @@ struct Nat
 	/*! logical or equals */
 	Nat& operator|=(const Nat &operand);
 
+	/*! logical xor equals */
+	Nat& operator^=(const Nat &operand);
+
 	/*! add with carry */
 	Nat operator+(const Nat &operand) const;
 
@@ -159,6 +162,9 @@ struct Nat
 
 	/*! logical or */
 	Nat operator|(const Nat &operand) const;
+
+	/*! logical xor */
+	Nat operator^(const Nat &operand) const;
 
 	/*! logical not */
 	Nat operator~() const;

@@ -254,6 +254,17 @@ Nat& Nat::operator|=(const Nat &operand)
 	return *this;
 }
 
+/*! logical xor equals */
+Nat& Nat::operator^=(const Nat &operand)
+{
+	_expand(operand);
+	for (size_t i = 0; i < num_limbs(); i++) {
+		limbs[i] = operand.limb_at(i) ^ limbs[i];
+	}
+	_contract();
+	return *this;
+}
+
 
 /* const operations copy and use the mutating operations */
 
@@ -297,6 +308,13 @@ Nat Nat::operator|(const Nat &operand) const
 {
 	Nat result(*this);
 	return result |= operand;
+}
+
+/*! logical xor */
+Nat Nat::operator^(const Nat &operand) const
+{
+	Nat result(*this);
+	return result ^= operand;
 }
 
 /*! logical not */
