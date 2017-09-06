@@ -147,6 +147,7 @@ struct Nat
 
 	/*! subtract with borrow */
 	Nat operator-(const Nat &operand) const;
+
 	/*! left shift */
 	Nat operator<<(size_t shamt) const;
 
