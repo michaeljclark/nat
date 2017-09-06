@@ -80,9 +80,7 @@ node* calc_driver::newnat(std::string str)
 node* calc_driver::lookup(std::string var)
 {
 	node *n = variables[var];
-	if (!n) {
-		error("unknown symbol: " + var);
-	}
+	if (!n) error("unknown symbol: " + var);
 	return n;
 }
 
@@ -90,8 +88,7 @@ int calc_driver::parse()
 {
 	calc_scanner scanner;
 	yy::calc_parser parser(scanner, *this);
-	int res = parser.parse();
-	return res;
+	return parser.parse();
 }
 
 void calc_driver::error(const yy::location& l, const std::string& m)
