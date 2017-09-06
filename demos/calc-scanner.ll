@@ -16,6 +16,8 @@ static yy::location loc;
 
 id    [a-zA-Z][a-zA-Z_0-9]*
 int   [0-9]+
+ws    [ \t]+
+eol   \n
 
 %%
 "="     return yy::calc_parser::make_ASSIGN(loc);
@@ -41,8 +43,8 @@ int   [0-9]+
 "**"    return yy::calc_parser::make_POW(loc);
 {int}   return yy::calc_parser::make_NUMBER(yytext, loc);
 {id}    return yy::calc_parser::make_IDENTIFIER(yytext, loc);
-[ \t]+  loc.step();
-\n      loc.lines(yyleng); loc.step(); return yy::calc_parser::make_NEWLINE(loc);
+{ws}    loc.step();
+{eol}   loc.lines(yyleng); loc.step(); return yy::calc_parser::make_NEWLINE(loc);
 <<EOF>> return yy::calc_parser::make_END(loc);
 .       driver.error (loc, "invalid character");
 %%
