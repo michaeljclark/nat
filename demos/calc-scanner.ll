@@ -19,7 +19,12 @@ int   [0-9]+|0b[01]+|0x[0-9A-Fa-f]+
 ws    [ \t]+
 eol   \n
 
+%{
+  #define YY_USER_ACTION loc.columns (yyleng);
+%}
+
 %%
+
 "<-"|"←"    return yy::calc_parser::make_ASSIGN(loc);
 "&"|"∧"     return yy::calc_parser::make_AND(loc);
 "|"|"∨"     return yy::calc_parser::make_OR(loc);
