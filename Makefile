@@ -22,7 +22,7 @@ libs: build/lib/libnat.a build/lib/libcalc.a
 
 tests: build/bin/nat-tests build/bin/int-tests
 
-demos: build/bin/calc-demo build/bin/nat-demo
+demos: build/bin/nat-demo
 
 clean: ; rm -fr build \
 	demos/calc-parser.cc demos/calc-parser.hh demos/calc-scanner.cc \
@@ -71,8 +71,5 @@ build/bin/nat-tests: build/obj/nat-tests.o build/lib/libnat.a
 build/bin/int-tests: build/obj/int-tests.o build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-build/bin/nat-demo: build/obj/nat-demo.o build/lib/libnat.a
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
-
-build/bin/calc-demo: build/obj/calc-demo.o build/lib/libcalc.a build/lib/libnat.a
+build/bin/nat-demo: build/obj/nat-demo.o build/lib/libcalc.a build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)
