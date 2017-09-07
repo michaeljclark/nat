@@ -14,7 +14,7 @@ src/int.h              | integer with sign and magnitude header
 src/int.cc             | integer with sign and magnitude impl
 tests/nat-tests.cc     | unit tests for the Nat class
 tests/int-tests.cc     | unit tests for the Int class
-demos/nat-demo.cc      | tests pow, multiply, divide and to_string
+demos/nat-demo.cc      | simple arbitrary precision calculator
 
 ## Testing
 
