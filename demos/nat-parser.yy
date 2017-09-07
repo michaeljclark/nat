@@ -40,12 +40,12 @@ struct node;
 %token
   END  0  "end of file"
   NEWLINE "\n"
-  ASSIGN  "<-"
+  ASSIGN  "="
   AND     "&"
   OR      "|"
   XOR     "^"
   NOT     "~"
-  EQ      "="
+  EQ      "=="
   NE      "!="
   LT      "<"
   LTE     "<="
@@ -79,12 +79,12 @@ end:  NEWLINE
 	;
 
 assignment:
-	  "identifier" "<-" expr { driver.variables[$1] = $3; };
+	  "identifier" "=" expr { driver.variables[$1] = $3; };
 
 %left "|";
 %left "^";
 %left "&";
-%left "=" "!=";
+%left "==" "!=";
 %left "<" "<=" ">" ">=";
 %left "<<" ">>";
 %left "+" "-";
@@ -96,7 +96,7 @@ expr:
 	  expr "|" expr  { $$ = driver.new_binary(op_or,  $1, $3); }
 	| expr "&" expr  { $$ = driver.new_binary(op_and, $1, $3); }
 	| expr "^" expr  { $$ = driver.new_binary(op_xor, $1, $3); }
-	| expr "=" expr  { $$ = driver.new_binary(op_eq,  $1, $3); }
+	| expr "==" expr { $$ = driver.new_binary(op_eq,  $1, $3); }
 	| expr "!=" expr { $$ = driver.new_binary(op_ne,  $1, $3); }
 	| expr "<" expr  { $$ = driver.new_binary(op_lt,  $1, $3); }
 	| expr "<=" expr { $$ = driver.new_binary(op_lte, $1, $3); }

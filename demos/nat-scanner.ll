@@ -25,12 +25,12 @@ eol   \n
 
 %%
 
-"<-"|"←"    return yy::nat_parser::make_ASSIGN(loc);
+"="|"←"     return yy::nat_parser::make_ASSIGN(loc);
 "&"|"∧"     return yy::nat_parser::make_AND(loc);
 "|"|"∨"     return yy::nat_parser::make_OR(loc);
 "^"|"⊻"     return yy::nat_parser::make_XOR(loc);
 "~"|"¬"     return yy::nat_parser::make_NOT(loc);
-"="         return yy::nat_parser::make_EQ(loc);
+"=="        return yy::nat_parser::make_EQ(loc);
 "!="|"≠"    return yy::nat_parser::make_NE(loc);
 "<"         return yy::nat_parser::make_LT(loc);
 "<="|"≤"    return yy::nat_parser::make_LTE(loc);
