@@ -22,7 +22,7 @@ libs: build/lib/libnat.a build/lib/libcalc.a
 
 tests: build/bin/nat-tests build/bin/int-tests
 
-demos: build/bin/calc-demo build/bin/nat-demo build/bin/gmp-demo build/bin/BigJavaDemo.class
+demos: build/bin/calc-demo build/bin/nat-demo
 
 clean: ; rm -fr build \
 	demos/calc-parser.cc demos/calc-parser.hh demos/calc-scanner.cc \
@@ -76,9 +76,3 @@ build/bin/nat-demo: build/obj/nat-demo.o build/lib/libnat.a
 
 build/bin/calc-demo: build/obj/calc-demo.o build/lib/libcalc.a build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)
-
-build/bin/gmp-demo: build/obj/gmp-demo.o
-	@echo LD $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) $(LDFLAGS) -lgmp -o $@ $^
-
-build/bin/BigJavaDemo.class: demos/BigJavaDemo.java
-	@echo JAVAC $@ ; mkdir -p $(@D) ; javac -d $(@D) $^
