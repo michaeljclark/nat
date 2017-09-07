@@ -20,12 +20,12 @@ ws    [ \t]+
 eol   \n
 
 %%
-"="|"←"     return yy::calc_parser::make_ASSIGN(loc);
+"<-"|"←"    return yy::calc_parser::make_ASSIGN(loc);
 "&"|"∧"     return yy::calc_parser::make_AND(loc);
 "|"|"∨"     return yy::calc_parser::make_OR(loc);
 "^"|"⊻"     return yy::calc_parser::make_XOR(loc);
 "~"|"¬"     return yy::calc_parser::make_NOT(loc);
-"=="        return yy::calc_parser::make_EQ(loc);
+"="         return yy::calc_parser::make_EQ(loc);
 "!="|"≠"    return yy::calc_parser::make_NE(loc);
 "<"         return yy::calc_parser::make_LT(loc);
 "<="|"≤"    return yy::calc_parser::make_LTE(loc);
