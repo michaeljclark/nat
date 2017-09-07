@@ -38,8 +38,8 @@ eol   \n
 ">="|"≥"    return yy::nat_parser::make_GTE(loc);
 ">>"|"»"    return yy::nat_parser::make_RSHIFT(loc);
 "<<"|"«"    return yy::nat_parser::make_LSHIFT(loc);
-"+"         return yy::nat_parser::make_PLUS(loc);
-"-"         return yy::nat_parser::make_MINUS(loc);
+"+"         return yy::nat_parser::make_ADD(loc);
+"-"         return yy::nat_parser::make_SUB(loc);
 "*"|"×"     return yy::nat_parser::make_MUL(loc);
 "/"|"÷"     return yy::nat_parser::make_DIV(loc);
 "%"|"mod"   return yy::nat_parser::make_REM(loc);
