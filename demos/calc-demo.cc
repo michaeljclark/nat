@@ -41,14 +41,19 @@ void repl(int argc, char **argv)
 	{
 		const LineInfo *li = el_line(el);
 		std::string line = li->buffer;
-		if (line.find("\n") == 0) continue;
+		bool empty = line.find("\n") == 0;
 		size_t contp = line.find(";\n");
-		continuation = contp != std::string::npos;
-		if (continuation) {
+		if (empty) {
+			if (continuation) continuation = false;
+			else continue;
+		}
+		if ((continuation = (contp != std::string::npos))) {
 			in << std::string(li->buffer, contp) << std::endl;
 			continue;
 		}
-		in << li->buffer;
+		if (!empty) {
+			in << li->buffer;
+		}
 		calc_driver driver;
 		driver.parse(in);
 		history(hist, &ev, H_ENTER, in.str().c_str());
