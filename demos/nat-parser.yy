@@ -28,7 +28,7 @@ struct node;
 #include <memory>
 #include <string>
 
-#include "int.h"
+#include "nat.h"
 #include "FlexLexer.h"
 #include "nat-driver.h"
 #include "nat-scanner.h"

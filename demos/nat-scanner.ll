@@ -3,7 +3,7 @@
 #include <memory>
 #include <string>
 
-#include "int.h"
+#include "nat.h"
 #include "nat-parser.hh"
 #include "nat-driver.h"
 #include "nat-scanner.h"
