@@ -4,10 +4,10 @@
 #include <iostream>
 
 #include "int.h"
-#include "calc-parser.hh"
-#include "calc-driver.h"
+#include "nat-parser.hh"
+#include "nat-driver.h"
 #include "FlexLexer.h"
-#include "calc-scanner.h"
+#include "nat-scanner.h"
 
 
 Nat unaryop::eval()
@@ -52,7 +52,7 @@ Nat natural::eval()
 	return *number;
 }
 
-node* calc_driver::new_unary(op opcode, node *l)
+node* nat_driver::new_unary(op opcode, node *l)
 {
 	unaryop *a = new unaryop;
 	a->opcode = opcode;
@@ -60,7 +60,7 @@ node* calc_driver::new_unary(op opcode, node *l)
 	return a;
 }
 
-node* calc_driver::new_binary(op opcode, node *l, node *r)
+node* nat_driver::new_binary(op opcode, node *l, node *r)
 {
 	binaryop *a = new binaryop;
 	a->opcode = opcode;
@@ -69,7 +69,7 @@ node* calc_driver::new_binary(op opcode, node *l, node *r)
 	return a;
 }
 
-node* calc_driver::new_natural(std::string str)
+node* nat_driver::new_natural(std::string str)
 {
 	natural *a = new natural;
 	a->opcode = op_li;
@@ -77,33 +77,33 @@ node* calc_driver::new_natural(std::string str)
 	return a;
 }
 
-node* calc_driver::lookup(std::string var)
+node* nat_driver::lookup(std::string var)
 {
 	node *n = variables[var];
 	if (!n) error("unknown symbol: " + var);
 	return n;
 }
 
-void calc_driver::eval(node *n)
+void nat_driver::eval(node *n)
 {
 	std::cout << "   = " << n->eval().to_string() << std::endl;
 }
 
-int calc_driver::parse(std::istream &in)
+int nat_driver::parse(std::istream &in)
 {
-	calc_scanner scanner;
+	nat_scanner scanner;
 	scanner.yyrestart(&in);
-	yy::calc_parser parser(scanner, *this);
+	yy::nat_parser parser(scanner, *this);
 	return parser.parse();
 }
 
-void calc_driver::error(const yy::location& l, const std::string& m)
+void nat_driver::error(const yy::location& l, const std::string& m)
 {
 	std::cerr << l << ": " << m << std::endl;
 	exit(1);
 }
 
-void calc_driver::error(const std::string& m)
+void nat_driver::error(const std::string& m)
 {
 	std::cerr << m << std::endl;
 	exit(1);

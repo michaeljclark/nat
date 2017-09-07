@@ -2,7 +2,7 @@
 %require "3.0.4"
 
 %defines
-%define parser_class_name {calc_parser}
+%define parser_class_name {nat_parser}
 %define api.token.constructor
 %define api.value.type variant
 %define parse.assert
@@ -11,14 +11,14 @@
 
 %code requires
 {
-struct calc_scanner;
-struct calc_driver;
+struct nat_scanner;
+struct nat_driver;
 struct node;
 }
 
-%parse-param { calc_scanner& scanner }
-%parse-param { calc_driver& driver }
-%lex-param { calc_driver& driver }
+%parse-param { nat_scanner& scanner }
+%parse-param { nat_driver& driver }
+%lex-param { nat_driver& driver }
 
 %locations
 
@@ -30,8 +30,8 @@ struct node;
 
 #include "int.h"
 #include "FlexLexer.h"
-#include "calc-driver.h"
-#include "calc-scanner.h"
+#include "nat-driver.h"
+#include "nat-scanner.h"
 
 #undef yylex
 #define yylex scanner.yylex
@@ -120,7 +120,7 @@ expr:
 %%
 
 void
-yy::calc_parser::error (const location_type& l, const std::string& m)
+yy::nat_parser::error (const location_type& l, const std::string& m)
 {
   driver.error(l, m);
 }

@@ -25,20 +25,20 @@ tests: build/bin/nat-tests build/bin/int-tests
 demos: build/bin/nat-demo
 
 clean: ; rm -fr build \
-	demos/calc-parser.cc demos/calc-parser.hh demos/calc-scanner.cc \
+	demos/nat-parser.cc demos/nat-parser.hh demos/nat-scanner.cc \
 	demos/stack.hh demos/position.hh demos/location.hh
 
 
 # build rules
 
 
-build/obj/calc-driver.o: demos/calc-driver.cc demos/calc-parser.hh
+build/obj/nat-driver.o: demos/nat-driver.cc demos/nat-parser.hh
 	@echo CC $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
-demos/calc-parser.cc demos/calc-parser.hh: demos/calc-parser.yy
-	$(BISON) --language=c++ -d -o demos/calc-parser.cc $<
+demos/nat-parser.cc demos/nat-parser.hh: demos/nat-parser.yy
+	$(BISON) --language=c++ -d -o demos/nat-parser.cc $<
 
-demos/calc-scanner.cc: demos/calc-scanner.ll demos/calc-parser.hh
+demos/nat-scanner.cc: demos/nat-scanner.ll demos/nat-parser.hh
 	$(FLEX) --c++ --stdinit -o $@ $<
 
 build/obj/%.o: src/%.c
@@ -59,7 +59,7 @@ build/obj/%.o: demos/%.c
 build/obj/%.o: utils/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
 
-build/lib/libcalc.a: build/obj/calc-driver.o build/obj/calc-parser.o build/obj/calc-scanner.o
+build/lib/libcalc.a: build/obj/nat-driver.o build/obj/nat-parser.o build/obj/nat-scanner.o
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/lib/libnat.a: build/obj/nat.o build/obj/int.o

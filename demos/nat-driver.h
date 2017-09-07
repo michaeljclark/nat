@@ -1,7 +1,7 @@
 #pragma once
 
 #undef YY_DECL
-#define YY_DECL yy::calc_parser::symbol_type calc_scanner::yylex(calc_driver &driver)
+#define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_driver &driver)
 
 enum op
 {
@@ -53,7 +53,7 @@ struct natural : node
 	virtual Nat eval();
 };
 
-struct calc_driver
+struct nat_driver
 {
 	std::map<std::string,node*> variables;
 

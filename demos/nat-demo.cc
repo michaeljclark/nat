@@ -8,8 +8,8 @@
 #include <histedit.h>
 
 #include "nat.h"
-#include "calc-parser.hh"
-#include "calc-driver.h"
+#include "nat-parser.hh"
+#include "nat-driver.h"
 
 
 static bool continuation = false;
@@ -54,7 +54,7 @@ void repl(int argc, char **argv)
 		if (!empty) {
 			in << li->buffer;
 		}
-		calc_driver driver;
+		nat_driver driver;
 		driver.parse(in);
 		history(hist, &ev, H_ENTER, in.str().c_str());
 		in.str(std::string());
@@ -66,7 +66,7 @@ void repl(int argc, char **argv)
 void interp(int argc, char **argv)
 {
 	std::ifstream in(argv[1]);
-	calc_driver driver;
+	nat_driver driver;
 	driver.parse(in);
 }
 
