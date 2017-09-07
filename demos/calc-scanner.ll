@@ -15,7 +15,7 @@ static yy::location loc;
 %option yyclass="calc_scanner"
 
 id    [a-zA-Z][a-zA-Z_0-9]*
-int   [0-9]+
+int   [0-9]+|0b[01]+|0x[0-9A-Fa-f]+
 ws    [ \t]+
 eol   \n
 
