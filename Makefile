@@ -1,8 +1,10 @@
-AR          = ar
-CC          = cc
-CXX         = c++
-FLEX        = /usr/local/bin/flex
-BISON       = /usr/local/bin/bison
+AR          := $(shell which ar)
+CC          := $(shell which cc)
+CXX         := $(shell which c++)
+FLEX        := $(shell which flex)
+BISON       := $(shell which bison)
+EDIT_CFLAGS := $(shell pkg-config ncurses --cflags) $(shell pkg-config libedit --cflags)
+EDIT_LIBS   := $(shell pkg-config ncurses --libs) $(shell pkg-config libedit --libs)
 INCLUDES    = -Isrc -I/usr/local/include
 DEBUG_FLAGS = -g
 OPT_FLAGS   = -O3
@@ -49,7 +51,7 @@ build/obj/%.o: tests/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
 
 build/obj/%.o: demos/%.cc
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
+	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $^
 
 build/obj/%.o: demos/%.c
 	@echo CC $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) -c -o $@ $^
@@ -73,7 +75,7 @@ build/bin/nat-demo: build/obj/nat-demo.o build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 build/bin/calc-demo: build/obj/calc-demo.o build/lib/libcalc.a build/lib/libnat.a
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)
 
 build/bin/gmp-demo: build/obj/gmp-demo.o
 	@echo LD $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) $(LDFLAGS) -lgmp -o $@ $^

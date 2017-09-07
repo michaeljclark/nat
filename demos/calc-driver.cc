@@ -89,9 +89,10 @@ void calc_driver::eval(node *n)
 	std::cout << "= " << n->eval().to_string() << std::endl;
 }
 
-int calc_driver::parse()
+int calc_driver::parse(std::istream &in)
 {
 	calc_scanner scanner;
+	scanner.yyrestart(&in);
 	yy::calc_parser parser(scanner, *this);
 	return parser.parse();
 }

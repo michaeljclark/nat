@@ -70,9 +70,12 @@ struct node;
 %%
 
 unit:
-	| unit expr "\n"  { driver.eval($2); };
-	| unit assignment "\n"
-	| unit "\n"
+	| unit expr end  { driver.eval($2); };
+	| unit assignment end
+	;
+
+end:  NEWLINE
+	| END
 	;
 
 assignment:

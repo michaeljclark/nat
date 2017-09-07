@@ -63,7 +63,7 @@ struct calc_driver
 	node* lookup(std::string var);
 
 	void eval(node *n);
-	int parse();
+	int parse(std::istream &in);
 	void error(const yy::location& l, const std::string& m);
 	void error(const std::string& m);
 };
