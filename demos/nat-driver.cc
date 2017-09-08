@@ -126,9 +126,10 @@ int nat_driver::parse(std::istream &in)
 	return parser.parse();
 }
 
-void nat_driver::run()
+void nat_driver::run(op opcode)
 {
 	for (auto n : nodes) {
+		if (n->opcode != opcode) continue;
 		switch (n->opcode) {
 			case op_setvar:
 				std::cout << " "
