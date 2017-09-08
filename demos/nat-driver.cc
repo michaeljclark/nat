@@ -25,23 +25,23 @@ Nat binaryop::eval()
 {
 	Nat v = 0;
 	switch(opcode) {
-		case op_and: v = this->l->eval() & this->r->eval(); break;
-		case op_or:  v = this->l->eval() | this->r->eval(); break;
-		case op_xor: v = this->l->eval() ^ this->r->eval(); break;
-		case op_eq:  v = this->l->eval() == this->r->eval(); break;
-		case op_ne:  v = this->l->eval() != this->r->eval(); break;
-		case op_lt:  v = this->l->eval() < this->r->eval(); break;
-		case op_lte: v = this->l->eval() <= this->r->eval(); break;
-		case op_gt:  v = this->l->eval() > this->r->eval(); break;
-		case op_gte: v = this->l->eval() >= this->r->eval(); break;
-		case op_srl: v = this->l->eval() >> this->r->eval().limb_at(0); break;
-		case op_sll: v = this->l->eval() << this->r->eval().limb_at(0); break;
-		case op_add: v = this->l->eval() + this->r->eval(); break;
-		case op_sub: v = this->l->eval() - this->r->eval(); break;
-		case op_mul: v = this->l->eval() * this->r->eval(); break;
-		case op_div: v = this->l->eval() / this->r->eval(); break;
-		case op_rem: v = this->l->eval() % this->r->eval(); break;
-		case op_pow: v = this->l->eval().pow(this->r->eval().limb_at(0)); break;
+		case op_and: v = l->eval() &  r->eval(); break;
+		case op_or:  v = l->eval() |  r->eval(); break;
+		case op_xor: v = l->eval() ^  r->eval(); break;
+		case op_eq:  v = l->eval() == r->eval(); break;
+		case op_ne:  v = l->eval() != r->eval(); break;
+		case op_lt:  v = l->eval() <  r->eval(); break;
+		case op_lte: v = l->eval() <= r->eval(); break;
+		case op_gt:  v = l->eval() >  r->eval(); break;
+		case op_gte: v = l->eval() >= r->eval(); break;
+		case op_srl: v = l->eval() >> r->eval().limb_at(0); break;
+		case op_sll: v = l->eval() << r->eval().limb_at(0); break;
+		case op_add: v = l->eval() +  r->eval(); break;
+		case op_sub: v = l->eval() -  r->eval(); break;
+		case op_mul: v = l->eval() *  r->eval(); break;
+		case op_div: v = l->eval() /  r->eval(); break;
+		case op_rem: v = l->eval() %  r->eval(); break;
+		case op_pow: v = l->eval().pow(r->eval().limb_at(0)); break;
 		default: break;
 	}
 	return v;
