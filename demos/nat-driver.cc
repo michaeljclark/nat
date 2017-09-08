@@ -10,46 +10,65 @@
 #include "nat-scanner.h"
 
 
-Nat unaryop::eval()
+Nat unaryop::eval(nat_driver *d)
 {
 	Nat v = 0;
 	switch(opcode) {
-		case op_not: v = ~l->eval(); break;
-		case op_neg: v = -l->eval(); break;
+		case op_not: v = ~l->eval(d); break;
+		case op_neg: v = -l->eval(d); break;
 		default: break;
 	}
 	return v;
 }
 
-Nat binaryop::eval()
+Nat binaryop::eval(nat_driver *d)
 {
 	Nat v = 0;
 	switch(opcode) {
-		case op_and: v = l->eval() &  r->eval(); break;
-		case op_or:  v = l->eval() |  r->eval(); break;
-		case op_xor: v = l->eval() ^  r->eval(); break;
-		case op_eq:  v = l->eval() == r->eval(); break;
-		case op_ne:  v = l->eval() != r->eval(); break;
-		case op_lt:  v = l->eval() <  r->eval(); break;
-		case op_lte: v = l->eval() <= r->eval(); break;
-		case op_gt:  v = l->eval() >  r->eval(); break;
-		case op_gte: v = l->eval() >= r->eval(); break;
-		case op_srl: v = l->eval() >> r->eval().limb_at(0); break;
-		case op_sll: v = l->eval() << r->eval().limb_at(0); break;
-		case op_add: v = l->eval() +  r->eval(); break;
-		case op_sub: v = l->eval() -  r->eval(); break;
-		case op_mul: v = l->eval() *  r->eval(); break;
-		case op_div: v = l->eval() /  r->eval(); break;
-		case op_rem: v = l->eval() %  r->eval(); break;
-		case op_pow: v = l->eval().pow(r->eval().limb_at(0)); break;
+		case op_and: v = l->eval(d) &  r->eval(d); break;
+		case op_or:  v = l->eval(d) |  r->eval(d); break;
+		case op_xor: v = l->eval(d) ^  r->eval(d); break;
+		case op_eq:  v = l->eval(d) == r->eval(d); break;
+		case op_ne:  v = l->eval(d) != r->eval(d); break;
+		case op_lt:  v = l->eval(d) <  r->eval(d); break;
+		case op_lte: v = l->eval(d) <= r->eval(d); break;
+		case op_gt:  v = l->eval(d) >  r->eval(d); break;
+		case op_gte: v = l->eval(d) >= r->eval(d); break;
+		case op_srl: v = l->eval(d) >> r->eval(d).limb_at(0); break;
+		case op_sll: v = l->eval(d) << r->eval(d).limb_at(0); break;
+		case op_add: v = l->eval(d) +  r->eval(d); break;
+		case op_sub: v = l->eval(d) -  r->eval(d); break;
+		case op_mul: v = l->eval(d) *  r->eval(d); break;
+		case op_div: v = l->eval(d) /  r->eval(d); break;
+		case op_rem: v = l->eval(d) %  r->eval(d); break;
+		case op_pow: v = l->eval(d).pow(r->eval(d).limb_at(0)); break;
 		default: break;
 	}
 	return v;
 }
 
-Nat natural::eval()
+Nat natural::eval(nat_driver *d)
 {
-	return *number;
+	return *r;
+}
+
+Nat setvar::eval(nat_driver *d)
+{
+	d->variables[*l] = r.get();
+	return r->eval(d);
+}
+
+Nat reg::eval(nat_driver *d)
+{
+	auto ri = d->registers.find(l);
+	return ri != d->registers.end() ? ri->second : Nat(0);
+}
+
+Nat setreg::eval(nat_driver *d)
+{
+	Nat val = r->eval(d);
+	d->registers[l] = val;
+	return val;
 }
 
 node* nat_driver::new_unary(op opcode, node *l)
@@ -73,20 +92,30 @@ node* nat_driver::new_natural(std::string str)
 {
 	natural *a = new natural;
 	a->opcode = op_li;
-	a->number = std::unique_ptr<Nat>(new Nat(str));
+	a->r = std::unique_ptr<Nat>(new Nat(str));
 	return a;
 }
 
-node* nat_driver::lookup(std::string var)
+node* nat_driver::new_variable(std::string str, node *r)
+{
+	setvar *a = new setvar;
+	a->opcode = op_setvar;
+	a->l = std::unique_ptr<std::string>(new std::string(str));
+	a->r = std::unique_ptr<node>(r);
+	variables[str] = a;
+	return a;
+}
+
+node* nat_driver::lookup_variable(std::string var)
 {
 	node *n = variables[var];
 	if (!n) error("unknown symbol: " + var);
 	return n;
 }
 
-void nat_driver::eval(node *n)
+void nat_driver::add_toplevel(node *n)
 {
-	std::cout << "   = " << n->eval().to_string() << std::endl;
+	nodes.push_back(n);
 }
 
 int nat_driver::parse(std::istream &in)
@@ -95,6 +124,26 @@ int nat_driver::parse(std::istream &in)
 	scanner.yyrestart(&in);
 	yy::nat_parser parser(scanner, *this);
 	return parser.parse();
+}
+
+void nat_driver::run()
+{
+	for (auto n : nodes) {
+		switch (n->opcode) {
+			case op_setvar:
+				std::cout << " "
+					<< *static_cast<setvar*>(n)->l
+					<< " = " << n->eval(this).to_string() << std::endl;
+				break;
+			case op_setreg:
+				std::cout << "_"
+					<< static_cast<setreg*>(n)->l
+					<< " = " << n->eval(this).to_string() << std::endl;
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void nat_driver::error(const yy::location& l, const std::string& m)

@@ -56,6 +56,7 @@ void repl(int argc, char **argv)
 		}
 		nat_driver driver;
 		driver.parse(in);
+		driver.run();
 		history(hist, &ev, H_ENTER, in.str().c_str());
 		in.str(std::string());
 	}
@@ -68,6 +69,7 @@ void interp(int argc, char **argv)
 	std::ifstream in(argv[1]);
 	nat_driver driver;
 	driver.parse(in);
+	driver.run();
 }
 
 int main(int argc, char **argv)

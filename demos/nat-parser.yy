@@ -65,13 +65,13 @@ struct node;
 
 %token <std::string> NUMBER "number"
 %token <std::string> IDENTIFIER "identifier"
+%type <node*> assignment
 %type <node*> expr
 
 %%
 
 unit:
-	| unit expr end  { driver.eval($2); };
-	| unit assignment end
+	| unit assignment end   { driver.add_toplevel($2); }
 	;
 
 end:  NEWLINE
@@ -79,7 +79,7 @@ end:  NEWLINE
 	;
 
 assignment:
-	  "identifier" "=" expr { driver.variables[$1] = $3; };
+	  "identifier" "=" expr { $$ = driver.new_variable($1, $3); };
 
 %left "|";
 %left "^";
@@ -110,7 +110,7 @@ expr:
 	| expr "/" expr  { $$ = driver.new_binary(op_div, $1, $3); }
 	| expr "%" expr  { $$ = driver.new_binary(op_rem, $1, $3); }
 	| "(" expr ")"   { $$ = std::move($2); }
-	| "identifier"   { $$ = driver.lookup($1); }
+	| "identifier"   { $$ = driver.lookup_variable($1); }
 	| "~" expr       { $$ = driver.new_unary(op_not, $2); }
 	| "-" expr       { $$ = driver.new_unary(op_neg, $2); }
 	| expr "**" expr { $$ = driver.new_binary(op_pow, $1, $3); }

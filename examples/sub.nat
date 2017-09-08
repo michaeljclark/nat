@@ -3,4 +3,3 @@ mask ← (1«xlen)-1
 rs1 ← 9
 rs2 ← 3
 rd  ← (rs1 + ¬rs2 + 1) ∧ mask
-rd

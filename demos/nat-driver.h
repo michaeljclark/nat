@@ -6,6 +6,8 @@
 enum op
 {
 	op_none,
+	op_setvar,
+	op_setreg,
 	op_li,
 	op_and,
 	op_or,
@@ -28,42 +30,70 @@ enum op
 	op_pow,
 };
 
+struct nat_driver;
+
 struct node
 {
 	op opcode;
 	virtual ~node() {}
-	virtual Nat eval() = 0;
+	virtual Nat eval(nat_driver *) = 0;
 };
 
 struct unaryop : node
 {
 	std::unique_ptr<node> l;
-	virtual Nat eval();
+	virtual Nat eval(nat_driver *);
 };
 
 struct binaryop : node
 {
 	std::unique_ptr<node> l, r;
-	virtual Nat eval();
+	virtual Nat eval(nat_driver *);
 };
 
 struct natural : node
 {
-	std::unique_ptr<Nat> number;
-	virtual Nat eval();
+	std::unique_ptr<Nat> r;
+	virtual Nat eval(nat_driver *);
+};
+
+struct setvar : node
+{
+	std::unique_ptr<std::string> l;
+	std::unique_ptr<node> r;
+	virtual Nat eval(nat_driver *);
+};
+
+struct reg : node
+{
+	size_t l;
+	virtual Nat eval(nat_driver *);
+};
+
+struct setreg : node
+{
+	size_t l;
+	std::unique_ptr<node> r;
+	virtual Nat eval(nat_driver *);
 };
 
 struct nat_driver
 {
+	std::vector<node*> nodes;
 	std::map<std::string,node*> variables;
+	std::map<size_t,Nat> registers;
 
 	node* new_unary(op opcode, node *l);
 	node* new_binary(op opcode, node *l, node *r);
 	node* new_natural(std::string str);
-	node* lookup(std::string var);
+	node* new_variable(std::string str, node *r);
+	node* lookup_variable(std::string var);
 
-	void eval(node *n);
+	void add_toplevel(node *n);
+
 	int parse(std::istream &in);
+	void run();
+
 	void error(const yy::location& l, const std::string& m);
 	void error(const std::string& m);
 };
