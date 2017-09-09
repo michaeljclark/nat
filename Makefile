@@ -31,7 +31,6 @@ clean: ; rm -fr build \
 
 # build rules
 
-
 build/obj/nat-driver.o: demo/nat-driver.cc demo/nat-parser.hh
 	@echo CC $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 

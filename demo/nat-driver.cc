@@ -319,7 +319,6 @@ void nat_driver::add_toplevel(node *n)
 	nodes.push_back(n);
 }
 
-
 void nat_driver::error(const yy::location& l, const std::string& m)
 {
 	std::cerr << l << ": " << m << std::endl;
