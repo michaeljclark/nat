@@ -79,10 +79,9 @@ setvar::setvar(std::string l, node *r)
 reg::reg(size_t l)
 	: node(op_reg), l(l) {}
 
-setreg::setreg(size_t l, node *r, var *v)
+setreg::setreg(size_t l, node *r)
 	: node(op_setreg), l(l),
-	  r(std::unique_ptr<node>(r)),
-	  v(std::unique_ptr<var>(v)) {}
+	  r(std::unique_ptr<node>(r)) {}
 
 
 /*
@@ -277,8 +276,7 @@ std::string reg::to_string(nat_driver *d)
 
 std::string setreg::to_string(nat_driver *d)
 {
-	return std::string("(") + op_name[opcode] + " _" + std::to_string(l) + ", " + r->to_string(d) + ")" +
-		(v ? std::string(" /* " + *v->l + std::string(" */")) : "");
+	return std::string("(") + op_name[opcode] + " _" + std::to_string(l) + ", " + r->to_string(d) + ")";
 }
 
 
