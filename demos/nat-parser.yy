@@ -79,7 +79,7 @@ end:  NEWLINE
 	;
 
 assignment:
-	  "identifier" "=" expr { $$ = driver.new_variable($1, $3); };
+	  "identifier" "=" expr { $$ = driver.set_variable($1, $3); };
 
 %left "|";
 %left "^";
@@ -93,26 +93,26 @@ assignment:
 %left "**";
 
 expr:
-	  expr "|" expr  { $$ = driver.new_binary(op_or,  $1, $3); }
-	| expr "&" expr  { $$ = driver.new_binary(op_and, $1, $3); }
-	| expr "^" expr  { $$ = driver.new_binary(op_xor, $1, $3); }
-	| expr "==" expr { $$ = driver.new_binary(op_eq,  $1, $3); }
-	| expr "!=" expr { $$ = driver.new_binary(op_ne,  $1, $3); }
-	| expr "<" expr  { $$ = driver.new_binary(op_lt,  $1, $3); }
-	| expr "<=" expr { $$ = driver.new_binary(op_lte, $1, $3); }
-	| expr ">" expr  { $$ = driver.new_binary(op_gt,  $1, $3); }
-	| expr ">=" expr { $$ = driver.new_binary(op_gte, $1, $3); }
-	| expr ">>" expr { $$ = driver.new_binary(op_srl, $1, $3); }
-	| expr "<<" expr { $$ = driver.new_binary(op_sll, $1, $3); }
-	| expr "+" expr  { $$ = driver.new_binary(op_add, $1, $3); }
-	| expr "-" expr  { $$ = driver.new_binary(op_sub, $1, $3); }
-	| expr "*" expr  { $$ = driver.new_binary(op_mul, $1, $3); }
-	| expr "/" expr  { $$ = driver.new_binary(op_div, $1, $3); }
-	| expr "%" expr  { $$ = driver.new_binary(op_rem, $1, $3); }
+	  expr "|" expr  { $$ = driver.new_binary(op_or,   $1, $3); }
+	| expr "&" expr  { $$ = driver.new_binary(op_and,  $1, $3); }
+	| expr "^" expr  { $$ = driver.new_binary(op_xor,  $1, $3); }
+	| expr "==" expr { $$ = driver.new_binary(op_seq,  $1, $3); }
+	| expr "!=" expr { $$ = driver.new_binary(op_sne,  $1, $3); }
+	| expr "<" expr  { $$ = driver.new_binary(op_slt,  $1, $3); }
+	| expr "<=" expr { $$ = driver.new_binary(op_slte, $1, $3); }
+	| expr ">" expr  { $$ = driver.new_binary(op_sgt,  $1, $3); }
+	| expr ">=" expr { $$ = driver.new_binary(op_sgte, $1, $3); }
+	| expr ">>" expr { $$ = driver.new_binary(op_srl,  $1, $3); }
+	| expr "<<" expr { $$ = driver.new_binary(op_sll,  $1, $3); }
+	| expr "+" expr  { $$ = driver.new_binary(op_add,  $1, $3); }
+	| expr "-" expr  { $$ = driver.new_binary(op_sub,  $1, $3); }
+	| expr "*" expr  { $$ = driver.new_binary(op_mul,  $1, $3); }
+	| expr "/" expr  { $$ = driver.new_binary(op_div,  $1, $3); }
+	| expr "%" expr  { $$ = driver.new_binary(op_rem,  $1, $3); }
 	| "(" expr ")"   { $$ = std::move($2); }
-	| "identifier"   { $$ = driver.lookup_variable($1); }
-	| "~" expr       { $$ = driver.new_unary(op_not, $2); }
-	| "-" expr       { $$ = driver.new_unary(op_neg, $2); }
+	| "identifier"   { $$ = driver.get_variable($1); }
+	| "~" expr       { $$ = driver.new_unary(op_not,  $2); }
+	| "-" expr       { $$ = driver.new_unary(op_neg,  $2); }
 	| expr "**" expr { $$ = driver.new_binary(op_pow, $1, $3); }
 	| "number"       { $$ = driver.new_natural($1); }
 	;

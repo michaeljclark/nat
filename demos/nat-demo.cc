@@ -64,12 +64,35 @@ void repl(int argc, char **argv)
 	history_end(hist);
 }
 
+void print_usage(char **argv)
+{
+	fprintf(stderr, "usage: %s [(--run|--dump|--lower) <filename>]\n", argv[0]);
+}
+
 void interp(int argc, char **argv)
 {
-	std::ifstream in(argv[1]);
+	bool run = strcmp(argv[1], "--run") == 0;
+	bool dump = strcmp(argv[1], "--dump") == 0;
+	bool lower = strcmp(argv[1], "--lower") == 0;
+
+	if (!(run || dump || lower)) {
+		print_usage(argv);
+		exit(1);
+	}
+
+	std::ifstream in(argv[2]);
 	nat_driver driver;
 	driver.parse(in);
-	driver.run(op_setvar);
+	if (run) {
+		driver.run(op_setvar);
+	}
+	else if (dump) {
+		driver.dump(op_setvar);
+	}
+	else if (lower) {
+		driver.lower();
+		driver.dump(op_setreg);
+	}
 }
 
 int main(int argc, char **argv)
@@ -78,10 +101,10 @@ int main(int argc, char **argv)
 		(argc == 2 && strcmp(argv[1], "-") == 0))
 	{
 		repl(argc, argv);
-	} else if (argc == 2) {
+	} else if (argc == 3) {
 		interp(argc, argv);
 	} else {
-		fprintf(stderr, "usage: %s [<filename>|-]\n", argv[0]);
+		print_usage(argv);
 		exit(1);
 	}
 }

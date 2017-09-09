@@ -3,21 +3,31 @@
 #undef YY_DECL
 #define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_driver &driver)
 
+struct node;
+struct reg;
+typedef std::vector<node*> node_list;
+typedef std::map<std::string,node*> node_map;
+typedef std::map<std::string,size_t> ssa_map;
+typedef std::map<size_t,Nat> reg_map;
+struct nat_driver;
+
 enum op
 {
 	op_none,
+	op_var,
 	op_setvar,
+	op_reg,
 	op_setreg,
 	op_li,
 	op_and,
 	op_or,
 	op_xor,
-	op_eq,
-	op_ne,
-	op_lt,
-	op_lte,
-	op_gt,
-	op_gte,
+	op_seq,
+	op_sne,
+	op_slt,
+	op_slte,
+	op_sgt,
+	op_sgte,
 	op_srl,
 	op_sll,
 	op_add,
@@ -30,69 +40,111 @@ enum op
 	op_pow,
 };
 
-struct nat_driver;
-
 struct node
 {
 	op opcode;
+
+	node(op opcode);
 	virtual ~node() {}
 	virtual Nat eval(nat_driver *) = 0;
+	virtual node_list lower(nat_driver *) = 0;
+	virtual std::string to_string(nat_driver *) = 0;
 };
 
 struct unaryop : node
 {
 	std::unique_ptr<node> l;
+
+	unaryop(op opcode, node *l);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct binaryop : node
 {
 	std::unique_ptr<node> l, r;
+
+	binaryop(op opcode, node *l, node *r);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct natural : node
 {
 	std::unique_ptr<Nat> r;
+
+	natural(std::string r);
+	natural(Nat &n);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
+};
+
+struct var : node
+{
+	std::unique_ptr<std::string> l;
+
+	var(std::string l);
+	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct setvar : node
 {
 	std::unique_ptr<std::string> l;
 	std::unique_ptr<node> r;
+
+	setvar(std::string l, node *r);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct reg : node
 {
 	size_t l;
+
+	reg(size_t l);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct setreg : node
 {
 	size_t l;
 	std::unique_ptr<node> r;
+
+	setreg(size_t l, node *r);
 	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
 };
 
 struct nat_driver
 {
-	std::vector<node*> nodes;
-	std::map<std::string,node*> variables;
-	std::map<size_t,Nat> registers;
+	node_list nodes;
+	node_map variables;
+	ssa_map varssa;
+	reg_map registers;
+	size_t regnum;
+
+	nat_driver();
 
 	node* new_unary(op opcode, node *l);
 	node* new_binary(op opcode, node *l, node *r);
-	node* new_natural(std::string str);
-	node* new_variable(std::string str, node *r);
-	node* lookup_variable(std::string var);
-
+	node* new_natural(std::string num);
+	node* set_variable(std::string name, node *r);
+	node* get_variable(std::string name);
 	void add_toplevel(node *n);
 
 	int parse(std::istream &in);
+	void lower();
 	void run(op opcode);
+	void dump(op opcode);
 
 	void error(const yy::location& l, const std::string& m);
 	void error(const std::string& m);
