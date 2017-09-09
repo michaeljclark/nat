@@ -385,18 +385,23 @@ size_t nat_driver::lower_reg(node_list &l)
 
 void nat_driver::run(op opcode)
 {
+	Nat num;
 	for (auto n : nodes) {
 		if (n->opcode != opcode) continue;
 		switch (n->opcode) {
 			case op_setvar:
+				num = n->eval(this);
 				std::cout << " "
 					<< *static_cast<setvar*>(n)->l
-					<< " = " << n->eval(this).to_string() << std::endl;
+					<< " = " << num.to_string(10)
+					<< " (" << num.to_string(16) << ")" << std::endl;
 				break;
 			case op_setreg:
+				num = n->eval(this);
 				std::cout << "_"
 					<< static_cast<setreg*>(n)->l
-					<< " = " << n->eval(this).to_string() << std::endl;
+					<< " = " << num.to_string(10)
+					<< " (" << num.to_string(16) << ")" << std::endl;
 				break;
 			default:
 				break;
