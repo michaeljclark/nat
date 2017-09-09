@@ -71,7 +71,15 @@ $ ./build/bin/nat-demo --run examples/bswap.nat
  s = 83886080
 ```
 
-To dump the parse tree with nat-demo:
+View the source for a nat-demo example expression:
+
+```
+$ cat examples/bswap.nat
+p = 5
+s = ((p >> 24) & 0x000000ff) | ((p << 8 ) & 0x00ff0000) | ((p >> 8 ) & 0x0000ff00) | ((p << 24) & 0xff000000)
+```
+
+Dump the parse tree with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --dump examples/bswap.nat
@@ -79,7 +87,7 @@ $ ./build/bin/nat-demo --dump examples/bswap.nat
 	(setvar 's', (or (or (or (and (srl (var 'p'), (li 0x18)), (li 0xff)), (and (sll (var 'p'), (li 0x8)), (li 0xff0000))), (and (srl (var 'p'), (li 0x8)), (li 0xff00))), (and (sll (var 'p'), (li 0x18)), (li 0xff000000))))
 ```
 
-To lower an expression to SSA form with nat-demo:
+Lower the expression to SSA form with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --lower examples/bswap.nat
