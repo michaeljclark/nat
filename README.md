@@ -57,9 +57,9 @@ $ ./build/bin/nat-demo
 Nat> a = 2;
    | b = 128;
    | c = 2 ** b
- a = 2
- b = 128
- c = 340282366920938463463374607431768211456
+ a = 2 (0x2)
+ b = 128 (0x80)
+ c = 340282366920938463463374607431768211456 (0x100000000000000000000000000000000)
 Nat> 
 ```
 
@@ -75,8 +75,8 @@ Evaluate an expression with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --run examples/bswap.nat
- p = 5
- s = 83886080
+ p = 5 (0x5)
+ s = 83886080 (0x5000000)
 ```
 
 Dump the parse tree with nat-demo:
