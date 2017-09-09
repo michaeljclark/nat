@@ -68,7 +68,7 @@ View the source for a nat-demo example expression:
 ```
 $ cat examples/bswap.nat
 p = 127
-s = ((p >> 24) & 0x000000ff) | ((p << 8 ) & 0x00ff0000) | ((p >> 8 ) & 0x0000ff00) | ((p << 24) & 0xff000000)
+s = ((p >> 24) & 0x000000ff) | ((p << 8) & 0x00ff0000) | ((p >> 8) & 0x0000ff00) | ((p << 24) & 0xff000000)
 ```
 
 Evaluate an expression with nat-demo:
