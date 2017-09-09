@@ -254,7 +254,7 @@ std::string binaryop::to_string(nat_driver *d)
 
 std::string natural::to_string(nat_driver *d)
 {
-	return r->to_string(16);
+	return std::string("(") + op_name[opcode] + " " + r->to_string(16) + ")";
 }
 
 std::string var::to_string(nat_driver *d)
