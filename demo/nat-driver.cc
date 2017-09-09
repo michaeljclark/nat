@@ -2,6 +2,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <iomanip>
+#include <typeinfo>
 
 #include "nat.h"
 #include "nat-parser.hh"
@@ -346,6 +348,66 @@ int nat_driver::parse(std::istream &in)
 	return parser.parse();
 }
 
+void nat_driver::usedef()
+{
+	size_t def_use_size = nodes.size() * regnum;
+	def_use = std::unique_ptr<char[]>(new char[def_use_size]);
+	memset(def_use.get(), ' ', def_use_size);
+	for (size_t i = 0; i < nodes.size(); i++) {
+		node *ndef = nodes[i];
+		if (ndef->opcode != op_setreg) continue;
+		setreg *srdef = static_cast<setreg*>(ndef);
+		size_t defreg = srdef->l;
+		def_use[i * regnum + defreg] = 'v';
+		for (size_t j = i + 1; j < nodes.size(); j++) {
+			node *nuse = nodes[j];
+			if (nuse->opcode != op_setreg) continue;
+			setreg *sruse = static_cast<setreg*>(nuse);
+			node *nuse_op = sruse->r.get();
+			if (typeid(*nuse_op) == typeid(unaryop)) {
+				unaryop *use_op = static_cast<unaryop*>(nuse_op);
+				node *l = use_op->l.get();
+				if (typeid(*l) == typeid(reg)) {
+					size_t usereg = static_cast<reg*>(l)->l;
+					if (usereg == defreg) {
+						def_use[j * regnum + defreg] = '+';
+						for (size_t k = j - 1; k != i; k--) {
+							if (def_use[k * regnum + defreg] == ' ') {
+								def_use[k * regnum + defreg] = '|';
+							}
+						}
+					}
+				}
+			} else if (typeid(*nuse_op) == typeid(binaryop)) {
+				binaryop *use_op = static_cast<binaryop*>(nuse_op);
+				node *l = use_op->l.get(), *r = use_op->r.get();
+				if (typeid(*l) == typeid(reg)) {
+					size_t usereg = static_cast<reg*>(l)->l;
+					if (usereg == defreg) {
+						def_use[j * regnum + defreg] = '+';
+						for (size_t k = j - 1; k != i; k--) {
+							if (def_use[k * regnum + defreg] == ' ') {
+								def_use[k * regnum + defreg] = '|';
+							}
+						}
+					}
+				}
+				if (typeid(*r) == typeid(reg)) {
+					size_t usereg = static_cast<reg*>(r)->l;
+					if (usereg == defreg) {
+						def_use[j * regnum + defreg] = '+';
+						for (size_t k = j - 1; k != i; k--) {
+							if (def_use[k * regnum + defreg] == ' ') {
+								def_use[k * regnum + defreg] = '|';
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 void nat_driver::lower()
 {
 	node_list new_nodes;
@@ -362,6 +424,7 @@ void nat_driver::lower()
 		}
 	}
 	nodes = std::move(new_nodes);
+	usedef();
 }
 
 size_t nat_driver::lower_reg(node_list &l)
@@ -412,15 +475,24 @@ void nat_driver::run(op opcode)
 
 void nat_driver::dump(op opcode)
 {
-	for (auto n : nodes) {
+	for (size_t i = 0; i < nodes.size(); i++) {
+		node *n = nodes[i];
 		if (n->opcode != opcode) continue;
 		switch (n->opcode) {
-			case op_setvar:
+			case op_setvar: {
 				std::cout << "\t" << n->to_string(this) << std::endl;
 				break;
-			case op_setreg:
-				std::cout << "\t" << n->to_string(this) << std::endl;
+			}
+			case op_setreg: {
+				std::cout << "\t"
+					<< std::left << std::setw(40) 
+					<< n->to_string(this);
+				for (size_t j = 0; j < regnum; j++) {
+					std::cout << def_use[i * regnum + j];
+				}
+				std::cout << std::endl;
 				break;
+			}
 			default:
 				break;
 		}

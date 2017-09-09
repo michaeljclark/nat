@@ -132,6 +132,7 @@ struct nat_driver
 	ssa_map varssa;
 	reg_map registers;
 	size_t regnum;
+	std::unique_ptr<char[]> def_use;
 
 	nat_driver();
 
@@ -145,6 +146,7 @@ struct nat_driver
 	void error(const std::string& m);
 
 	int parse(std::istream &in);
+	void usedef();
 	void lower();
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
