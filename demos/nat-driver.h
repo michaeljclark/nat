@@ -140,12 +140,12 @@ struct nat_driver
 	node* set_variable(std::string name, node *r);
 	node* get_variable(std::string name);
 	void add_toplevel(node *n);
+	void error(const yy::location& l, const std::string& m);
+	void error(const std::string& m);
 
 	int parse(std::istream &in);
 	void lower();
+	size_t lower_reg(node_list &l);
 	void run(op opcode);
 	void dump(op opcode);
-
-	void error(const yy::location& l, const std::string& m);
-	void error(const std::string& m);
 };

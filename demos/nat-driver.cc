@@ -162,14 +162,16 @@ Nat setreg::eval(nat_driver *d)
 
 node_list unaryop::lower(nat_driver *d)
 {
+	/* get register of operand */
 	node_list ll = l->lower(d);
-	size_t lregnum = static_cast<setreg*>(ll.back())->l;
-	reg *rl = new reg(lregnum);
+	reg *lreg = new reg(d->lower_reg(ll));
 
-	unaryop *op = new unaryop(opcode, rl);
+	/* create new unary op using registers */
+	unaryop *op = new unaryop(opcode, lreg);
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
+	/* construct node list */
 	node_list nodes;
 	nodes.insert(nodes.end(), ll.begin(), ll.end());
 	nodes.insert(nodes.end(), sr);
@@ -179,18 +181,18 @@ node_list unaryop::lower(nat_driver *d)
 
 node_list binaryop::lower(nat_driver *d)
 {
+	/* get registers of operands */
 	node_list ll = l->lower(d);
-	size_t lregnum = static_cast<setreg*>(ll.back())->l;
-	reg *lr = new reg(lregnum);
-
 	node_list rl = r->lower(d);
-	size_t rregnum = static_cast<setreg*>(rl.back())->l;
-	reg *rr = new reg(rregnum);
+	reg *lreg = new reg(d->lower_reg(ll));
+	reg *rreg = new reg(d->lower_reg(rl));
 
-	binaryop *op = new binaryop(opcode, lr, rr);
+	/* create binary op using registers */
+	binaryop *op = new binaryop(opcode, lreg, rreg);
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
+	/* construct node list */
 	node_list nodes;
 	nodes.insert(nodes.end(), ll.begin(), ll.end());
 	nodes.insert(nodes.end(), rl.begin(), rl.end());
@@ -201,6 +203,7 @@ node_list binaryop::lower(nat_driver *d)
 
 node_list natural::lower(nat_driver *d)
 {
+	/* move the number into a register */
 	natural *op = new natural(*r);
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
@@ -210,18 +213,14 @@ node_list natural::lower(nat_driver *d)
 
 node_list var::lower(nat_driver *d)
 {
-	/* caller expects setreg so move register to a new regnum */
+	/* return most recent register for this variable */
 	size_t regnum = d->varssa[*l];
-	reg *op = new reg(regnum);
-	setreg *sr = new setreg(d->regnum++, op);
-	d->registers[sr->l] = Nat(0);
-
-	return node_list{sr};
+	return node_list{new reg(regnum)};
 }
 
 node_list setvar::lower(nat_driver *d)
 {
-	/* store the most recent register number for this variable */
+	/* store most recent register for this variable */
 	node_list rl = r->lower(d);
 	size_t regnum = static_cast<setreg*>(rl.back())->l;
 	d->varssa[*l] = regnum;
@@ -320,6 +319,24 @@ void nat_driver::add_toplevel(node *n)
 	nodes.push_back(n);
 }
 
+
+void nat_driver::error(const yy::location& l, const std::string& m)
+{
+	std::cerr << l << ": " << m << std::endl;
+	exit(1);
+}
+
+void nat_driver::error(const std::string& m)
+{
+	std::cerr << m << std::endl;
+	exit(1);
+}
+
+
+/*
+ * client interface
+ */
+
 int nat_driver::parse(std::istream &in)
 {
 	nat_scanner scanner;
@@ -344,6 +361,26 @@ void nat_driver::lower()
 		}
 	}
 	nodes = std::move(new_nodes);
+}
+
+size_t nat_driver::lower_reg(node_list &l)
+{
+	size_t regnum;
+	node *n = static_cast<node*>(l.back());
+	switch(n->opcode) {
+		case op_reg:
+			regnum = static_cast<reg*>(n)->l;
+			l.pop_back();
+			break;
+		case op_setreg:
+			regnum = static_cast<setreg*>(n)->l;
+			break;
+		default:
+			regnum = 0;
+			error("expected reg or setreg node");
+			break;
+	}
+	return regnum;
 }
 
 void nat_driver::run(op opcode)
@@ -382,16 +419,4 @@ void nat_driver::dump(op opcode)
 				break;
 		}
 	}
-}
-
-void nat_driver::error(const yy::location& l, const std::string& m)
-{
-	std::cerr << l << ": " << m << std::endl;
-	exit(1);
-}
-
-void nat_driver::error(const std::string& m)
-{
-	std::cerr << m << std::endl;
-	exit(1);
 }
