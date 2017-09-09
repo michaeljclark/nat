@@ -50,7 +50,7 @@ The code has been tested with the following compilers:
 ## Nat Demo
 
 For an interactive nat-demo command line interface (use semicolon
-as a continuation marker for multiple line expressions):
+continuation marker for multi-line expressions):
 
 ```
 $ ./build/bin/nat-demo 
