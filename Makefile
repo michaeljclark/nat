@@ -16,29 +16,29 @@ LDFLAGS     = -L/usr/local/lib
 
 # build targets
 
-all: libs tests demos
+all: libs tests demo
 
 libs: build/lib/libnat.a build/lib/libcalc.a
 
 tests: build/bin/nat-tests build/bin/int-tests
 
-demos: build/bin/nat-demo
+demo: build/bin/nat-demo
 
 clean: ; rm -fr build \
-	demos/nat-parser.cc demos/nat-parser.hh demos/nat-scanner.cc \
-	demos/stack.hh demos/position.hh demos/location.hh
+	demo/nat-parser.cc demo/nat-parser.hh demo/nat-scanner.cc \
+	demo/stack.hh demo/position.hh demo/location.hh
 
 
 # build rules
 
 
-build/obj/nat-driver.o: demos/nat-driver.cc demos/nat-parser.hh
+build/obj/nat-driver.o: demo/nat-driver.cc demo/nat-parser.hh
 	@echo CC $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
-demos/nat-parser.cc demos/nat-parser.hh: demos/nat-parser.yy
-	$(BISON) --language=c++ -d -o demos/nat-parser.cc $<
+demo/nat-parser.cc demo/nat-parser.hh: demo/nat-parser.yy
+	$(BISON) --language=c++ -d -o demo/nat-parser.cc $<
 
-demos/nat-scanner.cc: demos/nat-scanner.ll demos/nat-parser.hh
+demo/nat-scanner.cc: demo/nat-scanner.ll demo/nat-parser.hh
 	$(FLEX) --c++ --stdinit -o $@ $<
 
 build/obj/%.o: src/%.c
@@ -50,10 +50,10 @@ build/obj/%.o: src/%.cc
 build/obj/%.o: tests/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
 
-build/obj/%.o: demos/%.cc
+build/obj/%.o: demo/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $^
 
-build/obj/%.o: demos/%.c
+build/obj/%.o: demo/%.c
 	@echo CC $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) -c -o $@ $^
 
 build/obj/%.o: utils/%.cc
