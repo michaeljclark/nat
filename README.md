@@ -67,7 +67,7 @@ View the source for a nat-demo example expression:
 
 ```
 $ cat examples/bswap.nat
-p = 5
+p = 127
 s = ((p >> 24) & 0x000000ff) | ((p << 8 ) & 0x00ff0000) | ((p >> 8 ) & 0x0000ff00) | ((p << 24) & 0xff000000)
 ```
 
@@ -75,15 +75,15 @@ Evaluate an expression with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --run examples/bswap.nat
- p = 5 (0x5)
- s = 83886080 (0x5000000)
+ p = 127 (0x7f)
+ s = 2130706432 (0x7f000000)
 ```
 
 Dump the parse tree with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --dump examples/bswap.nat
-	(setvar 'p', (li 0x5))
+	(setvar 'p', (li 0x7f))
 	(setvar 's', (or (or (or (and (srl (var 'p'), (li 0x18)), (li 0xff)), (and (sll (var 'p'), (li 0x8)), (li 0xff0000))), (and (srl (var 'p'), (li 0x8)), (li 0xff00))), (and (sll (var 'p'), (li 0x18)), (li 0xff000000))))
 ```
 
@@ -91,7 +91,7 @@ Lower the expression to SSA form with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --lower examples/bswap.nat
-	(setreg _0, (li 0x5)) /* p */
+	(setreg _0, (li 0x7f)) /* p */
 	(setreg _1, (li 0x18))
 	(setreg _2, (srl _0, _1))
 	(setreg _3, (li 0xff))
