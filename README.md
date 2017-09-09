@@ -63,20 +63,20 @@ Nat> a = 2;
 Nat> 
 ```
 
-To evaluate an expression with nat-demo:
-
-```
-$ ./build/bin/nat-demo --run examples/bswap.nat
- p = 5
- s = 83886080
-```
-
 View the source for a nat-demo example expression:
 
 ```
 $ cat examples/bswap.nat
 p = 5
 s = ((p >> 24) & 0x000000ff) | ((p << 8 ) & 0x00ff0000) | ((p >> 8 ) & 0x0000ff00) | ((p << 24) & 0xff000000)
+```
+
+Evaluate an expression with nat-demo:
+
+```
+$ ./build/bin/nat-demo --run examples/bswap.nat
+ p = 5
+ s = 83886080
 ```
 
 Dump the parse tree with nat-demo:
