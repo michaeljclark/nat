@@ -1,7 +1,7 @@
 # nat
 
-Simple arbitrary precision natural number and signed integer arithmetic library
-with demo expression parser and compiler.
+Simple arbitrary precision arithmetic library with demo expression
+parser and compiler.
 
 ## Project
 
