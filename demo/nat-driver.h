@@ -117,8 +117,9 @@ struct setreg : node
 {
 	size_t l;
 	std::unique_ptr<node> r;
+	std::unique_ptr<var> v;
 
-	setreg(size_t l, node *r);
+	setreg(size_t l, node *r, var *v = nullptr);
 	virtual Nat eval(nat_driver *);
 	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *);

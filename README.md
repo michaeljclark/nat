@@ -83,7 +83,7 @@ To lower an expression to SSA form with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --lower examples/bswap.nat
-	(setreg _0, (li 0x5))
+	(setreg _0, (li 0x5)) /* p */
 	(setreg _1, (li 0x18))
 	(setreg _2, (srl _0, _1))
 	(setreg _3, (li 0xff))
@@ -102,7 +102,7 @@ $ ./build/bin/nat-demo --lower examples/bswap.nat
 	(setreg _16, (sll _0, _15))
 	(setreg _17, (li 0xff000000))
 	(setreg _18, (and _16, _17))
-	(setreg _19, (or _14, _18))
+	(setreg _19, (or _14, _18)) /* s */
 ```
 
 

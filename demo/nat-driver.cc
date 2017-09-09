@@ -79,9 +79,10 @@ setvar::setvar(std::string l, node *r)
 reg::reg(size_t l)
 	: node(op_reg), l(l) {}
 
-setreg::setreg(size_t l, node *r)
+setreg::setreg(size_t l, node *r, var *v)
 	: node(op_setreg), l(l),
-	  r(std::unique_ptr<node>(r)) {}
+	  r(std::unique_ptr<node>(r)),
+	  v(std::unique_ptr<var>(v)) {}
 
 
 /*
@@ -222,7 +223,9 @@ node_list setvar::lower(nat_driver *d)
 {
 	/* store most recent register for this variable */
 	node_list rl = r->lower(d);
-	size_t regnum = static_cast<setreg*>(rl.back())->l;
+	auto sr = static_cast<setreg*>(rl.back());
+	sr->v = std::unique_ptr<var>(new var(*l));
+	size_t regnum = sr->l;
 	d->varssa[*l] = regnum;
 	return rl;
 }
@@ -274,7 +277,8 @@ std::string reg::to_string(nat_driver *d)
 
 std::string setreg::to_string(nat_driver *d)
 {
-	return std::string("(") + op_name[opcode] + " _" + std::to_string(l) + ", " + r->to_string(d) + ")";
+	return std::string("(") + op_name[opcode] + " _" + std::to_string(l) + ", " + r->to_string(d) + ")" +
+		(v ? std::string(" /* " + *v->l + std::string(" */")) : "");
 }
 
 
