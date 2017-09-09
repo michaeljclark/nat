@@ -10,7 +10,9 @@
 #include "nat-scanner.h"
 
 
-/* contstants */
+/*
+ * contstants
+ */
 
 static const char* op_name[] = {
 	"none",
@@ -41,7 +43,9 @@ static const char* op_name[] = {
 };
 
 
-/* node constructors */
+/*
+ * node constructors
+ */
 
 node::node(op opcode)
 	: opcode(opcode) {}
@@ -80,7 +84,9 @@ setreg::setreg(size_t l, node *r)
 	  r(std::unique_ptr<node>(r)) {}
 
 
-/* node eval */
+/*
+ * evalulate expressions recursively
+ */
 
 Nat unaryop::eval(nat_driver *d)
 {
@@ -150,17 +156,17 @@ Nat setreg::eval(nat_driver *d)
 }
 
 
-/* node lower */
+/*
+ * lower tree into single static assignment tuples
+ */
 
 node_list unaryop::lower(nat_driver *d)
 {
 	node_list ll = l->lower(d);
 	size_t lregnum = static_cast<setreg*>(ll.back())->l;
-
 	reg *rl = new reg(lregnum);
 
 	unaryop *op = new unaryop(opcode, rl);
-
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
@@ -175,15 +181,13 @@ node_list binaryop::lower(nat_driver *d)
 {
 	node_list ll = l->lower(d);
 	size_t lregnum = static_cast<setreg*>(ll.back())->l;
+	reg *lr = new reg(lregnum);
 
 	node_list rl = r->lower(d);
 	size_t rregnum = static_cast<setreg*>(rl.back())->l;
-
-	reg *lr = new reg(lregnum);
 	reg *rr = new reg(rregnum);
 
 	binaryop *op = new binaryop(opcode, lr, rr);
-
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
@@ -198,22 +202,17 @@ node_list binaryop::lower(nat_driver *d)
 node_list natural::lower(nat_driver *d)
 {
 	natural *op = new natural(*r);
-
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
-	node_list nodes;
-	nodes.insert(nodes.end(), sr);
-
-	return nodes;
+	return node_list{sr};
 }
 
 node_list var::lower(nat_driver *d)
 {
+	/* caller expects setreg so move register to a new regnum */
 	size_t regnum = d->varssa[*l];
-
 	reg *op = new reg(regnum);
-
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
@@ -222,11 +221,10 @@ node_list var::lower(nat_driver *d)
 
 node_list setvar::lower(nat_driver *d)
 {
+	/* store the most recent register number for this variable */
 	node_list rl = r->lower(d);
-
 	size_t regnum = static_cast<setreg*>(rl.back())->l;
 	d->varssa[*l] = regnum;
-
 	return rl;
 }
 
@@ -241,7 +239,9 @@ node_list setreg::lower(nat_driver *d)
 }
 
 
-/* node to_string */
+/*
+ * convert nodes to string
+ */
 
 std::string unaryop::to_string(nat_driver *d)
 {
@@ -279,7 +279,9 @@ std::string setreg::to_string(nat_driver *d)
 }
 
 
-/* nat_driver */
+/*
+ * driver methods called by parser
+ */
 
 nat_driver::nat_driver() : regnum(0) {}
 
