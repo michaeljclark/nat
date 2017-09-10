@@ -20,31 +20,29 @@ demos/nat-demo.cc      | simple arbitrary precision calculator
 
 ## Building
 
-The following packages are required:
+The following packages are required to build nat-demo:
 
-- bison 3.0.4
-- flex 2.6.4
-- libedit 20170329
-- ncurses 6.0
+Package Name | Version
+:--          | --:
+bison        | 3.0.4
+flex         | 2.6.4
+libedit      | 20170329
+ncurses      | 6.0
 
-### macOS dependencies
+To install dependencies required to build nat-demo:
 
-To install dependencies on macOS using brew:
+Operating System | Installation method
+:--              | :--
+macOS            | `brew install bison flex libedit ncurses`
+Debian or Ubuntu | `apt-get install bison flex libedit-dev libncurses-dev`
 
-`brew install bison flex libedit ncurses`
-
-### Linux dependencies
-
-To install dependencies on Debian or Ubuntu using apt:
-
-`apt-get install bison flex libedit-dev libncurses-dev`
-
-### Compiler support
 
 The code has been tested with the following compilers:
 
-- GCC 6.3.0 (Debian Linux)
-- Apple LLVM version 8.1.0 (clang-802.0.42)
+Compiler   | Version | Operating System
+:--        | --:     | :--
+GCC        | 6.3.0   | Debian Linux
+Apple LLVM | 8.1.0   | macos 10.12.6
 
 
 ## Nat Demo
