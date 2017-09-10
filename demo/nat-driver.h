@@ -14,6 +14,7 @@ struct nat_driver;
 enum op
 {
 	op_none,
+	op_const_int,
 	op_var,
 	op_setvar,
 	op_reg,
@@ -51,6 +52,17 @@ struct node
 	virtual std::string to_string(nat_driver *) = 0;
 };
 
+struct const_int : node
+{
+	std::unique_ptr<Nat> r;
+
+	const_int(std::string r);
+	const_int(Nat &n);
+	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
+};
+
 struct unaryop : node
 {
 	std::unique_ptr<node> l;
@@ -66,17 +78,6 @@ struct binaryop : node
 	std::unique_ptr<node> l, r;
 
 	binaryop(op opcode, node *l, node *r);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
-};
-
-struct natural : node
-{
-	std::unique_ptr<Nat> r;
-
-	natural(std::string r);
-	natural(Nat &n);
 	virtual Nat eval(nat_driver *);
 	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *);
@@ -138,7 +139,7 @@ struct nat_driver
 
 	node* new_unary(op opcode, node *l);
 	node* new_binary(op opcode, node *l, node *r);
-	node* new_natural(std::string num);
+	node* new_const_int(std::string num);
 	node* set_variable(std::string name, node *r);
 	node* get_variable(std::string name);
 	void add_toplevel(node *n);

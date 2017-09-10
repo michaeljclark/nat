@@ -18,6 +18,7 @@
 
 static const char* op_name[] = {
 	"none",
+	"const_int",
 	"var",
 	"setvar",
 	"reg",
@@ -52,6 +53,14 @@ static const char* op_name[] = {
 node::node(op opcode)
 	: opcode(opcode) {}
 
+const_int::const_int(std::string r)
+	: node(op_const_int),
+	  r(std::unique_ptr<Nat>(new Nat(r))) {}
+
+const_int::const_int(Nat &n)
+	: node(op_const_int),
+	  r(std::unique_ptr<Nat>(new Nat(n))) {}
+
 unaryop::unaryop(op opcode, node *l)
 	: node(opcode),
 	  l(std::unique_ptr<node>(l)) {}
@@ -60,14 +69,6 @@ binaryop::binaryop(op opcode, node *l, node *r)
 	: node(opcode),
 	  l(std::unique_ptr<node>(l)),
 	  r(std::unique_ptr<node>(r)) {}
-
-natural::natural(std::string r)
-	: node(op_li),
-	  r(std::unique_ptr<Nat>(new Nat(r))) {}
-
-natural::natural(Nat &n)
-	: node(op_li),
-	  r(std::unique_ptr<Nat>(new Nat(n))) {}
 
 var::var(std::string l)
 	: node(op_var),
@@ -127,7 +128,7 @@ Nat binaryop::eval(nat_driver *d)
 	return v;
 }
 
-Nat natural::eval(nat_driver *d)
+Nat const_int::eval(nat_driver *d)
 {
 	return *r;
 }
@@ -203,10 +204,10 @@ node_list binaryop::lower(nat_driver *d)
 	return nodes;
 }
 
-node_list natural::lower(nat_driver *d)
+node_list const_int::lower(nat_driver *d)
 {
 	/* move the number into a register */
-	natural *op = new natural(*r);
+	const_int *op = new const_int(*r);
 	setreg *sr = new setreg(d->regnum++, op);
 	d->registers[sr->l] = Nat(0);
 
@@ -256,7 +257,7 @@ std::string binaryop::to_string(nat_driver *d)
 	return std::string("(") + op_name[opcode] + " " + l->to_string(d) + ", " + r->to_string(d) + ")";
 }
 
-std::string natural::to_string(nat_driver *d)
+std::string const_int::to_string(nat_driver *d)
 {
 	return std::string("(") + op_name[opcode] + " " + r->to_string(16) + ")";
 }
@@ -298,9 +299,9 @@ node* nat_driver::new_binary(op opcode, node *l, node *r)
 	return new binaryop(opcode, l, r);
 }
 
-node* nat_driver::new_natural(std::string num)
+node* nat_driver::new_const_int(std::string num)
 {
-	return new natural(num);
+	return new const_int(num);
 }
 
 node* nat_driver::set_variable(std::string name, node *r)
