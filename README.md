@@ -57,7 +57,7 @@ continuation marker for multi-line expressions):
 $ ./build/bin/nat-demo 
 Nat> a = 2;
    | b = 128;
-   | c = 2 ** b
+   | c = 2 << (b-1)
  a = 2 (0x2)
  b = 128 (0x80)
  c = 340282366920938463463374607431768211456 (0x100000000000000000000000000000000)
