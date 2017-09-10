@@ -35,8 +35,11 @@ static const char* op_name[] = {
 	"sgt",
 	"sgte",
 	"srl",
+	"srli",
 	"sll",
+	"slli",
 	"add",
+	"addi",
 	"sub",
 	"mul",
 	"div",
@@ -193,6 +196,40 @@ node_list unaryop::lower(nat_driver *d)
 
 node_list binaryop::lower(nat_driver *d)
 {
+	/* lower const_int operand as immediate where possible */
+	switch (opcode) {
+		case op_srl:
+		case op_sll:
+			if (r->opcode == op_const_int) {
+				/* get immediate opcode */
+				op imm_opcode;
+				switch(opcode) {
+					case op_srl: imm_opcode = op_srli; break;
+					case op_sll: imm_opcode = op_slli; break;
+					default: imm_opcode = op_none; break;
+				}
+
+				/* get registers of operand */
+				node_list ll = l->lower(d);
+				reg *lreg = new reg(d->lower_reg(ll));
+				imm *rimm = new imm(static_cast<const_int*>(r.get())->r->limb_at(0));
+
+				/* create binary op using registers */
+				binaryop *op = new binaryop(imm_opcode, lreg, rimm);
+				setreg *sr = new setreg(d->regnum++, op);
+				d->registers[sr->l] = Nat(0);
+
+				/* construct node list */
+				node_list nodes;
+				nodes.insert(nodes.end(), ll.begin(), ll.end());
+				nodes.insert(nodes.end(), sr);
+
+				return nodes;
+			}
+		default:
+			break;
+	}
+
 	/* get registers of operands */
 	node_list ll = l->lower(d);
 	node_list rl = r->lower(d);
@@ -293,7 +330,7 @@ std::string reg::to_string(nat_driver *d)
 
 std::string imm::to_string(nat_driver *d)
 {
-	return std::to_string(r);
+	return Nat(r).to_string(16);
 }
 
 std::string setreg::to_string(nat_driver *d)
