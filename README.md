@@ -10,17 +10,21 @@ The project includes the following files:
 File                   | Description
 :---                   | :---
 src/nat.h              | unsigned natural number header
-src/nat.cc             | unsigned natural number impl
+src/nat.cc             | unsigned natural number implementation
 src/int.h              | integer with sign and magnitude header
-src/int.cc             | integer with sign and magnitude impl
+src/int.cc             | integer with sign and magnitude implementation
 tests/nat-tests.cc     | unit tests for the Nat class
 tests/int-tests.cc     | unit tests for the Int class
-demos/nat-demo.cc      | simple arbitrary precision calculator
-
+demo/nat-demo.cc       | compiler CLI
+demo/nat-driver.h      | compiler driver interface
+demo/nat-driver.cc     | compiler driver implementation
+demo/nat-parser.yy     | compiler grammar specifiction
+demo/nat-scanner.h     | compiler scanner interface
+demo/nat-scanner.ll    | compiler lexical analyser specifiction
 
 ## Building
 
-The following packages are required to build nat-demo:
+Packages required to build nat-demo:
 
 Package Name | Version
 :--          | --:
@@ -29,13 +33,12 @@ flex         | 2.6.4
 libedit      | 20170329
 ncurses      | 6.0
 
-To install dependencies required to build nat-demo:
+Dependency installation for nat-demo:
 
 Operating System | Installation method
 :--              | :--
 macOS            | `brew install bison flex libedit ncurses`
 Debian or Ubuntu | `apt-get install bison flex libedit-dev libncurses-dev`
-
 
 The code has been tested with the following compilers:
 
