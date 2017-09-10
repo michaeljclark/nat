@@ -18,6 +18,7 @@ enum op
 	op_var,
 	op_setvar,
 	op_reg,
+	op_imm,
 	op_setreg,
 	op_li,
 	op_and,
@@ -109,6 +110,16 @@ struct reg : node
 	size_t l;
 
 	reg(size_t l);
+	virtual Nat eval(nat_driver *);
+	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
+};
+
+struct imm : node
+{
+	int r;
+
+	imm(int r);
 	virtual Nat eval(nat_driver *);
 	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *);

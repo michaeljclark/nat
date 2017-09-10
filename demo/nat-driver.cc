@@ -22,6 +22,7 @@ static const char* op_name[] = {
 	"var",
 	"setvar",
 	"reg",
+	"imm",
 	"setreg",
 	"li",
 	"and",
@@ -81,6 +82,9 @@ setvar::setvar(std::string l, node *r)
 
 reg::reg(size_t l)
 	: node(op_reg), l(l) {}
+
+imm::imm(int r)
+	: node(op_imm), r(r) {}
 
 setreg::setreg(size_t l, node *r)
 	: node(op_setreg), l(l),
@@ -149,6 +153,11 @@ Nat reg::eval(nat_driver *d)
 {
 	auto ri = d->registers.find(l);
 	return ri != d->registers.end() ? ri->second : Nat(0);
+}
+
+Nat imm::eval(nat_driver *d)
+{
+	return Nat(r);
 }
 
 Nat setreg::eval(nat_driver *d)
@@ -237,6 +246,11 @@ node_list reg::lower(nat_driver *d)
 	return node_list();
 }
 
+node_list imm::lower(nat_driver *d)
+{
+	return node_list();
+}
+
 node_list setreg::lower(nat_driver *d)
 {
 	return node_list();
@@ -275,6 +289,11 @@ std::string setvar::to_string(nat_driver *d)
 std::string reg::to_string(nat_driver *d)
 {
 	return std::string("_") + std::to_string(l);
+}
+
+std::string imm::to_string(nat_driver *d)
+{
+	return std::to_string(r);
 }
 
 std::string setreg::to_string(nat_driver *d)
