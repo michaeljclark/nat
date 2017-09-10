@@ -368,7 +368,23 @@ int nat_driver::parse(std::istream &in)
 	return parser.parse();
 }
 
-void nat_driver::usedef()
+void nat_driver::use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg)
+{
+	node *l = nr.get();
+	if (typeid(*l) != typeid(reg)) return;
+	size_t usereg = static_cast<reg*>(l)->l;
+	if (usereg != defreg) return;
+	def_use[j * regnum + defreg] = '+';
+	for (size_t k = j - 1; k != i; k--) {
+		if (def_use[k * regnum + defreg] == ' ') {
+			def_use[k * regnum + defreg] = '|';
+		} else {
+			break;
+		}
+	}
+}
+
+void nat_driver::usedef_analysis()
 {
 	size_t def_use_size = nodes.size() * regnum;
 	def_use = std::unique_ptr<char[]>(new char[def_use_size]);
@@ -385,43 +401,11 @@ void nat_driver::usedef()
 			node *sruse_op = sruse->r.get();
 			if (typeid(*sruse_op) == typeid(unaryop)) {
 				unaryop *use_op = static_cast<unaryop*>(sruse_op);
-				node *l = use_op->l.get();
-				if (typeid(*l) == typeid(reg)) {
-					size_t usereg = static_cast<reg*>(l)->l;
-					if (usereg == defreg) {
-						def_use[j * regnum + defreg] = '+';
-						for (size_t k = j - 1; k != i; k--) {
-							if (def_use[k * regnum + defreg] == ' ') {
-								def_use[k * regnum + defreg] = '|';
-							}
-						}
-					}
-				}
+				use_scan(use_op->l, i, j, defreg);
 			} else if (typeid(*sruse_op) == typeid(binaryop)) {
 				binaryop *use_op = static_cast<binaryop*>(sruse_op);
-				node *l = use_op->l.get(), *r = use_op->r.get();
-				if (typeid(*l) == typeid(reg)) {
-					size_t usereg = static_cast<reg*>(l)->l;
-					if (usereg == defreg) {
-						def_use[j * regnum + defreg] = '+';
-						for (size_t k = j - 1; k != i; k--) {
-							if (def_use[k * regnum + defreg] == ' ') {
-								def_use[k * regnum + defreg] = '|';
-							}
-						}
-					}
-				}
-				if (typeid(*r) == typeid(reg)) {
-					size_t usereg = static_cast<reg*>(r)->l;
-					if (usereg == defreg) {
-						def_use[j * regnum + defreg] = '+';
-						for (size_t k = j - 1; k != i; k--) {
-							if (def_use[k * regnum + defreg] == ' ') {
-								def_use[k * regnum + defreg] = '|';
-							}
-						}
-					}
-				}
+				use_scan(use_op->l, i, j, defreg);
+				use_scan(use_op->r, i, j, defreg);
 			}
 		}
 	}
@@ -443,7 +427,7 @@ void nat_driver::lower()
 		}
 	}
 	nodes = std::move(new_nodes);
-	usedef();
+	usedef_analysis();
 }
 
 size_t nat_driver::lower_reg(node_list &l)

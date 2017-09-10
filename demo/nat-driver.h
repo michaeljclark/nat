@@ -158,7 +158,8 @@ struct nat_driver
 	void error(const std::string& m);
 
 	int parse(std::istream &in);
-	void usedef();
+	void use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg);
+	void usedef_analysis();
 	void lower();
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
