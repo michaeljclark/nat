@@ -92,26 +92,22 @@ Lower the expression to SSA form with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --lower examples/bswap.nat
-	(setreg _0, (li 0x7f))                  v                   
-	(setreg _1, (li 0x18))                  |v                  
-	(setreg _2, (srl _0, _1))               ++v                 
-	(setreg _3, (li 0xff))                  | |v                
-	(setreg _4, (and _2, _3))               | ++v               
-	(setreg _5, (li 0x8))                   |   |v              
-	(setreg _6, (sll _0, _5))               +   |+v             
-	(setreg _7, (li 0xff0000))              |   | |v            
-	(setreg _8, (and _6, _7))               |   | ++v           
-	(setreg _9, (or _4, _8))                |   +   +v          
-	(setreg _10, (li 0x8))                  |        |v         
-	(setreg _11, (srl _0, _10))             +        |+v        
-	(setreg _12, (li 0xff00))               |        | |v       
-	(setreg _13, (and _11, _12))            |        | ++v      
-	(setreg _14, (or _9, _13))              |        +   +v     
-	(setreg _15, (li 0x18))                 |             |v    
-	(setreg _16, (sll _0, _15))             +             |+v   
-	(setreg _17, (li 0xff000000))                         | |v  
-	(setreg _18, (and _16, _17))                          | ++v 
-	(setreg _19, (or _14, _18))                           +   +v
+	(setreg _0, (const_int 0x7f))           v               
+	(setreg _1, (srli _0, 0x18))            +v              
+	(setreg _2, (const_int 0xff))           ||v             
+	(setreg _3, (and _1, _2))               |++v            
+	(setreg _4, (slli _0, 0x8))             +  |v           
+	(setreg _5, (const_int 0xff0000))       |  ||v          
+	(setreg _6, (and _4, _5))               |  |++v         
+	(setreg _7, (or _3, _6))                |  +  +v        
+	(setreg _8, (srli _0, 0x8))             +      |v       
+	(setreg _9, (const_int 0xff00))         |      ||v      
+	(setreg _10, (and _8, _9))              |      |++v     
+	(setreg _11, (or _7, _10))              |      +  +v    
+	(setreg _12, (slli _0, 0x18))           +          |v   
+	(setreg _13, (const_int 0xff000000))               ||v  
+	(setreg _14, (and _12, _13))                       |++v 
+	(setreg _15, (or _11, _14))                        +  +v
 ```
 
 
