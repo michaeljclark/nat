@@ -360,12 +360,11 @@ void nat_driver::usedef()
 		size_t defreg = srdef->l;
 		def_use[i * regnum + defreg] = 'v';
 		for (size_t j = i + 1; j < nodes.size(); j++) {
-			node *nuse = nodes[j];
-			if (nuse->opcode != op_setreg) continue;
-			setreg *sruse = static_cast<setreg*>(nuse);
-			node *nuse_op = sruse->r.get();
-			if (typeid(*nuse_op) == typeid(unaryop)) {
-				unaryop *use_op = static_cast<unaryop*>(nuse_op);
+			if (nodes[j]->opcode != op_setreg) continue;
+			setreg *sruse = static_cast<setreg*>(nodes[j]);
+			node *sruse_op = sruse->r.get();
+			if (typeid(*sruse_op) == typeid(unaryop)) {
+				unaryop *use_op = static_cast<unaryop*>(sruse_op);
 				node *l = use_op->l.get();
 				if (typeid(*l) == typeid(reg)) {
 					size_t usereg = static_cast<reg*>(l)->l;
@@ -378,8 +377,8 @@ void nat_driver::usedef()
 						}
 					}
 				}
-			} else if (typeid(*nuse_op) == typeid(binaryop)) {
-				binaryop *use_op = static_cast<binaryop*>(nuse_op);
+			} else if (typeid(*sruse_op) == typeid(binaryop)) {
+				binaryop *use_op = static_cast<binaryop*>(sruse_op);
 				node *l = use_op->l.get(), *r = use_op->r.get();
 				if (typeid(*l) == typeid(reg)) {
 					size_t usereg = static_cast<reg*>(l)->l;
