@@ -66,7 +66,7 @@ Nat>
 ```
 
 
-### Two’s complement subtraction example with Unicode syntax
+### Two’s complement subtraction example using Unicode syntax
 
 ```
 $ cat examples/sub.nat
@@ -187,7 +187,7 @@ $ ./build/bin/nat-repl --asm examples/bswap.nat
 ```
 
 
-### Running the lowered machine code
+### Running the lowered machine IR
 
 ```
 ./build/bin/nat-repl --run examples/bswap.nat
