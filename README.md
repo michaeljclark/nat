@@ -9,12 +9,12 @@ The project includes the following files:
 
 File                   | Description
 :---                   | :---
-src/nat.h              | unsigned natural number header
-src/nat.cc             | unsigned natural number implementation
-src/int.h              | integer with sign and magnitude header
-src/int.cc             | integer with sign and magnitude implementation
-tests/nat-tests.cc     | unit tests for the Nat class
-tests/int-tests.cc     | unit tests for the Int class
+src/nat.h              | arbitrary precision unsigned natural number header
+src/nat.cc             | arbitrary precision unsigned natural number implementation
+src/int.h              | arbitrary precision integer with sign and magnitude header
+src/int.cc             | arbitrary precision integer with sign and magnitude implementation
+tests/nat-tests.cc     | unit tests for the Nat implementation
+tests/int-tests.cc     | unit tests for the Int implementation
 demo/nat-repl.cc       | simple compiler REPL
 demo/nat-compiler.h    | simple compiler interface
 demo/nat-compiler.cc   | simple compiler implementation
