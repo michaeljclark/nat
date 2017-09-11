@@ -1,10 +1,13 @@
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 
+#include <map>
+#include <deque>
+#include <vector>
+#include <memory>
+#include <string>
 #include <fstream>
 #include <sstream>
-#include <map>
-#include <memory>
 
 #include <histedit.h>
 

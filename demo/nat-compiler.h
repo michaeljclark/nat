@@ -7,7 +7,7 @@ struct node;
 typedef std::vector<node*> node_list;
 typedef std::map<std::string,node*> node_map;
 typedef std::map<std::string,size_t> var_map;
-typedef std::vector<size_t> reg_free_list;
+typedef std::deque<size_t> reg_free_list;
 typedef std::map<size_t,size_t> reg_alloc_map;
 typedef std::map<size_t,Nat> reg_value_map;
 struct nat_compiler;

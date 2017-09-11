@@ -25,6 +25,8 @@ struct node;
 %code
 {
 #include <map>
+#include <deque>
+#include <vector>
 #include <memory>
 #include <string>
 

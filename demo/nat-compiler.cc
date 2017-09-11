@@ -1,4 +1,5 @@
 #include <map>
+#include <deque>
 #include <vector>
 #include <memory>
 #include <string>
@@ -49,6 +50,57 @@ static const char* op_name[] = {
 	"not",
 	"neg",
 	"pow"
+};
+
+static const char* reg_name[] = {
+	"zero",
+	"ra",
+	"sp",
+	"gp",
+	"tp",
+	"t0",
+	"t1",
+	"t2",
+	"s0",
+	"s1",
+	"a0",
+	"a1",
+	"a2",
+	"a3",
+	"a4",
+	"a5",
+	"a6",
+	"a7",
+	"s2",
+	"s3",
+	"s4",
+	"s5",
+	"s6",
+	"s7",
+	"s8",
+	"s9",
+	"s10",
+	"s11",
+	"t3",
+	"t4",
+	"t5",
+	"t6"
+};
+
+enum { no, cr, ce };
+
+static const size_t reg_avail[] = {
+	cr, cr, cr, cr, cr, cr, cr, cr,
+	cr, cr, cr, cr, cr, cr, cr, ce,
+	ce, ce, ce, ce, ce, ce, ce, ce,
+	ce, ce, ce, no, no, no, no, no
+};
+
+static const size_t reg_order[] = {
+	10, 11, 12, 13, 14, 15, 16, 17,
+	5,  6,  7,  28, 29, 30, 31, 8,
+	9,  18, 19, 20, 21, 22, 23, 24,
+	25, 26, 27, 1,  2,  3,  4,  0
 };
 
 
@@ -334,7 +386,7 @@ std::string ssareg::to_string(nat_compiler *d)
 
 std::string phyreg::to_string(nat_compiler *d)
 {
-	return std::string("x") + std::to_string(reg::l);
+	return reg_name[reg::l];
 }
 
 std::string setreg::to_string(nat_compiler *d)
@@ -463,9 +515,10 @@ void nat_compiler::allocate_registers()
 	/* create physical registers */
 	size_t def_use_phy_size = nodes.size() * phyregcount;
 	def_use_phy = std::unique_ptr<char[]>(new char[def_use_phy_size]());
-	for (size_t i = phyregcount; i > 0; i--) {
-		reg_values[i] = 0;
-		reg_free.push_back(i);
+	const size_t *reg = reg_order;
+	while (*reg != 0) {
+		reg_values[*reg] = 0;
+		reg_free.push_back(*reg++);
 	}
 
 	/* loop through nodes to assign physical registers */
@@ -475,7 +528,7 @@ void nat_compiler::allocate_registers()
 		setreg *srdef = static_cast<setreg*>(ndef);
 
 		/* free unused physical registers */
-		auto rfi = reg_free.end();
+		auto rfi = reg_free.begin();
 		for (auto ri = reg_used.begin(); ri != reg_used.end();) {
 			size_t ssaregnum = ri->first, phyregnum = ri->second;
 			def_use_phy[i * phyregcount + phyregnum] =
@@ -515,10 +568,13 @@ void nat_compiler::allocate_registers()
 			error("register spilling not implemented");
 		}
 		size_t ssaregnum = srdef->l->l;
-		size_t phyregnum = reg_free.back();
+		size_t phyregnum = reg_free.front();
+		if (reg_avail[phyregnum] == no) {
+			error("register spilling not implemented");
+		}
 		def_use_phy[i * phyregcount + phyregnum] =
 			def_use_ssa[i * ssaregcount + ssaregnum];
-		reg_free.pop_back();
+		reg_free.pop_front();
 		reg_used[ssaregnum] = phyregnum;
 		srdef->l = std::unique_ptr<phyreg>(new phyreg(phyregnum));
 	}
