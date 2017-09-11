@@ -24,7 +24,7 @@ demo/nat-scanner.ll    | simple compiler lexical analyser specification
 
 ## Building
 
-Packages required to build nat-repl:
+### Packages required to build nat-repl
 
 Package Name | Version
 :--          | --:
@@ -33,14 +33,14 @@ flex         | 2.6.4
 libedit      | 20170329
 ncurses      | 6.0
 
-Dependency installation for nat-repl:
+### Installation of build dependencies
 
 Operating System | Installation method
 :--              | :--
 macOS            | `brew install bison flex libedit ncurses`
 Debian or Ubuntu | `apt-get install bison flex libedit-dev libncurses-dev`
 
-The code has been tested with the following compilers:
+### Supported compilers and operating systems
 
 Compiler   | Version | Operating System
 :--        | --:     | :--
@@ -50,9 +50,9 @@ Apple LLVM | 8.1.0   | macos 10.12.6
 
 ## Nat REPL
 
-The Nat REPL is a simple expression evaluator.  For an interactive
-command line interface execute nat-repl with no arguments. Use
-semicolon as a continuation marker for multi-line expressions.
+The Nat REPL is a simple expression parser and evaluator.  For an
+interactive command line interface execute nat-repl with no arguments.
+Use semicolon as a continuation marker for multi-line expressions.
 
 ```
 $ ./build/bin/nat-repl 
