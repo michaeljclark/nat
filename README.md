@@ -1,6 +1,6 @@
 # nat
 
-Simple arbitrary precision arithmetic library with example expression
+Simple arbitrary precision arithmetic library with simple expression
 parser and compiler.
 
 ## Project
