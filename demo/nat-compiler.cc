@@ -5,7 +5,6 @@
 #include <string>
 #include <iostream>
 #include <iomanip>
-#include <typeinfo>
 
 #include "nat.h"
 #include "nat-parser.hh"
@@ -108,51 +107,51 @@ static const size_t reg_order[] = {
  * node constructors
  */
 
-node::node(op opcode)
-	: opcode(opcode) {}
+node::node(type typecode, op opcode)
+	: typecode(typecode), opcode(opcode) {}
 
 const_int::const_int(std::string r)
-	: node(op_const_int),
+	: node(type_const_int, op_const_int),
 	  r(std::unique_ptr<Nat>(new Nat(r))) {}
 
 const_int::const_int(Nat &n)
-	: node(op_const_int),
+	: node(type_const_int, op_const_int),
 	  r(std::unique_ptr<Nat>(new Nat(n))) {}
 
 unaryop::unaryop(op opcode, node *l)
-	: node(opcode),
+	: node(type_unaryop, opcode),
 	  l(std::unique_ptr<node>(l)) {}
 
 binaryop::binaryop(op opcode, node *l, node *r)
-	: node(opcode),
+	: node(type_binaryop, opcode),
 	  l(std::unique_ptr<node>(l)),
 	  r(std::unique_ptr<node>(r)) {}
 
 var::var(std::string l)
-	: node(op_var),
+	: node(type_var, op_var),
 	  l(std::unique_ptr<std::string>(new std::string(l))) {}
 
 setvar::setvar(std::string l, node *r)
-	: node(op_setvar),
+	: node(type_setvar, op_setvar),
 	  l(std::unique_ptr<std::string>(new std::string(l))),
 	  r(std::unique_ptr<node>(r)) {}
 
-reg::reg(op opcode, size_t l)
-	: node(opcode), l(l) {}
+reg::reg(type typecode, op opcode, size_t l)
+	: node(typecode, opcode), l(l) {}
 
 ssareg::ssareg(size_t l)
-	: reg(op_ssareg, l) {}
+	: reg(type_ssareg, op_ssareg, l) {}
 
 phyreg::phyreg(size_t l)
-	: reg(op_phyreg, l) {}
+	: reg(type_phyreg, op_phyreg, l) {}
 
 setreg::setreg(reg *l, node *r)
-	: node(op_setreg),
+	: node(type_setreg, op_setreg),
 	  l(std::unique_ptr<reg>(l)),
 	  r(std::unique_ptr<node>(r)) {}
 
 imm::imm(int r)
-	: node(op_imm), r(r) {}
+	: node(type_imm, op_imm), r(r) {}
 
 
 /*
@@ -470,7 +469,7 @@ void nat_compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 	size_t i, size_t j, size_t defreg)
 {
 	node *l = nr.get();
-	if (typeid(*l) != typeid(ssareg)) return;
+	if (l->typecode != type_ssareg) return;
 	size_t usereg = static_cast<ssareg*>(l)->l;
 	if (usereg != defreg) return;
 	def_use_ssa[j * ssaregcount + defreg] = '+';
@@ -498,10 +497,10 @@ void nat_compiler::def_use_ssa_analysis()
 			if (nodes[j]->opcode != op_setreg) continue;
 			setreg *sruse = static_cast<setreg*>(nodes[j]);
 			node *sruse_op = sruse->r.get();
-			if (typeid(*sruse_op) == typeid(unaryop)) {
+			if (sruse_op->typecode == type_unaryop) {
 				unaryop *use_op = static_cast<unaryop*>(sruse_op);
 				use_ssa_scan(use_op->l, i, j, defreg);
-			} else if (typeid(*sruse_op) == typeid(binaryop)) {
+			} else if (sruse_op->typecode == type_binaryop) {
 				binaryop *use_op = static_cast<binaryop*>(sruse_op);
 				use_ssa_scan(use_op->l, i, j, defreg);
 				use_ssa_scan(use_op->r, i, j, defreg);
@@ -543,21 +542,21 @@ void nat_compiler::allocate_registers()
 
 		/* replace ssa registers with physical registers */
 		node *n = srdef->r.get();
-		if (typeid(*n) == typeid(unaryop)) {
+		if (n->typecode == type_unaryop) {
 			unaryop *op = static_cast<unaryop*>(n);
 			node *l = op->l.get();
-			if (typeid(*l) == typeid(ssareg)) {
+			if (l->typecode == type_ssareg) {
 				size_t ssaregnum = static_cast<ssareg*>(l)->l;
 				op->l = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
 			}
-		} else if (typeid(*n) == typeid(binaryop)) {
+		} else if (n->typecode == type_binaryop) {
 			binaryop *op = static_cast<binaryop*>(n);
 			node *l = op->l.get(), *r = op->r.get();
-			if (typeid(*l) == typeid(ssareg)) {
+			if (l->typecode == type_ssareg) {
 				size_t ssaregnum = static_cast<ssareg*>(l)->l;
 				op->l = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
 			}
-			if (typeid(*r) == typeid(ssareg)) {
+			if (r->typecode == type_ssareg) {
 				size_t ssaregnum = static_cast<ssareg*>(r)->l;
 				op->r = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
 			}
@@ -698,10 +697,10 @@ void nat_compiler::emit_asm()
 			<< "\t"
 			<< sr->l->to_string(this)
 			<< ", ";
-		if (typeid(*sr_op) == typeid(unaryop)) {
+		if (sr_op->typecode == type_unaryop) {
 			std::cout
 				<< static_cast<unaryop*>(sr_op)->l->to_string(this);
-		} else if (typeid(*sr_op) == typeid(binaryop)) {
+		} else if (sr_op->typecode == type_binaryop) {
 			std::cout
 				<< static_cast<binaryop*>(sr_op)->l->to_string(this)
 				<< ", "

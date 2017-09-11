@@ -18,10 +18,24 @@ struct nat_compiler;
 
 
 /*
- * tree node opcodes
+ * tree node typecodes and opcodes
  */
 
-enum op
+enum type : char
+{
+	type_none,
+	type_const_int,
+	type_unaryop,
+	type_binaryop,
+	type_var,
+	type_setvar,
+	type_ssareg,
+	type_phyreg,
+	type_setreg,
+	type_imm,
+};
+
+enum op : char
 {
 	op_none,
 	op_const_int,
@@ -63,9 +77,10 @@ enum op
 
 struct node
 {
+	type typecode;
 	op opcode;
 
-	node(op opcode);
+	node(type typecode, op opcode);
 
 	virtual ~node() {}
 	virtual Nat eval(nat_compiler *) = 0;
@@ -134,7 +149,7 @@ struct reg : node
 {
 	size_t l;
 
-	reg(op opcode, size_t l);
+	reg(type typecode, op opcode, size_t l);
 };
 
 struct ssareg : reg
@@ -153,16 +168,6 @@ struct phyreg : reg
 	virtual std::string to_string(nat_compiler *);
 };
 
-struct imm : node
-{
-	int r;
-
-	imm(int r);
-
-	virtual Nat eval(nat_compiler *);
-	virtual std::string to_string(nat_compiler *);
-};
-
 struct setreg : node
 {
 	std::unique_ptr<reg> l;
@@ -170,6 +175,16 @@ struct setreg : node
 	std::unique_ptr<var> v;
 
 	setreg(reg *l, node *r);
+
+	virtual Nat eval(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
+};
+
+struct imm : node
+{
+	int r;
+
+	imm(int r);
 
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
