@@ -15,16 +15,16 @@ src/int.h              | integer with sign and magnitude header
 src/int.cc             | integer with sign and magnitude implementation
 tests/nat-tests.cc     | unit tests for the Nat class
 tests/int-tests.cc     | unit tests for the Int class
-demo/nat-demo.cc       | compiler CLI
-demo/nat-driver.h      | compiler driver interface
-demo/nat-driver.cc     | compiler driver implementation
-demo/nat-parser.yy     | compiler grammar specifiction
-demo/nat-scanner.h     | compiler scanner interface
-demo/nat-scanner.ll    | compiler lexical analyser specifiction
+demo/nat-repl.cc       | simple compiler REPL
+demo/nat-driver.h      | simple compiler driver interface
+demo/nat-driver.cc     | simple compiler driver implementation
+demo/nat-parser.yy     | simple compiler grammar specifiction
+demo/nat-scanner.h     | simple compiler scanner interface
+demo/nat-scanner.ll    | simple compiler lexical analyser specifiction
 
 ## Building
 
-Packages required to build nat-demo:
+Packages required to build nat-repl:
 
 Package Name | Version
 :--          | --:
@@ -33,7 +33,7 @@ flex         | 2.6.4
 libedit      | 20170329
 ncurses      | 6.0
 
-Dependency installation for nat-demo:
+Dependency installation for nat-repl:
 
 Operating System | Installation method
 :--              | :--
@@ -48,13 +48,13 @@ GCC        | 6.3.0   | Debian Linux
 Apple LLVM | 8.1.0   | macos 10.12.6
 
 
-## Nat Demo
+## Nat REPL
 
-For an interactive nat-demo command line interface (use semicolon
+For an interactive nat-repl command line interface (use semicolon
 continuation marker for multi-line expressions):
 
 ```
-$ ./build/bin/nat-demo 
+$ ./build/bin/nat-repl 
 Nat> a = 2;
    | b = 128;
    | c = 2 << (b-1)
@@ -75,7 +75,7 @@ s = ((p >> 24) & 0x000000ff) | ((p << 8) & 0x00ff0000) | ((p >> 8) & 0x0000ff00)
 Interpret an expression:
 
 ```
-$ ./build/bin/nat-demo --interp examples/bswap.nat
+$ ./build/bin/nat-repl --interp examples/bswap.nat
  p = 168496141 (0xa0b0c0d)
  s = 218893066 (0xd0c0b0a)
 ```
@@ -83,7 +83,7 @@ $ ./build/bin/nat-demo --interp examples/bswap.nat
 Print the parse tree:
 
 ```
-$ ./build/bin/nat-demo --tree examples/bswap.nat
+$ ./build/bin/nat-repl --tree examples/bswap.nat
 	(setvar 'p', (const_int 0xa0b0c0d))
 	(setvar 's', (or (or (or (and (srl (var 'p'), (const_int 0x18)), (const_int 0xff)), (and (sll (var 'p'), (const_int 0x8)), (const_int 0xff0000))), (and (srl (var 'p'), (const_int 0x8)), (const_int 0xff00))), (and (sll (var 'p'), (const_int 0x18)), (const_int 0xff000000))))
 ```
@@ -91,7 +91,7 @@ $ ./build/bin/nat-demo --tree examples/bswap.nat
 Lower the expression parse tree to SSA form IR:
 
 ```
-$ ./build/bin/nat-demo --ssa examples/bswap.nat
+$ ./build/bin/nat-repl --ssa examples/bswap.nat
 	(setreg _0, (li 0xa0b0c0d))             v               
 	(setreg _1, (srli _0, 0x18))            +v              
 	(setreg _2, (li 0xff))                  ||v             
@@ -113,7 +113,7 @@ $ ./build/bin/nat-demo --ssa examples/bswap.nat
 Lower the expression parse tree to IR and allocate physical registers:
 
 ```
-$ ./build/bin/nat-demo --regalloc examples/bswap.nat
+$ ./build/bin/nat-repl --regalloc examples/bswap.nat
 	(setreg x1, (li 0xa0b0c0d))             v
 	(setreg x2, (srli x1, 0x18))            +v
 	(setreg x3, (li 0xff))                  ||v
@@ -135,7 +135,7 @@ $ ./build/bin/nat-demo --regalloc examples/bswap.nat
 To run the lowered code:
 
 ```
-./build/bin/nat-demo --run examples/bswap.nat
+./build/bin/nat-repl --run examples/bswap.nat
  x1 = 168496141 (0xa0b0c0d)
  x2 = 10 (0xa)
  x3 = 255 (0xff)
