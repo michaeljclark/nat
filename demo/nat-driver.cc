@@ -1,4 +1,5 @@
 #include <map>
+#include <vector>
 #include <memory>
 #include <string>
 #include <iostream>
@@ -21,9 +22,10 @@ static const char* op_name[] = {
 	"const_int",
 	"var",
 	"setvar",
-	"reg",
-	"imm",
+	"ssareg",
+	"phyreg",
 	"setreg",
+	"imm",
 	"li",
 	"and",
 	"or",
@@ -83,15 +85,22 @@ setvar::setvar(std::string l, node *r)
 	  l(std::unique_ptr<std::string>(new std::string(l))),
 	  r(std::unique_ptr<node>(r)) {}
 
-reg::reg(size_t l)
-	: node(op_reg), l(l) {}
+reg::reg(op opcode, size_t l)
+	: node(opcode), l(l) {}
+
+ssareg::ssareg(size_t l)
+	: reg(op_ssareg, l) {}
+
+phyreg::phyreg(size_t l)
+	: reg(op_phyreg, l) {}
+
+setreg::setreg(reg *l, node *r)
+	: node(op_setreg),
+	  l(std::unique_ptr<reg>(l)),
+	  r(std::unique_ptr<node>(r)) {}
 
 imm::imm(int r)
 	: node(op_imm), r(r) {}
-
-setreg::setreg(size_t l, node *r)
-	: node(op_setreg), l(l),
-	  r(std::unique_ptr<node>(r)) {}
 
 
 /*
@@ -152,10 +161,22 @@ Nat setvar::eval(nat_driver *d)
 	return r->eval(d);
 }
 
-Nat reg::eval(nat_driver *d)
+Nat ssareg::eval(nat_driver *d)
 {
-	auto ri = d->registers.find(l);
-	return ri != d->registers.end() ? ri->second : Nat(0);
+	return Nat(0);
+}
+
+Nat phyreg::eval(nat_driver *d)
+{
+	auto ri = d->reg_values.find(l);
+	return ri != d->reg_values.end() ? ri->second : Nat(0);
+}
+
+Nat setreg::eval(nat_driver *d)
+{
+	Nat val = r->eval(d);
+	d->reg_values[l->l] = val;
+	return val;
 }
 
 Nat imm::eval(nat_driver *d)
@@ -163,28 +184,25 @@ Nat imm::eval(nat_driver *d)
 	return Nat(r);
 }
 
-Nat setreg::eval(nat_driver *d)
-{
-	Nat val = r->eval(d);
-	d->registers[l] = val;
-	return val;
-}
-
 
 /*
  * lower tree into single static assignment tuples
  */
 
+node_list node::lower(nat_driver *)
+{
+	return node_list();
+}
+
 node_list unaryop::lower(nat_driver *d)
 {
 	/* get register of operand */
 	node_list ll = l->lower(d);
-	reg *lreg = new reg(d->lower_reg(ll));
+	ssareg *lreg = new ssareg(d->lower_reg(ll));
 
 	/* create new unary op using registers */
 	unaryop *op = new unaryop(opcode, lreg);
-	setreg *sr = new setreg(d->regnum++, op);
-	d->registers[sr->l] = Nat(0);
+	setreg *sr = new setreg(new ssareg(d->ssaregcount++), op);
 
 	/* construct node list */
 	node_list nodes;
@@ -211,13 +229,12 @@ node_list binaryop::lower(nat_driver *d)
 
 				/* get registers of operand */
 				node_list ll = l->lower(d);
-				reg *lreg = new reg(d->lower_reg(ll));
+				ssareg *lreg = new ssareg(d->lower_reg(ll));
 				imm *rimm = new imm(static_cast<const_int*>(r.get())->r->limb_at(0));
 
 				/* create binary op using registers */
 				binaryop *op = new binaryop(imm_opcode, lreg, rimm);
-				setreg *sr = new setreg(d->regnum++, op);
-				d->registers[sr->l] = Nat(0);
+				setreg *sr = new setreg(new ssareg(d->ssaregcount++), op);
 
 				/* construct node list */
 				node_list nodes;
@@ -233,13 +250,12 @@ node_list binaryop::lower(nat_driver *d)
 	/* get registers of operands */
 	node_list ll = l->lower(d);
 	node_list rl = r->lower(d);
-	reg *lreg = new reg(d->lower_reg(ll));
-	reg *rreg = new reg(d->lower_reg(rl));
+	ssareg *lreg = new ssareg(d->lower_reg(ll));
+	ssareg *rreg = new ssareg(d->lower_reg(rl));
 
 	/* create binary op using registers */
 	binaryop *op = new binaryop(opcode, lreg, rreg);
-	setreg *sr = new setreg(d->regnum++, op);
-	d->registers[sr->l] = Nat(0);
+	setreg *sr = new setreg(new ssareg(d->ssaregcount++), op);
 
 	/* construct node list */
 	node_list nodes;
@@ -254,8 +270,7 @@ node_list const_int::lower(nat_driver *d)
 {
 	/* move the number into a register */
 	const_int *op = new const_int(*r);
-	setreg *sr = new setreg(d->regnum++, op);
-	d->registers[sr->l] = Nat(0);
+	setreg *sr = new setreg(new ssareg(d->ssaregcount++), op);
 
 	return node_list{sr};
 }
@@ -263,8 +278,8 @@ node_list const_int::lower(nat_driver *d)
 node_list var::lower(nat_driver *d)
 {
 	/* return most recent register for this variable */
-	size_t regnum = d->varssa[*l];
-	return node_list{new reg(regnum)};
+	size_t ssaregnum = d->varssa[*l];
+	return node_list{new ssareg(ssaregnum)};
 }
 
 node_list setvar::lower(nat_driver *d)
@@ -273,24 +288,9 @@ node_list setvar::lower(nat_driver *d)
 	node_list rl = r->lower(d);
 	auto sr = static_cast<setreg*>(rl.back());
 	sr->v = std::unique_ptr<var>(new var(*l));
-	size_t regnum = sr->l;
-	d->varssa[*l] = regnum;
+	size_t ssaregnum = sr->l->l;
+	d->varssa[*l] = ssaregnum;
 	return rl;
-}
-
-node_list reg::lower(nat_driver *d)
-{
-	return node_list();
-}
-
-node_list imm::lower(nat_driver *d)
-{
-	return node_list();
-}
-
-node_list setreg::lower(nat_driver *d)
-{
-	return node_list();
 }
 
 
@@ -323,9 +323,19 @@ std::string setvar::to_string(nat_driver *d)
 	return std::string("(") + op_name[opcode] + " '" + *l + "', " + r->to_string(d) + ")";
 }
 
-std::string reg::to_string(nat_driver *d)
+std::string ssareg::to_string(nat_driver *d)
 {
-	return std::string("_") + std::to_string(l);
+	return std::string("_") + std::to_string(reg::l);
+}
+
+std::string phyreg::to_string(nat_driver *d)
+{
+	return std::string("x") + std::to_string(reg::l);
+}
+
+std::string setreg::to_string(nat_driver *d)
+{
+	return std::string("(") + op_name[opcode] + " " + l->to_string(d) + ", " + r->to_string(d) + ")";
 }
 
 std::string imm::to_string(nat_driver *d)
@@ -333,17 +343,12 @@ std::string imm::to_string(nat_driver *d)
 	return Nat(r).to_string(16);
 }
 
-std::string setreg::to_string(nat_driver *d)
-{
-	return std::string("(") + op_name[opcode] + " _" + std::to_string(l) + ", " + r->to_string(d) + ")";
-}
-
 
 /*
  * driver methods called by parser
  */
 
-nat_driver::nat_driver() : regnum(0) {}
+nat_driver::nat_driver() : ssaregcount(0), phyregcount(31) {}
 
 node* nat_driver::new_unary(op opcode, node *l)
 {
@@ -408,30 +413,30 @@ int nat_driver::parse(std::istream &in)
 void nat_driver::use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg)
 {
 	node *l = nr.get();
-	if (typeid(*l) != typeid(reg)) return;
-	size_t usereg = static_cast<reg*>(l)->l;
+	if (typeid(*l) != typeid(ssareg)) return;
+	size_t usereg = static_cast<ssareg*>(l)->l;
 	if (usereg != defreg) return;
-	def_use[j * regnum + defreg] = '+';
+	def_use[j * ssaregcount + defreg] = '+';
 	for (size_t k = j - 1; k != i; k--) {
-		if (def_use[k * regnum + defreg] == ' ') {
-			def_use[k * regnum + defreg] = '|';
+		if (def_use[k * ssaregcount + defreg] == ' ') {
+			def_use[k * ssaregcount + defreg] = '|';
 		} else {
 			break;
 		}
 	}
 }
 
-void nat_driver::usedef_analysis()
+void nat_driver::def_use_analysis()
 {
-	size_t def_use_size = nodes.size() * regnum;
+	size_t def_use_size = nodes.size() * ssaregcount;
 	def_use = std::unique_ptr<char[]>(new char[def_use_size]);
 	memset(def_use.get(), ' ', def_use_size);
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *ndef = nodes[i];
 		if (ndef->opcode != op_setreg) continue;
 		setreg *srdef = static_cast<setreg*>(ndef);
-		size_t defreg = srdef->l;
-		def_use[i * regnum + defreg] = 'v';
+		size_t defreg = srdef->l->l;
+		def_use[i * ssaregcount + defreg] = 'v';
 		for (size_t j = i + 1; j < nodes.size(); j++) {
 			if (nodes[j]->opcode != op_setreg) continue;
 			setreg *sruse = static_cast<setreg*>(nodes[j]);
@@ -448,7 +453,66 @@ void nat_driver::usedef_analysis()
 	}
 }
 
-void nat_driver::lower()
+void nat_driver::allocate_registers(size_t numregs)
+{
+	/* create physical registers */
+	for (size_t i = numregs; i > 0; i--) {
+		reg_values[i] = 0;
+		reg_free.push_back(i);
+	}
+
+	for (size_t i = 0; i < nodes.size(); i++) {
+		node *ndef = nodes[i];
+		if (ndef->opcode != op_setreg) continue;
+		setreg *srdef = static_cast<setreg*>(ndef);
+
+		/* free physical registers */
+		auto rfi = reg_free.end();
+		for (auto ri = reg_used.begin(); ri != reg_used.end();) {
+			size_t ssaregnum = ri->first, phyregnum = ri->second;
+			if (def_use[i * ssaregcount + ssaregnum] == ' ') {
+				ri = reg_used.erase(ri);
+				reg_free.insert(rfi, phyregnum);
+			} else {
+				ri++;
+			}
+		}
+
+		/* replace ssa register with physical registers */
+		node *n = srdef->r.get();
+		if (typeid(*n) == typeid(unaryop)) {
+			unaryop *op = static_cast<unaryop*>(n);
+			node *l = op->l.get();
+			if (typeid(*l) == typeid(ssareg)) {
+				size_t ssaregnum = static_cast<ssareg*>(l)->l;
+				op->l = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
+			}
+		} else if (typeid(*n) == typeid(binaryop)) {
+			binaryop *op = static_cast<binaryop*>(n);
+			node *l = op->l.get(), *r = op->r.get();
+			if (typeid(*l) == typeid(ssareg)) {
+				size_t ssaregnum = static_cast<ssareg*>(l)->l;
+				op->l = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
+			}
+			if (typeid(*r) == typeid(ssareg)) {
+				size_t ssaregnum = static_cast<ssareg*>(r)->l;
+				op->r = std::unique_ptr<phyreg>(new phyreg(reg_used[ssaregnum]));
+			}
+		}
+
+		/* assign physical register */
+		if (reg_free.size() == 0) {
+			error("register spilling not implemented");
+		}
+		size_t ssaregnum = srdef->l->l;
+		size_t phyregnum = reg_free.back();
+		reg_free.pop_back();
+		reg_used[ssaregnum] = phyregnum;
+		srdef->l = std::unique_ptr<phyreg>(new phyreg(phyregnum));
+	}
+}
+
+void nat_driver::lower(bool regalloc)
 {
 	node_list new_nodes;
 	for (auto ni = nodes.begin(); ni != nodes.end(); ni++) {
@@ -464,27 +528,30 @@ void nat_driver::lower()
 		}
 	}
 	nodes = std::move(new_nodes);
-	usedef_analysis();
+	def_use_analysis();
+	if (regalloc) {
+		allocate_registers(phyregcount);
+	}
 }
 
 size_t nat_driver::lower_reg(node_list &l)
 {
-	size_t regnum;
+	size_t ssaregnum;
 	node *n = static_cast<node*>(l.back());
 	switch(n->opcode) {
-		case op_reg:
-			regnum = static_cast<reg*>(n)->l;
+		case op_ssareg:
+			ssaregnum = static_cast<ssareg*>(n)->l;
 			l.pop_back();
 			break;
 		case op_setreg:
-			regnum = static_cast<setreg*>(n)->l;
+			ssaregnum = static_cast<setreg*>(n)->l->l;
 			break;
 		default:
-			regnum = 0;
+			ssaregnum = 0;
 			error("expected reg or setreg node");
 			break;
 	}
-	return regnum;
+	return ssaregnum;
 }
 
 void nat_driver::run(op opcode)
@@ -503,7 +570,7 @@ void nat_driver::run(op opcode)
 			case op_setreg:
 				num = n->eval(this);
 				std::cout << "_"
-					<< static_cast<setreg*>(n)->l
+					<< static_cast<setreg*>(n)->l->to_string(this)
 					<< " = " << num.to_string(10)
 					<< " (" << num.to_string(16) << ")" << std::endl;
 				break;
@@ -527,8 +594,8 @@ void nat_driver::dump(op opcode)
 				std::cout << "\t"
 					<< std::left << std::setw(40) 
 					<< n->to_string(this);
-				for (size_t j = 0; j < regnum; j++) {
-					std::cout << def_use[i * regnum + j];
+				for (size_t j = 0; j < ssaregcount; j++) {
+					std::cout << def_use[i * ssaregcount + j];
 				}
 				std::cout << std::endl;
 				break;

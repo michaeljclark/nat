@@ -4,11 +4,12 @@
 #define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_driver &driver)
 
 struct node;
-struct reg;
 typedef std::vector<node*> node_list;
 typedef std::map<std::string,node*> node_map;
-typedef std::map<std::string,size_t> ssa_map;
-typedef std::map<size_t,Nat> reg_map;
+typedef std::map<std::string,size_t> var_map;
+typedef std::vector<size_t> reg_free_list;
+typedef std::map<size_t,size_t> reg_alloc_map;
+typedef std::map<size_t,Nat> reg_value_map;
 struct nat_driver;
 
 enum op
@@ -17,9 +18,10 @@ enum op
 	op_const_int,
 	op_var,
 	op_setvar,
-	op_reg,
-	op_imm,
+	op_ssareg,
+	op_phyreg,
 	op_setreg,
+	op_imm,
 	op_li,
 	op_and,
 	op_or,
@@ -52,7 +54,7 @@ struct node
 	node(op opcode);
 	virtual ~node() {}
 	virtual Nat eval(nat_driver *) = 0;
-	virtual node_list lower(nat_driver *) = 0;
+	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *) = 0;
 };
 
@@ -112,9 +114,20 @@ struct reg : node
 {
 	size_t l;
 
-	reg(size_t l);
+	reg(op opcode, size_t l);
+};
+
+struct ssareg : reg
+{
+	ssareg(size_t l);
 	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
+	virtual std::string to_string(nat_driver *);
+};
+
+struct phyreg : reg
+{
+	phyreg(size_t l);
+	virtual Nat eval(nat_driver *);
 	virtual std::string to_string(nat_driver *);
 };
 
@@ -124,19 +137,17 @@ struct imm : node
 
 	imm(int r);
 	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *);
 };
 
 struct setreg : node
 {
-	size_t l;
+	std::unique_ptr<reg> l;
 	std::unique_ptr<node> r;
 	std::unique_ptr<var> v;
 
-	setreg(size_t l, node *r);
+	setreg(reg *l, node *r);
 	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
 	virtual std::string to_string(nat_driver *);
 };
 
@@ -144,9 +155,12 @@ struct nat_driver
 {
 	node_list nodes;
 	node_map variables;
-	ssa_map varssa;
-	reg_map registers;
-	size_t regnum;
+	var_map varssa;
+	reg_free_list reg_free;
+	reg_alloc_map reg_used;
+	reg_value_map reg_values;
+	size_t ssaregcount;
+	size_t phyregcount;
 	std::unique_ptr<char[]> def_use;
 
 	nat_driver();
@@ -161,9 +175,12 @@ struct nat_driver
 	void error(const std::string& m);
 
 	int parse(std::istream &in);
+
 	void use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg);
-	void usedef_analysis();
-	void lower();
+	void def_use_analysis();
+	void allocate_registers(size_t numregs);
+	void lower(bool regalloc);
+
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
 	void dump(op opcode);
