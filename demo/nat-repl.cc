@@ -76,9 +76,10 @@ void interp(int argc, char **argv)
 	bool tree = strcmp(argv[1], "--tree") == 0;
 	bool ssa = strcmp(argv[1], "--ssa") == 0;
 	bool regalloc = strcmp(argv[1], "--regalloc") == 0;
+	bool toyasm = strcmp(argv[1], "--asm") == 0;
 	bool run = strcmp(argv[1], "--run") == 0;
 
-	if (!(interp || tree || ssa || regalloc || run)) {
+	if (!(interp || tree || ssa || regalloc || toyasm || run)) {
 		print_usage(argv);
 		exit(1);
 	}
@@ -92,9 +93,9 @@ void interp(int argc, char **argv)
 	else if (tree) {
 		driver.dump(op_setvar);
 	}
-	else if (ssa || regalloc) {
-		driver.lower(regalloc);
-		driver.dump(op_setreg, regalloc);
+	else if (ssa || regalloc || toyasm) {
+		driver.lower(regalloc || toyasm);
+		driver.dump(op_setreg, regalloc || toyasm, toyasm);
 	}
 	else if (run) {
 		driver.lower(true);

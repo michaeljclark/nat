@@ -185,5 +185,5 @@ struct nat_compiler
 
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
-	void dump(op opcode, bool regalloc = false);
+	void dump(op opcode, bool regalloc = false, bool toyasm = false);
 };

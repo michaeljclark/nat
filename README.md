@@ -132,6 +132,28 @@ $ ./build/bin/nat-repl --regalloc examples/bswap.nat
 	(setreg x2, (or x4, x3))                 v++
 ```
 
+Output RISC-V like assembly language:
+
+```
+$ ./build/bin/nat-repl --asm examples/bswap.nat
+	li	x1, 0xa0b0c0d
+	srli	x2, x1, 0x18
+	li	x3, 0xff
+	and	x4, x2, x3
+	slli	x2, x1, 0x8
+	li	x3, 0xff0000
+	and	x5, x2, x3
+	or	x2, x4, x5
+	srli	x4, x1, 0x8
+	li	x5, 0xff00
+	and	x3, x4, x5
+	or	x4, x2, x3
+	slli	x2, x1, 0x18
+	li	x1, 0xff000000
+	and	x3, x2, x1
+	or	x2, x4, x3
+```
+
 To run the lowered code:
 
 ```
