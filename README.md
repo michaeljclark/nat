@@ -115,22 +115,22 @@ Lower the expression and allocate physical registers with nat-demo:
 
 ```
 $ ./build/bin/nat-demo --regalloc examples/bswap.nat
-	(setreg x1, (const_int 0x7f))           v               
-	(setreg x2, (srli x1, 0x18))            +v              
-	(setreg x3, (const_int 0xff))           ||v             
-	(setreg x4, (and x2, x3))               |++v            
-	(setreg x2, (slli x1, 0x8))             +  |v           
-	(setreg x3, (const_int 0xff0000))       |  ||v          
-	(setreg x5, (and x2, x3))               |  |++v         
-	(setreg x2, (or x4, x5))                |  +  +v        
-	(setreg x4, (srli x1, 0x8))             +      |v       
-	(setreg x5, (const_int 0xff00))         |      ||v      
-	(setreg x3, (and x4, x5))               |      |++v     
-	(setreg x4, (or x2, x3))                |      +  +v    
-	(setreg x2, (slli x1, 0x18))            +          |v   
-	(setreg x1, (const_int 0xff000000))                ||v  
-	(setreg x3, (and x2, x1))                          |++v 
-	(setreg x2, (or x4, x3))                           +  +v
+	(setreg x1, (const_int 0x7f))           v
+	(setreg x2, (srli x1, 0x18))            +v
+	(setreg x3, (const_int 0xff))           ||v
+	(setreg x4, (and x2, x3))               |++v
+	(setreg x2, (slli x1, 0x8))             +v |
+	(setreg x3, (const_int 0xff0000))       ||v|
+	(setreg x5, (and x2, x3))               |++|v
+	(setreg x2, (or x4, x5))                |v ++
+	(setreg x4, (srli x1, 0x8))             +|v 
+	(setreg x5, (const_int 0xff00))         |||v
+	(setreg x3, (and x4, x5))               ||v++
+	(setreg x4, (or x2, x3))                |++v 
+	(setreg x2, (slli x1, 0x18))            +v |
+	(setreg x1, (const_int 0xff000000))     v||
+	(setreg x3, (and x2, x1))               ++v|
+	(setreg x2, (or x4, x3))                 v++
 ```
 
 
