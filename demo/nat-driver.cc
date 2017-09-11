@@ -111,6 +111,7 @@ Nat unaryop::eval(nat_driver *d)
 {
 	Nat v = 0;
 	switch(opcode) {
+		case op_li:   v =  l->eval(d); break;
 		case op_not:  v = ~l->eval(d); break;
 		case op_neg:  v = -l->eval(d); break;
 		default: break;
@@ -271,7 +272,8 @@ node_list binaryop::lower(nat_driver *d)
 node_list const_int::lower(nat_driver *d)
 {
 	/* move the number into a register */
-	const_int *op = new const_int(*r);
+	imm *op_imm = new imm(r->limb_at(0));
+	unaryop *op = new unaryop(op_li, op_imm);
 	setreg *sr = new setreg(new ssareg(d->ssaregcount++), op);
 
 	return node_list{sr};
