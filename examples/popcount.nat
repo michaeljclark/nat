@@ -1,4 +1,4 @@
-v1 = 97
+v1 = 0xf00f
 v2 = ((v1 & 0xaaaaaaaa) >> 1)  + (v1 & 0x55555555)
 v3 = ((v2 & 0xcccccccc) >> 2)  + (v2 & 0x33333333)
 v4 = ((v3 & 0xf0f0f0f0) >> 4)  + (v3 & 0x0f0f0f0f)
