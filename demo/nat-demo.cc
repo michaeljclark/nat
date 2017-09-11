@@ -67,17 +67,18 @@ void repl(int argc, char **argv)
 
 void print_usage(char **argv)
 {
-	fprintf(stderr, "usage: %s [(--run|--dump|--ssa|--regalloc) <filename>]\n", argv[0]);
+	fprintf(stderr, "usage: %s [(--interp|--tree|--ssa|--regalloc|--run) <filename>]\n", argv[0]);
 }
 
 void interp(int argc, char **argv)
 {
-	bool run = strcmp(argv[1], "--run") == 0;
-	bool dump = strcmp(argv[1], "--dump") == 0;
+	bool interp = strcmp(argv[1], "--interp") == 0;
+	bool tree = strcmp(argv[1], "--tree") == 0;
 	bool ssa = strcmp(argv[1], "--ssa") == 0;
 	bool regalloc = strcmp(argv[1], "--regalloc") == 0;
+	bool run = strcmp(argv[1], "--run") == 0;
 
-	if (!(run || dump || ssa || regalloc)) {
+	if (!(interp || tree || ssa || regalloc || run)) {
 		print_usage(argv);
 		exit(1);
 	}
@@ -85,15 +86,19 @@ void interp(int argc, char **argv)
 	std::ifstream in(argv[2]);
 	nat_driver driver;
 	driver.parse(in);
-	if (run) {
+	if (interp) {
 		driver.run(op_setvar);
 	}
-	else if (dump) {
+	else if (tree) {
 		driver.dump(op_setvar);
 	}
 	else if (ssa || regalloc) {
 		driver.lower(regalloc);
 		driver.dump(op_setreg, regalloc);
+	}
+	else if (run) {
+		driver.lower(true);
+		driver.run(op_setreg);
 	}
 }
 

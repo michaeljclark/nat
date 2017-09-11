@@ -132,7 +132,9 @@ Nat binaryop::eval(nat_driver *d)
 		case op_sgt:  v = l->eval(d) >  r->eval(d); break;
 		case op_sgte: v = l->eval(d) >= r->eval(d); break;
 		case op_srl:  v = l->eval(d) >> r->eval(d).limb_at(0); break;
+		case op_srli: v = l->eval(d) >> r->eval(d).limb_at(0); break;
 		case op_sll:  v = l->eval(d) << r->eval(d).limb_at(0); break;
+		case op_slli: v = l->eval(d) << r->eval(d).limb_at(0); break;
 		case op_add:  v = l->eval(d) +  r->eval(d); break;
 		case op_sub:  v = l->eval(d) -  r->eval(d); break;
 		case op_mul:  v = l->eval(d) *  r->eval(d); break;
@@ -576,7 +578,7 @@ void nat_driver::run(op opcode)
 				break;
 			case op_setreg:
 				num = n->eval(this);
-				std::cout << "_"
+				std::cout << " "
 					<< static_cast<setreg*>(n)->l->to_string(this)
 					<< " = " << num.to_string(10)
 					<< " (" << num.to_string(16) << ")" << std::endl;
