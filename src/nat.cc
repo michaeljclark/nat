@@ -658,6 +658,8 @@ std::string Nat::to_string(size_t radix) const
 			return s.substr(offset);
 		}
 		case 2: {
+			if (*this == 0) return "0b0";
+
 			std::string s("0b");
 			limb_t l1 = limbs.back();
 			size_t n = limb_bits - clz(l1);
@@ -676,6 +678,8 @@ std::string Nat::to_string(size_t radix) const
 			return s;
 		}
 		case 16: {
+			if (*this == 0) return "0x0";
+
 			std::string s("0x");
 			limb_t l1 = limbs.back();
 			size_t n = ((limb_bits >> 2) - (clz(l1) >> 2));
