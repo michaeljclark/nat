@@ -597,7 +597,7 @@ void nat_compiler::run(op opcode)
 	}
 }
 
-void nat_compiler::dump(op opcode, bool regalloc, bool toyasm)
+void nat_compiler::dump_ast(op opcode, bool regalloc)
 {
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
@@ -608,44 +608,49 @@ void nat_compiler::dump(op opcode, bool regalloc, bool toyasm)
 				break;
 			}
 			case op_setreg: {
-				if (toyasm) {
-					setreg *sr = static_cast<setreg*>(n);
-					node *sr_op = sr->r.get();
-					std::cout
-						<< "\t"
-						<< op_name[sr_op->opcode]
-						<< "\t"
-						<< sr->l->to_string(this)
-						<< ", ";
-					if (typeid(*sr_op) == typeid(unaryop)) {
-						std::cout
-							<< static_cast<unaryop*>(sr_op)->l->to_string(this);
-					} else if (typeid(*sr_op) == typeid(binaryop)) {
-						std::cout
-							<< static_cast<binaryop*>(sr_op)->l->to_string(this)
-							<< ", "
-							<< static_cast<binaryop*>(sr_op)->r->to_string(this);
+				std::cout << "\t"
+					<< std::left << std::setw(40)
+					<< n->to_string(this);
+				if (regalloc) {
+					for (size_t j = 0; j < phyregcount; j++) {
+						std::cout << def_use_phy[i * phyregcount + j];
 					}
-					std::cout << std::endl;
 				} else {
-					std::cout << "\t"
-						<< std::left << std::setw(40)
-						<< n->to_string(this);
-					if (regalloc) {
-						for (size_t j = 0; j < phyregcount; j++) {
-							std::cout << def_use_phy[i * phyregcount + j];
-						}
-					} else {
-						for (size_t j = 0; j < ssaregcount; j++) {
-							std::cout << def_use_ssa[i * ssaregcount + j];
-						}
+					for (size_t j = 0; j < ssaregcount; j++) {
+						std::cout << def_use_ssa[i * ssaregcount + j];
 					}
-					std::cout << std::endl;
 				}
+				std::cout << std::endl;
 				break;
 			}
 			default:
 				break;
 		}
+	}
+}
+
+void nat_compiler::emit_asm()
+{
+	for (size_t i = 0; i < nodes.size(); i++) {
+		node *n = nodes[i];
+		if (n->opcode != op_setreg) continue;
+		setreg *sr = static_cast<setreg*>(n);
+		node *sr_op = sr->r.get();
+		std::cout
+			<< "\t"
+			<< op_name[sr_op->opcode]
+			<< "\t"
+			<< sr->l->to_string(this)
+			<< ", ";
+		if (typeid(*sr_op) == typeid(unaryop)) {
+			std::cout
+				<< static_cast<unaryop*>(sr_op)->l->to_string(this);
+		} else if (typeid(*sr_op) == typeid(binaryop)) {
+			std::cout
+				<< static_cast<binaryop*>(sr_op)->l->to_string(this)
+				<< ", "
+				<< static_cast<binaryop*>(sr_op)->r->to_string(this);
+		}
+		std::cout << std::endl;
 	}
 }

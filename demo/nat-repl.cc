@@ -55,9 +55,9 @@ void repl(int argc, char **argv)
 		if (!empty) {
 			in << li->buffer;
 		}
-		nat_compiler driver;
-		driver.parse(in);
-		driver.run(op_setvar);
+		nat_compiler compiler;
+		compiler.parse(in);
+		compiler.run(op_setvar);
 		history(hist, &ev, H_ENTER, in.str().c_str());
 		in.str(std::string());
 	}
@@ -85,21 +85,25 @@ void interp(int argc, char **argv)
 	}
 
 	std::ifstream in(argv[2]);
-	nat_compiler driver;
-	driver.parse(in);
+	nat_compiler compiler;
+	compiler.parse(in);
 	if (interp) {
-		driver.run(op_setvar);
+		compiler.run(op_setvar);
 	}
 	else if (tree) {
-		driver.dump(op_setvar);
+		compiler.dump_ast(op_setvar);
 	}
-	else if (ssa || regalloc || toyasm) {
-		driver.lower(regalloc || toyasm);
-		driver.dump(op_setreg, regalloc || toyasm, toyasm);
+	else if (ssa || regalloc) {
+		compiler.lower(regalloc);
+		compiler.dump_ast(op_setreg, regalloc);
+	}
+	else if (toyasm) {
+		compiler.lower(true);
+		compiler.emit_asm();
 	}
 	else if (run) {
-		driver.lower(true);
-		driver.run(op_setreg);
+		compiler.lower(true);
+		compiler.run(op_setreg);
 	}
 }
 

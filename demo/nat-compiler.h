@@ -185,5 +185,6 @@ struct nat_compiler
 
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
-	void dump(op opcode, bool regalloc = false, bool toyasm = false);
+	void dump_ast(op opcode, bool regalloc = false);
+	void emit_asm();
 };
