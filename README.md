@@ -1,7 +1,7 @@
 # nat
 
 Simple arbitrary precision arithmetic library with simple expression
-parser and compiler.
+parser and compiler targetting a subset of the RISC-V ISA.
 
 ## Project
 
@@ -50,8 +50,9 @@ Apple LLVM | 8.1.0   | macos 10.12.6
 
 ## Nat REPL
 
-For an interactive nat-repl command line interface (use semicolon
-continuation marker for multi-line expressions):
+The Nat REPL is a simple expression evaluator.  For an interactive
+command line interface execute nat-repl with no arguments. Use
+semicolon as a continuation marker for multi-line expressions.
 
 ```
 $ ./build/bin/nat-repl 
@@ -64,7 +65,33 @@ Nat> a = 2;
 Nat> 
 ```
 
-View the source for an example expression:
+
+### Two’s complement subtraction using a Unicode syntax
+
+```
+$ cat examples/sub.nat
+xlen ← 32
+mask ← (1«xlen)-1
+rs1 ← 9
+rs2 ← 3
+rd  ← (rs1 + ¬rs2 + 1) ∧ mask
+```
+
+
+### Population count example using C-like syntax
+
+```
+$ cat examples/popcount.nat
+v1 = 0xf00f
+v2 = ((v1 & 0xaaaaaaaa) >> 1)  + (v1 & 0x55555555)
+v3 = ((v2 & 0xcccccccc) >> 2)  + (v2 & 0x33333333)
+v4 = ((v3 & 0xf0f0f0f0) >> 4)  + (v3 & 0x0f0f0f0f)
+v5 = ((v4 & 0xff00ff00) >> 8)  + (v4 & 0x00ff00ff)
+v6 = ((v5 & 0xffff0000) >> 16) + (v5 & 0x0000ffff)
+```
+
+
+### Byte swap example using C-like syntax
 
 ```
 $ cat examples/bswap.nat
@@ -72,7 +99,8 @@ p = 0x0a0b0c0d
 s = ((p >> 24) & 0x000000ff) | ((p << 8) & 0x00ff0000) | ((p >> 8) & 0x0000ff00) | ((p << 24) & 0xff000000)
 ```
 
-Interpret an expression:
+
+### Evaluating an expression from a file
 
 ```
 $ ./build/bin/nat-repl --interp examples/bswap.nat
@@ -80,7 +108,8 @@ $ ./build/bin/nat-repl --interp examples/bswap.nat
  s = 218893066 (0xd0c0b0a)
 ```
 
-Print the parse tree:
+
+### Printing the abstract syntax tree for the expression
 
 ```
 $ ./build/bin/nat-repl --tree examples/bswap.nat
@@ -88,7 +117,8 @@ $ ./build/bin/nat-repl --tree examples/bswap.nat
 	(setvar 's', (or (or (or (and (srl (var 'p'), (const_int 0x18)), (const_int 0xff)), (and (sll (var 'p'), (const_int 0x8)), (const_int 0xff0000))), (and (srl (var 'p'), (const_int 0x8)), (const_int 0xff00))), (and (sll (var 'p'), (const_int 0x18)), (const_int 0xff000000))))
 ```
 
-Lower the expression parse tree to SSA form IR:
+
+### Lowering the AST to an SSA form intermediate representation
 
 ```
 $ ./build/bin/nat-repl --ssa examples/bswap.nat
@@ -110,7 +140,8 @@ $ ./build/bin/nat-repl --ssa examples/bswap.nat
 	(setreg _15, (or _11, _14))                        +  +v
 ```
 
-Lower the expression parse tree to IR and allocate physical registers:
+
+### Performing register allocation on the SSA form IR
 
 ```
 $ ./build/bin/nat-repl --regalloc examples/bswap.nat
@@ -132,7 +163,8 @@ $ ./build/bin/nat-repl --regalloc examples/bswap.nat
 	(setreg x2, (or x4, x3))                 v++
 ```
 
-Output RISC-V like assembly language:
+
+### Outputting RISC-V like assembly language
 
 ```
 $ ./build/bin/nat-repl --asm examples/bswap.nat
@@ -154,7 +186,8 @@ $ ./build/bin/nat-repl --asm examples/bswap.nat
 	or	x2, x4, x3
 ```
 
-To run the lowered code:
+
+### Running the lowered machine code
 
 ```
 ./build/bin/nat-repl --run examples/bswap.nat
