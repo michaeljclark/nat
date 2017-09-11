@@ -1,5 +1,4 @@
 AR          := $(shell which ar)
-CC          := $(shell which cc)
 CXX         := $(shell which c++)
 FLEX        := $(shell which flex)
 BISON       := $(shell which bison)
@@ -9,7 +8,6 @@ INCLUDES    = -Isrc -I/usr/local/include
 DEBUG_FLAGS = -g
 OPT_FLAGS   = -O3
 WARN_FLAGS  = -Wall
-CFLAGS      = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
 CXXFLAGS    = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES) -std=c++11
 LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lnat
 
@@ -31,17 +29,14 @@ clean: ; rm -fr build \
 
 # build rules
 
-build/obj/nat-compiler.o: demo/nat-compiler.cc demo/nat-parser.hh
-	@echo CC $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
-
 demo/nat-parser.cc demo/nat-parser.hh: demo/nat-parser.yy
 	$(BISON) --language=c++ -d -o demo/nat-parser.cc $<
 
 demo/nat-scanner.cc: demo/nat-scanner.ll demo/nat-parser.hh
 	$(FLEX) --c++ --stdinit -o $@ $<
 
-build/obj/%.o: src/%.c
-	@echo CC $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) -c -o $@ $^
+build/obj/nat-compiler.o: demo/nat-compiler.cc demo/nat-parser.hh
+	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/obj/%.o: src/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
