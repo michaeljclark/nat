@@ -145,22 +145,22 @@ $ ./build/bin/nat-repl --ssa examples/bswap.nat
 
 ```
 $ ./build/bin/nat-repl --regalloc examples/bswap.nat
-	(setreg x1, (li 0xa0b0c0d))             v
-	(setreg x2, (srli x1, 0x18))            +v
-	(setreg x3, (li 0xff))                  ||v
-	(setreg x4, (and x2, x3))               |++v
-	(setreg x2, (slli x1, 0x8))             +v |
-	(setreg x3, (li 0xff0000))              ||v|
-	(setreg x5, (and x2, x3))               |++|v
-	(setreg x2, (or x4, x5))                |v ++
-	(setreg x4, (srli x1, 0x8))             +|v 
-	(setreg x5, (li 0xff00))                |||v
-	(setreg x3, (and x4, x5))               ||v++
-	(setreg x4, (or x2, x3))                |++v 
-	(setreg x2, (slli x1, 0x18))            +v |
-	(setreg x1, (li 0xff000000))            v||
-	(setreg x3, (and x2, x1))               ++v|
-	(setreg x2, (or x4, x3))                 v++
+	(setreg a0, (li 0xa0b0c0d))             v
+	(setreg a1, (srli a0, 0x18))            +v
+	(setreg a2, (li 0xff))                  ||v
+	(setreg a3, (and a1, a2))               |++v
+	(setreg a1, (slli a0, 0x8))             +v |
+	(setreg a2, (li 0xff0000))              ||v|
+	(setreg a4, (and a1, a2))               |++|v
+	(setreg a1, (or a3, a4))                |v ++
+	(setreg a3, (srli a0, 0x8))             +|v 
+	(setreg a4, (li 0xff00))                |||v
+	(setreg a2, (and a3, a4))               ||v++
+	(setreg a3, (or a1, a2))                |++v 
+	(setreg a1, (slli a0, 0x18))            +v |
+	(setreg a0, (li 0xff000000))            v||
+	(setreg a2, (and a1, a0))               ++v|
+	(setreg a1, (or a3, a2))                 v++
 ```
 
 
@@ -168,22 +168,22 @@ $ ./build/bin/nat-repl --regalloc examples/bswap.nat
 
 ```
 $ ./build/bin/nat-repl --asm examples/bswap.nat
-	li	x1, 0xa0b0c0d
-	srli	x2, x1, 0x18
-	li	x3, 0xff
-	and	x4, x2, x3
-	slli	x2, x1, 0x8
-	li	x3, 0xff0000
-	and	x5, x2, x3
-	or	x2, x4, x5
-	srli	x4, x1, 0x8
-	li	x5, 0xff00
-	and	x3, x4, x5
-	or	x4, x2, x3
-	slli	x2, x1, 0x18
-	li	x1, 0xff000000
-	and	x3, x2, x1
-	or	x2, x4, x3
+	li	a0, 0xa0b0c0d
+	srli	a1, a0, 0x18
+	li	a2, 0xff
+	and	a3, a1, a2
+	slli	a1, a0, 0x8
+	li	a2, 0xff0000
+	and	a4, a1, a2
+	or	a1, a3, a4
+	srli	a3, a0, 0x8
+	li	a4, 0xff00
+	and	a2, a3, a4
+	or	a3, a1, a2
+	slli	a1, a0, 0x18
+	li	a0, 0xff000000
+	and	a2, a1, a0
+	or	a1, a3, a2
 ```
 
 
@@ -191,20 +191,20 @@ $ ./build/bin/nat-repl --asm examples/bswap.nat
 
 ```
 ./build/bin/nat-repl --run examples/bswap.nat
- x1 = 168496141 (0xa0b0c0d)
- x2 = 10 (0xa)
- x3 = 255 (0xff)
- x4 = 10 (0xa)
- x2 = 43135012096 (0xa0b0c0d00)
- x3 = 16711680 (0xff0000)
- x5 = 786432 (0xc0000)
- x2 = 786442 (0xc000a)
- x4 = 658188 (0xa0b0c)
- x5 = 65280 (0xff00)
- x3 = 2816 (0xb00)
- x4 = 789258 (0xc0b0a)
- x2 = 2826896152723456 (0xa0b0c0d000000)
- x1 = 4278190080 (0xff000000)
- x3 = 218103808 (0xd000000)
- x2 = 218893066 (0xd0c0b0a)
+ a0 = 168496141 (0xa0b0c0d)
+ a1 = 10 (0xa)
+ a2 = 255 (0xff)
+ a3 = 10 (0xa)
+ a1 = 43135012096 (0xa0b0c0d00)
+ a2 = 16711680 (0xff0000)
+ a4 = 786432 (0xc0000)
+ a1 = 786442 (0xc000a)
+ a3 = 658188 (0xa0b0c)
+ a4 = 65280 (0xff00)
+ a2 = 2816 (0xb00)
+ a3 = 789258 (0xc0b0a)
+ a1 = 2826896152723456 (0xa0b0c0d000000)
+ a0 = 4278190080 (0xff000000)
+ a2 = 218103808 (0xd000000)
+ a1 = 218893066 (0xd0c0b0a)
 ```
