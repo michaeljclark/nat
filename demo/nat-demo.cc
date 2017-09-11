@@ -93,7 +93,7 @@ void interp(int argc, char **argv)
 	}
 	else if (ssa || regalloc) {
 		driver.lower(regalloc);
-		driver.dump(op_setreg);
+		driver.dump(op_setreg, regalloc);
 	}
 }
 

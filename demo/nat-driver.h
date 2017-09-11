@@ -161,7 +161,8 @@ struct nat_driver
 	reg_value_map reg_values;
 	size_t ssaregcount;
 	size_t phyregcount;
-	std::unique_ptr<char[]> def_use;
+	std::unique_ptr<char[]> def_use_ssa;
+	std::unique_ptr<char[]> def_use_phy;
 
 	nat_driver();
 
@@ -176,12 +177,13 @@ struct nat_driver
 
 	int parse(std::istream &in);
 
-	void use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg);
-	void def_use_analysis();
-	void allocate_registers(size_t numregs);
+	void use_ssa_scan(std::unique_ptr<node> &nr,
+		size_t i, size_t j, size_t defreg);
+	void def_use_ssa_analysis();
+	void allocate_registers();
 	void lower(bool regalloc);
 
 	size_t lower_reg(node_list &l);
 	void run(op opcode);
-	void dump(op opcode);
+	void dump(op opcode, bool regalloc = false);
 };

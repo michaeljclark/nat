@@ -410,53 +410,56 @@ int nat_driver::parse(std::istream &in)
 	return parser.parse();
 }
 
-void nat_driver::use_scan(std::unique_ptr<node> &nr, size_t i, size_t j, size_t defreg)
+void nat_driver::use_ssa_scan(std::unique_ptr<node> &nr,
+	size_t i, size_t j, size_t defreg)
 {
 	node *l = nr.get();
 	if (typeid(*l) != typeid(ssareg)) return;
 	size_t usereg = static_cast<ssareg*>(l)->l;
 	if (usereg != defreg) return;
-	def_use[j * ssaregcount + defreg] = '+';
+	def_use_ssa[j * ssaregcount + defreg] = '+';
 	for (size_t k = j - 1; k != i; k--) {
-		if (def_use[k * ssaregcount + defreg] == ' ') {
-			def_use[k * ssaregcount + defreg] = '|';
+		if (def_use_ssa[k * ssaregcount + defreg] == ' ') {
+			def_use_ssa[k * ssaregcount + defreg] = '|';
 		} else {
 			break;
 		}
 	}
 }
 
-void nat_driver::def_use_analysis()
+void nat_driver::def_use_ssa_analysis()
 {
-	size_t def_use_size = nodes.size() * ssaregcount;
-	def_use = std::unique_ptr<char[]>(new char[def_use_size]);
-	memset(def_use.get(), ' ', def_use_size);
+	size_t def_use_ssa_size = nodes.size() * ssaregcount;
+	def_use_ssa = std::unique_ptr<char[]>(new char[def_use_ssa_size]);
+	memset(def_use_ssa.get(), ' ', def_use_ssa_size);
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *ndef = nodes[i];
 		if (ndef->opcode != op_setreg) continue;
 		setreg *srdef = static_cast<setreg*>(ndef);
 		size_t defreg = srdef->l->l;
-		def_use[i * ssaregcount + defreg] = 'v';
+		def_use_ssa[i * ssaregcount + defreg] = 'v';
 		for (size_t j = i + 1; j < nodes.size(); j++) {
 			if (nodes[j]->opcode != op_setreg) continue;
 			setreg *sruse = static_cast<setreg*>(nodes[j]);
 			node *sruse_op = sruse->r.get();
 			if (typeid(*sruse_op) == typeid(unaryop)) {
 				unaryop *use_op = static_cast<unaryop*>(sruse_op);
-				use_scan(use_op->l, i, j, defreg);
+				use_ssa_scan(use_op->l, i, j, defreg);
 			} else if (typeid(*sruse_op) == typeid(binaryop)) {
 				binaryop *use_op = static_cast<binaryop*>(sruse_op);
-				use_scan(use_op->l, i, j, defreg);
-				use_scan(use_op->r, i, j, defreg);
+				use_ssa_scan(use_op->l, i, j, defreg);
+				use_ssa_scan(use_op->r, i, j, defreg);
 			}
 		}
 	}
 }
 
-void nat_driver::allocate_registers(size_t numregs)
+void nat_driver::allocate_registers()
 {
 	/* create physical registers */
-	for (size_t i = numregs; i > 0; i--) {
+	size_t def_use_phy_size = nodes.size() * phyregcount;
+	def_use_phy = std::unique_ptr<char[]>(new char[def_use_phy_size]);
+	for (size_t i = phyregcount; i > 0; i--) {
 		reg_values[i] = 0;
 		reg_free.push_back(i);
 	}
@@ -470,7 +473,9 @@ void nat_driver::allocate_registers(size_t numregs)
 		auto rfi = reg_free.end();
 		for (auto ri = reg_used.begin(); ri != reg_used.end();) {
 			size_t ssaregnum = ri->first, phyregnum = ri->second;
-			if (def_use[i * ssaregcount + ssaregnum] == ' ') {
+			def_use_phy[i * phyregcount + phyregnum] =
+				def_use_ssa[i * ssaregcount + ssaregnum];
+			if (def_use_ssa[i * ssaregcount + ssaregnum] == ' ') {
 				ri = reg_used.erase(ri);
 				reg_free.insert(rfi, phyregnum);
 			} else {
@@ -506,6 +511,8 @@ void nat_driver::allocate_registers(size_t numregs)
 		}
 		size_t ssaregnum = srdef->l->l;
 		size_t phyregnum = reg_free.back();
+		def_use_phy[i * phyregcount + phyregnum] =
+			def_use_ssa[i * ssaregcount + ssaregnum];
 		reg_free.pop_back();
 		reg_used[ssaregnum] = phyregnum;
 		srdef->l = std::unique_ptr<phyreg>(new phyreg(phyregnum));
@@ -528,9 +535,9 @@ void nat_driver::lower(bool regalloc)
 		}
 	}
 	nodes = std::move(new_nodes);
-	def_use_analysis();
+	def_use_ssa_analysis();
 	if (regalloc) {
-		allocate_registers(phyregcount);
+		allocate_registers();
 	}
 }
 
@@ -580,7 +587,7 @@ void nat_driver::run(op opcode)
 	}
 }
 
-void nat_driver::dump(op opcode)
+void nat_driver::dump(op opcode, bool regalloc)
 {
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
@@ -594,8 +601,14 @@ void nat_driver::dump(op opcode)
 				std::cout << "\t"
 					<< std::left << std::setw(40) 
 					<< n->to_string(this);
-				for (size_t j = 0; j < ssaregcount; j++) {
-					std::cout << def_use[i * ssaregcount + j];
+				if (regalloc) {
+					for (size_t j = 0; j < phyregcount; j++) {
+						std::cout << def_use_phy[i * phyregcount + j];
+					}
+				} else {
+					for (size_t j = 0; j < ssaregcount; j++) {
+						std::cout << def_use_ssa[i * ssaregcount + j];
+					}
 				}
 				std::cout << std::endl;
 				break;
