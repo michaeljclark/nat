@@ -1,5 +1,9 @@
 #pragma once
 
+/*
+ * forward declarations
+ */
+
 #undef YY_DECL
 #define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_compiler &driver)
 
@@ -11,6 +15,11 @@ typedef std::deque<size_t> reg_free_list;
 typedef std::map<size_t,size_t> reg_alloc_map;
 typedef std::map<size_t,Nat> reg_value_map;
 struct nat_compiler;
+
+
+/*
+ * tree node opcodes
+ */
 
 enum op
 {
@@ -46,6 +55,11 @@ enum op
 	op_neg,
 	op_pow,
 };
+
+
+/*
+ * tree node types
+ */
 
 struct node
 {
@@ -160,6 +174,11 @@ struct setreg : node
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
 };
+
+
+/*
+ * compiler
+ */
 
 struct nat_compiler
 {

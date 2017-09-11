@@ -401,7 +401,7 @@ std::string imm::to_string(nat_compiler *d)
 
 
 /*
- * driver methods called by parser
+ * parser interface
  */
 
 nat_compiler::nat_compiler() : ssaregcount(0), phyregcount(31) {}
