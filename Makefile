@@ -11,7 +11,7 @@ OPT_FLAGS   = -O3
 WARN_FLAGS  = -Wall
 CFLAGS      = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES)
 CXXFLAGS    = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES) -std=c++11
-LDFLAGS     = -L/usr/local/lib
+LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lnat
 
 
 # build targets
@@ -52,23 +52,17 @@ build/obj/%.o: tests/%.cc
 build/obj/%.o: demo/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $^
 
-build/obj/%.o: demo/%.c
-	@echo CC $@ ; mkdir -p $(@D) ; $(CC) $(CFLAGS) -c -o $@ $^
-
-build/obj/%.o: utils/%.cc
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
-
-build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o
-	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
-
 build/lib/libnat.a: build/obj/nat.o build/obj/int.o
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
-build/bin/nat-tests: build/obj/nat-tests.o build/lib/libnat.a
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o 
+	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
-build/bin/int-tests: build/obj/int-tests.o build/lib/libnat.a
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
+build/bin/nat-tests: build/obj/nat-tests.o
+	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-build/bin/nat-repl: build/obj/nat-repl.o build/lib/libnat.a build/lib/libnatc.a
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)
+build/bin/int-tests: build/obj/int-tests.o
+	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+build/bin/nat-repl: build/obj/nat-repl.o
+	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ -lnatc $(LDFLAGS) $(EDIT_LIBS)
