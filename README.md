@@ -66,7 +66,7 @@ Nat>
 ```
 
 
-### Two’s complement subtraction using a Unicode syntax
+### Two’s complement subtraction example with Unicode syntax
 
 ```
 $ cat examples/sub.nat
@@ -109,7 +109,7 @@ $ ./build/bin/nat-repl --interp examples/bswap.nat
 ```
 
 
-### Printing the abstract syntax tree for the expression
+### Printing the abstract syntax tree for an expression
 
 ```
 $ ./build/bin/nat-repl --tree examples/bswap.nat
