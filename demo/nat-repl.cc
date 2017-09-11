@@ -116,9 +116,11 @@ int main(int argc, char **argv)
 		(argc == 2 && strcmp(argv[1], "-") == 0))
 	{
 		repl(argc, argv);
-	} else if (argc == 3) {
+	}
+	else if (argc == 3) {
 		interp(argc, argv);
-	} else {
+	}
+	else {
 		print_usage(argv);
 		exit(1);
 	}
