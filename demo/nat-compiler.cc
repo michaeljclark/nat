@@ -434,7 +434,7 @@ void nat_compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 void nat_compiler::def_use_ssa_analysis()
 {
 	size_t def_use_ssa_size = nodes.size() * ssaregcount;
-	def_use_ssa = std::unique_ptr<char[]>(new char[def_use_ssa_size]);
+	def_use_ssa = std::unique_ptr<char[]>(new char[def_use_ssa_size]());
 	memset(def_use_ssa.get(), ' ', def_use_ssa_size);
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *ndef = nodes[i];
@@ -462,7 +462,7 @@ void nat_compiler::allocate_registers()
 {
 	/* create physical registers */
 	size_t def_use_phy_size = nodes.size() * phyregcount;
-	def_use_phy = std::unique_ptr<char[]>(new char[def_use_phy_size]);
+	def_use_phy = std::unique_ptr<char[]>(new char[def_use_phy_size]());
 	for (size_t i = phyregcount; i > 0; i--) {
 		reg_values[i] = 0;
 		reg_free.push_back(i);
