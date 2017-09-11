@@ -1,7 +1,7 @@
 # nat
 
-Simple arbitrary precision arithmetic library with simple expression
-parser and compiler targetting a subset of the RISC-V ISA.
+Arbitrary precision arithmetic library with simple expression
+compiler targetting a subset of the RISC-V ISA.
 
 ## Project
 
