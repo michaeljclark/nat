@@ -59,10 +59,10 @@ build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/n
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/bin/nat-tests: build/obj/nat-tests.o
-	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 build/bin/int-tests: build/obj/int-tests.o
-	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 build/bin/nat-repl: build/obj/nat-repl.o
-	echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ -lnatc $(LDFLAGS) $(EDIT_LIBS)
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ -lnatc $(LDFLAGS) $(EDIT_LIBS)
