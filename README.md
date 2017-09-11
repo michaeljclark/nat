@@ -1,6 +1,6 @@
 # nat
 
-Simple arbitrary precision arithmetic library with demo expression
+Simple arbitrary precision arithmetic library with example expression
 parser and compiler.
 
 ## Project
@@ -64,35 +64,35 @@ Nat> a = 2;
 Nat> 
 ```
 
-View the source for a nat-demo example expression:
+View the source for an example expression:
 
 ```
 $ cat examples/bswap.nat
-p = 127
+p = 0x0a0b0c0d
 s = ((p >> 24) & 0x000000ff) | ((p << 8) & 0x00ff0000) | ((p >> 8) & 0x0000ff00) | ((p << 24) & 0xff000000)
 ```
 
-Evaluate an expression with nat-demo:
+Interpret an expression:
 
 ```
-$ ./build/bin/nat-demo --run examples/bswap.nat
- p = 127 (0x7f)
- s = 2130706432 (0x7f000000)
+$ ./build/bin/nat-demo --interp examples/bswap.nat
+ p = 168496141 (0xa0b0c0d)
+ s = 218893066 (0xd0c0b0a)
 ```
 
-Dump the parse tree with nat-demo:
+Print the parse tree:
 
 ```
-$ ./build/bin/nat-demo --dump examples/bswap.nat
-	(setvar 'p', (li 0x7f))
-	(setvar 's', (or (or (or (and (srl (var 'p'), (li 0x18)), (li 0xff)), (and (sll (var 'p'), (li 0x8)), (li 0xff0000))), (and (srl (var 'p'), (li 0x8)), (li 0xff00))), (and (sll (var 'p'), (li 0x18)), (li 0xff000000))))
+$ ./build/bin/nat-demo --tree examples/bswap.nat
+	(setvar 'p', (const_int 0xa0b0c0d))
+	(setvar 's', (or (or (or (and (srl (var 'p'), (const_int 0x18)), (const_int 0xff)), (and (sll (var 'p'), (const_int 0x8)), (const_int 0xff0000))), (and (srl (var 'p'), (const_int 0x8)), (const_int 0xff00))), (and (sll (var 'p'), (const_int 0x18)), (const_int 0xff000000))))
 ```
 
-Lower the expression to SSA form with nat-demo:
+Lower the expression parse tree to SSA form IR:
 
 ```
 $ ./build/bin/nat-demo --ssa examples/bswap.nat
-	(setreg _0, (const_int 0x7f))           v               
+	(setreg _0, (const_int 0xa0b0c0d))      v               
 	(setreg _1, (srli _0, 0x18))            +v              
 	(setreg _2, (const_int 0xff))           ||v             
 	(setreg _3, (and _1, _2))               |++v            
@@ -110,8 +110,7 @@ $ ./build/bin/nat-demo --ssa examples/bswap.nat
 	(setreg _15, (or _11, _14))                        +  +v
 ```
 
-Lower the expression and allocate physical registers with nat-demo:
-
+Lower the expression parse tree to IR and allocate physical registers:
 
 ```
 $ ./build/bin/nat-demo --regalloc examples/bswap.nat
@@ -133,6 +132,27 @@ $ ./build/bin/nat-demo --regalloc examples/bswap.nat
 	(setreg x2, (or x4, x3))                 v++
 ```
 
+To run the lowered code:
+
+```
+./build/bin/nat-demo --run examples/bswap.nat
+ x1 = 168496141 (0xa0b0c0d)
+ x2 = 10 (0xa)
+ x3 = 255 (0xff)
+ x4 = 10 (0xa)
+ x2 = 43135012096 (0xa0b0c0d00)
+ x3 = 16711680 (0xff0000)
+ x5 = 786432 (0xc0000)
+ x2 = 786442 (0xc000a)
+ x4 = 658188 (0xa0b0c)
+ x5 = 65280 (0xff00)
+ x3 = 2816 (0xb00)
+ x4 = 789258 (0xc0b0a)
+ x2 = 2826896152723456 (0xa0b0c0d000000)
+ x1 = 4278190080 (0xff000000)
+ x3 = 218103808 (0xd000000)
+ x2 = 218893066 (0xd0c0b0a)
+```
 
 ## Nat Interface
 
