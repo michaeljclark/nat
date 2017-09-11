@@ -18,7 +18,7 @@ LDFLAGS     = -L/usr/local/lib
 
 all: libs tests demo
 
-libs: build/lib/libnat.a build/lib/libcalc.a
+libs: build/lib/libnat.a build/lib/libnatc.a
 
 tests: build/bin/nat-tests build/bin/int-tests
 
@@ -58,7 +58,7 @@ build/obj/%.o: demo/%.c
 build/obj/%.o: utils/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
 
-build/lib/libcalc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o
+build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/lib/libnat.a: build/obj/nat.o build/obj/int.o
@@ -70,5 +70,5 @@ build/bin/nat-tests: build/obj/nat-tests.o build/lib/libnat.a
 build/bin/int-tests: build/obj/int-tests.o build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-build/bin/nat-repl: build/obj/nat-repl.o build/lib/libcalc.a build/lib/libnat.a
+build/bin/nat-repl: build/obj/nat-repl.o build/lib/libnat.a build/lib/libnatc.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)
