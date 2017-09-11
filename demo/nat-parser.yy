@@ -12,13 +12,13 @@
 %code requires
 {
 struct nat_scanner;
-struct nat_driver;
+struct nat_compiler;
 struct node;
 }
 
 %parse-param { nat_scanner& scanner }
-%parse-param { nat_driver& driver }
-%lex-param { nat_driver& driver }
+%parse-param { nat_compiler& driver }
+%lex-param { nat_compiler& driver }
 
 %locations
 
@@ -30,7 +30,7 @@ struct node;
 
 #include "nat.h"
 #include "FlexLexer.h"
-#include "nat-driver.h"
+#include "nat-compiler.h"
 #include "nat-scanner.h"
 
 #undef yylex

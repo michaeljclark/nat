@@ -22,7 +22,7 @@ libs: build/lib/libnat.a build/lib/libcalc.a
 
 tests: build/bin/nat-tests build/bin/int-tests
 
-demo: build/bin/nat-demo
+demo: build/bin/nat-repl
 
 clean: ; rm -fr build \
 	demo/nat-parser.cc demo/nat-parser.hh demo/nat-scanner.cc \
@@ -31,7 +31,7 @@ clean: ; rm -fr build \
 
 # build rules
 
-build/obj/nat-driver.o: demo/nat-driver.cc demo/nat-parser.hh
+build/obj/nat-compiler.o: demo/nat-compiler.cc demo/nat-parser.hh
 	@echo CC $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 demo/nat-parser.cc demo/nat-parser.hh: demo/nat-parser.yy
@@ -58,7 +58,7 @@ build/obj/%.o: demo/%.c
 build/obj/%.o: utils/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
 
-build/lib/libcalc.a: build/obj/nat-driver.o build/obj/nat-parser.o build/obj/nat-scanner.o
+build/lib/libcalc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/lib/libnat.a: build/obj/nat.o build/obj/int.o
@@ -70,5 +70,5 @@ build/bin/nat-tests: build/obj/nat-tests.o build/lib/libnat.a
 build/bin/int-tests: build/obj/int-tests.o build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
-build/bin/nat-demo: build/obj/nat-demo.o build/lib/libcalc.a build/lib/libnat.a
+build/bin/nat-repl: build/obj/nat-repl.o build/lib/libcalc.a build/lib/libnat.a
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(EDIT_LIBS)

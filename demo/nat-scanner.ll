@@ -5,7 +5,7 @@
 
 #include "nat.h"
 #include "nat-parser.hh"
-#include "nat-driver.h"
+#include "nat-compiler.h"
 #include "nat-scanner.h"
 
 static yy::location loc;

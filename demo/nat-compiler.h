@@ -1,7 +1,7 @@
 #pragma once
 
 #undef YY_DECL
-#define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_driver &driver)
+#define YY_DECL yy::nat_parser::symbol_type nat_scanner::yylex(nat_compiler &driver)
 
 struct node;
 typedef std::vector<node*> node_list;
@@ -10,7 +10,7 @@ typedef std::map<std::string,size_t> var_map;
 typedef std::vector<size_t> reg_free_list;
 typedef std::map<size_t,size_t> reg_alloc_map;
 typedef std::map<size_t,Nat> reg_value_map;
-struct nat_driver;
+struct nat_compiler;
 
 enum op
 {
@@ -53,9 +53,9 @@ struct node
 
 	node(op opcode);
 	virtual ~node() {}
-	virtual Nat eval(nat_driver *) = 0;
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *) = 0;
+	virtual Nat eval(nat_compiler *) = 0;
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *) = 0;
 };
 
 struct const_int : node
@@ -64,9 +64,9 @@ struct const_int : node
 
 	const_int(std::string r);
 	const_int(Nat &n);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct unaryop : node
@@ -74,9 +74,9 @@ struct unaryop : node
 	std::unique_ptr<node> l;
 
 	unaryop(op opcode, node *l);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct binaryop : node
@@ -84,9 +84,9 @@ struct binaryop : node
 	std::unique_ptr<node> l, r;
 
 	binaryop(op opcode, node *l, node *r);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct var : node
@@ -94,9 +94,9 @@ struct var : node
 	std::unique_ptr<std::string> l;
 
 	var(std::string l);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct setvar : node
@@ -105,9 +105,9 @@ struct setvar : node
 	std::unique_ptr<node> r;
 
 	setvar(std::string l, node *r);
-	virtual Nat eval(nat_driver *);
-	virtual node_list lower(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual node_list lower(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct reg : node
@@ -120,15 +120,15 @@ struct reg : node
 struct ssareg : reg
 {
 	ssareg(size_t l);
-	virtual Nat eval(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct phyreg : reg
 {
 	phyreg(size_t l);
-	virtual Nat eval(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct imm : node
@@ -136,8 +136,8 @@ struct imm : node
 	int r;
 
 	imm(int r);
-	virtual Nat eval(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
 struct setreg : node
@@ -147,11 +147,11 @@ struct setreg : node
 	std::unique_ptr<var> v;
 
 	setreg(reg *l, node *r);
-	virtual Nat eval(nat_driver *);
-	virtual std::string to_string(nat_driver *);
+	virtual Nat eval(nat_compiler *);
+	virtual std::string to_string(nat_compiler *);
 };
 
-struct nat_driver
+struct nat_compiler
 {
 	node_list nodes;
 	node_map variables;
@@ -164,7 +164,7 @@ struct nat_driver
 	std::unique_ptr<char[]> def_use_ssa;
 	std::unique_ptr<char[]> def_use_phy;
 
-	nat_driver();
+	nat_compiler();
 
 	node* new_unary(op opcode, node *l);
 	node* new_binary(op opcode, node *l, node *r);

@@ -16,11 +16,11 @@ src/int.cc             | integer with sign and magnitude implementation
 tests/nat-tests.cc     | unit tests for the Nat class
 tests/int-tests.cc     | unit tests for the Int class
 demo/nat-repl.cc       | simple compiler REPL
-demo/nat-driver.h      | simple compiler driver interface
-demo/nat-driver.cc     | simple compiler driver implementation
-demo/nat-parser.yy     | simple compiler grammar specifiction
+demo/nat-compiler.h    | simple compiler interface
+demo/nat-compiler.cc   | simple compiler implementation
+demo/nat-parser.yy     | simple compiler grammar specification
 demo/nat-scanner.h     | simple compiler scanner interface
-demo/nat-scanner.ll    | simple compiler lexical analyser specifiction
+demo/nat-scanner.ll    | simple compiler lexical analyser specification
 
 ## Building
 

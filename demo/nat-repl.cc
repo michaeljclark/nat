@@ -10,7 +10,7 @@
 
 #include "nat.h"
 #include "nat-parser.hh"
-#include "nat-driver.h"
+#include "nat-compiler.h"
 
 
 static bool continuation = false;
@@ -55,7 +55,7 @@ void repl(int argc, char **argv)
 		if (!empty) {
 			in << li->buffer;
 		}
-		nat_driver driver;
+		nat_compiler driver;
 		driver.parse(in);
 		driver.run(op_setvar);
 		history(hist, &ev, H_ENTER, in.str().c_str());
@@ -84,7 +84,7 @@ void interp(int argc, char **argv)
 	}
 
 	std::ifstream in(argv[2]);
-	nat_driver driver;
+	nat_compiler driver;
 	driver.parse(in);
 	if (interp) {
 		driver.run(op_setvar);
