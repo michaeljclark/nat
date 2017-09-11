@@ -52,6 +52,7 @@ struct node
 	op opcode;
 
 	node(op opcode);
+
 	virtual ~node() {}
 	virtual Nat eval(nat_compiler *) = 0;
 	virtual node_list lower(nat_compiler *);
@@ -64,6 +65,7 @@ struct const_int : node
 
 	const_int(std::string r);
 	const_int(Nat &n);
+
 	virtual Nat eval(nat_compiler *);
 	virtual node_list lower(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
@@ -74,6 +76,7 @@ struct unaryop : node
 	std::unique_ptr<node> l;
 
 	unaryop(op opcode, node *l);
+
 	virtual Nat eval(nat_compiler *);
 	virtual node_list lower(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
@@ -84,6 +87,7 @@ struct binaryop : node
 	std::unique_ptr<node> l, r;
 
 	binaryop(op opcode, node *l, node *r);
+
 	virtual Nat eval(nat_compiler *);
 	virtual node_list lower(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
@@ -94,6 +98,7 @@ struct var : node
 	std::unique_ptr<std::string> l;
 
 	var(std::string l);
+
 	virtual Nat eval(nat_compiler *);
 	virtual node_list lower(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
@@ -105,6 +110,7 @@ struct setvar : node
 	std::unique_ptr<node> r;
 
 	setvar(std::string l, node *r);
+
 	virtual Nat eval(nat_compiler *);
 	virtual node_list lower(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
@@ -120,6 +126,7 @@ struct reg : node
 struct ssareg : reg
 {
 	ssareg(size_t l);
+
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
 };
@@ -127,6 +134,7 @@ struct ssareg : reg
 struct phyreg : reg
 {
 	phyreg(size_t l);
+
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
 };
@@ -136,6 +144,7 @@ struct imm : node
 	int r;
 
 	imm(int r);
+
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
 };
@@ -147,6 +156,7 @@ struct setreg : node
 	std::unique_ptr<var> v;
 
 	setreg(reg *l, node *r);
+
 	virtual Nat eval(nat_compiler *);
 	virtual std::string to_string(nat_compiler *);
 };
