@@ -85,13 +85,18 @@ static const char* reg_name[] = {
 	"t6"
 };
 
-enum { no, cr, ce };
+enum reg_class
+{
+	rs, /* reserved */
+	cr, /* caller saved */
+	ce, /* callee saved */
+};
 
 static const size_t reg_avail[] = {
 	cr, cr, cr, cr, cr, cr, cr, cr,
 	cr, cr, cr, cr, cr, cr, cr, ce,
 	ce, ce, ce, ce, ce, ce, ce, ce,
-	ce, ce, ce, no, no, no, no, no
+	ce, ce, ce, rs, rs, rs, rs, rs
 };
 
 static const size_t reg_order[] = {
@@ -566,12 +571,12 @@ void nat_compiler::allocate_registers()
 		}
 		size_t ssaregnum = srdef->l->l;
 		size_t phyregnum = reg_free.front();
-		if (reg_avail[phyregnum] == no) {
+		if (reg_avail[phyregnum] == rs) {
 			error("register spilling not implemented");
 		}
+		reg_free.pop_front();
 		def_use_phy[i * phyregcount + phyregnum] =
 			def_use_ssa[i * ssaregcount + ssaregnum];
-		reg_free.pop_front();
 		reg_used[ssaregnum] = phyregnum;
 		srdef->l = std::unique_ptr<phyreg>(new phyreg(phyregnum));
 	}
