@@ -47,7 +47,6 @@ eol   \n
 "%"|"mod"   return yy::nat_parser::make_REM(loc);
 "("         return yy::nat_parser::make_LPAREN(loc);
 ")"         return yy::nat_parser::make_RPAREN(loc);
-"**"        return yy::nat_parser::make_POW(loc);
 {int}       return yy::nat_parser::make_NUMBER(yytext, loc);
 {id}        return yy::nat_parser::make_IDENTIFIER(yytext, loc);
 {ws}        loc.step();

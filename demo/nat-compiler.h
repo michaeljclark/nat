@@ -67,7 +67,6 @@ enum op : char
 	op_rem,
 	op_not,
 	op_neg,
-	op_pow,
 };
 
 

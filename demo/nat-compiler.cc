@@ -48,7 +48,6 @@ static const char* op_name[] = {
 	"rem",
 	"not",
 	"neg",
-	"pow"
 };
 
 static const char* reg_name[] = {
@@ -192,7 +191,6 @@ Nat binaryop::eval(nat_compiler *d)
 		case op_mul:  v = l->eval(d) *  r->eval(d); break;
 		case op_div:  v = l->eval(d) /  r->eval(d); break;
 		case op_rem:  v = l->eval(d) %  r->eval(d); break;
-		case op_pow:  v = l->eval(d).pow(r->eval(d).limb_at(0)); break;
 		default: break;
 	}
 	return v;

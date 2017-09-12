@@ -115,7 +115,6 @@ expr:
 	| "identifier"   { $$ = driver.get_variable($1); }
 	| "~" expr       { $$ = driver.new_unary(op_not,  $2); }
 	| "-" expr       { $$ = driver.new_unary(op_neg,  $2); }
-	| expr "**" expr { $$ = driver.new_binary(op_pow, $1, $3); }
 	| "number"       { $$ = driver.new_const_int($1); }
 	;
 
