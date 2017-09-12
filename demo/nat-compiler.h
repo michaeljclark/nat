@@ -198,14 +198,14 @@ namespace nat {
 
 	struct compiler
 	{
-		node_list nodes;
-		node_map variables;
-		var_map varssa;
-		reg_free_list reg_free;
-		reg_alloc_map reg_used;
-		reg_value_map reg_values;
-		size_t ssaregcount;
-		size_t phyregcount;
+		node_list               nodes;
+		node_map                var_name;
+		var_map                 var_ssa;
+		reg_free_list           reg_free;
+		reg_alloc_map           reg_used;
+		reg_value_map           reg_values;
+		size_t                  ssaregcount;
+		size_t                  phyregcount;
 		std::unique_ptr<char[]> def_use_ssa;
 		std::unique_ptr<char[]> def_use_phy;
 

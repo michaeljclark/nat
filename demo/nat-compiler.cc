@@ -210,13 +210,13 @@ Nat const_int::eval(compiler *d)
 
 Nat var::eval(compiler *d)
 {
-	auto vi = d->variables.find(*l);
-	return vi != d->variables.end() ? vi->second->eval(d) : Nat(0);
+	auto vi = d->var_name.find(*l);
+	return vi != d->var_name.end() ? vi->second->eval(d) : Nat(0);
 }
 
 Nat setvar::eval(compiler *d)
 {
-	d->variables[*l] = r.get();
+	d->var_name[*l] = r.get();
 	return r->eval(d);
 }
 
@@ -338,7 +338,7 @@ node_list const_int::lower(compiler *d)
 node_list var::lower(compiler *d)
 {
 	/* return most recent register for this variable */
-	size_t ssaregnum = d->varssa[*l];
+	size_t ssaregnum = d->var_ssa[*l];
 	return node_list{new ssareg(ssaregnum)};
 }
 
@@ -349,7 +349,7 @@ node_list setvar::lower(compiler *d)
 	auto sr = static_cast<setreg*>(rl.back());
 	sr->v = std::unique_ptr<var>(new var(*l));
 	size_t ssaregnum = sr->l->l;
-	d->varssa[*l] = ssaregnum;
+	d->var_ssa[*l] = ssaregnum;
 	return rl;
 }
 
@@ -428,14 +428,14 @@ node* compiler::new_const_int(std::string num)
 node* compiler::set_variable(std::string name, node *r)
 {
 	setvar *a = new setvar(name, r);
-	variables[name] = a;
+	var_name[name] = a;
 	return a;
 }
 
 node* compiler::get_variable(std::string name)
 {
-	auto vi = variables.find(name);
-	if (vi == variables.end()) error("unknown variable: " + name);
+	auto vi = var_name.find(name);
+	if (vi == var_name.end()) error("unknown variable: " + name);
 	var *a = new var(name);
 	return a;
 }
