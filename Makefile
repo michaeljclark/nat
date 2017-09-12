@@ -39,13 +39,13 @@ build/obj/nat-compiler.o: demo/nat-compiler.cc demo/nat-parser.hh
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/obj/%.o: src/%.cc
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
+	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/obj/%.o: tests/%.cc
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $^
+	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 build/obj/%.o: demo/%.cc
-	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $^
+	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $<
 
 build/lib/libnat.a: build/obj/nat.o build/obj/int.o
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
@@ -53,11 +53,11 @@ build/lib/libnat.a: build/obj/nat.o build/obj/int.o
 build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o 
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
-build/bin/nat-tests: build/obj/nat-tests.o
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+build/bin/nat-tests: build/obj/nat-tests.o libs
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
-build/bin/int-tests: build/obj/int-tests.o
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+build/bin/int-tests: build/obj/int-tests.o libs
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
-build/bin/nat-repl: build/obj/nat-repl.o
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $^ -lnatc $(LDFLAGS) $(EDIT_LIBS)
+build/bin/nat-repl: build/obj/nat-repl.o libs
+	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< -lnatc $(LDFLAGS) $(EDIT_LIBS)
