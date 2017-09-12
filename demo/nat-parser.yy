@@ -2,7 +2,8 @@
 %require "3.0.4"
 
 %defines
-%define parser_class_name {nat_parser}
+%define parser_class_name {parser}
+%define api.namespace {nat}
 %define api.token.constructor
 %define api.value.type variant
 %define parse.assert
@@ -11,14 +12,16 @@
 
 %code requires
 {
-struct nat_scanner;
-struct nat_compiler;
-struct node;
+namespace nat {
+	struct lexer;
+	struct compiler;
+	struct node;
+}
 }
 
-%parse-param { nat_scanner& scanner }
-%parse-param { nat_compiler& driver }
-%lex-param { nat_compiler& driver }
+%parse-param { lexer& scanner }
+%parse-param { compiler& driver }
+%lex-param { compiler& driver }
 
 %locations
 
@@ -121,7 +124,7 @@ expr:
 %%
 
 void
-yy::nat_parser::error (const location_type& l, const std::string& m)
+nat::parser::error (const location_type& l, const std::string& m)
 {
   driver.error(l, m);
 }

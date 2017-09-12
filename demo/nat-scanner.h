@@ -1,8 +1,12 @@
 #pragma once
 
-struct nat_scanner : yyFlexLexer
-{
-	using yyFlexLexer::yylex;
+namespace nat {
 
-	virtual yy::nat_parser::symbol_type yylex(nat_compiler &driver);
-};
+	struct lexer : yyFlexLexer
+	{
+		using yyFlexLexer::yylex;
+
+		virtual parser::symbol_type yylex(compiler &driver);
+	};
+
+}

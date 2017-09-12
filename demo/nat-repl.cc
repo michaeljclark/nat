@@ -16,6 +16,8 @@
 #include "nat-compiler.h"
 
 
+using namespace nat;
+
 static bool continuation = false;
 
 static char *nat_prompt(EditLine *el __attribute__((__unused__)))
@@ -58,7 +60,7 @@ void repl(int argc, char **argv)
 		if (!empty) {
 			in << li->buffer;
 		}
-		nat_compiler compiler;
+		compiler compiler;
 		compiler.parse(in);
 		compiler.run(op_setvar);
 		history(hist, &ev, H_ENTER, in.str().c_str());
@@ -88,7 +90,7 @@ void interp(int argc, char **argv)
 	}
 
 	std::ifstream in(argv[2]);
-	nat_compiler compiler;
+	compiler compiler;
 	compiler.parse(in);
 	if (interp) {
 		compiler.run(op_setvar);

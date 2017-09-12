@@ -13,6 +13,8 @@
 #include "nat-scanner.h"
 
 
+using namespace nat;
+
 /*
  * constants
  */
@@ -162,7 +164,7 @@ imm::imm(int r)
  * evalulate expressions recursively
  */
 
-Nat unaryop::eval(nat_compiler *d)
+Nat unaryop::eval(compiler *d)
 {
 	Nat v = 0;
 	switch(opcode) {
@@ -174,7 +176,7 @@ Nat unaryop::eval(nat_compiler *d)
 	return v;
 }
 
-Nat binaryop::eval(nat_compiler *d)
+Nat binaryop::eval(compiler *d)
 {
 	Nat v = 0;
 	switch(opcode) {
@@ -201,42 +203,42 @@ Nat binaryop::eval(nat_compiler *d)
 	return v;
 }
 
-Nat const_int::eval(nat_compiler *d)
+Nat const_int::eval(compiler *d)
 {
 	return *r;
 }
 
-Nat var::eval(nat_compiler *d)
+Nat var::eval(compiler *d)
 {
 	auto vi = d->variables.find(*l);
 	return vi != d->variables.end() ? vi->second->eval(d) : Nat(0);
 }
 
-Nat setvar::eval(nat_compiler *d)
+Nat setvar::eval(compiler *d)
 {
 	d->variables[*l] = r.get();
 	return r->eval(d);
 }
 
-Nat ssareg::eval(nat_compiler *d)
+Nat ssareg::eval(compiler *d)
 {
 	return Nat(0);
 }
 
-Nat phyreg::eval(nat_compiler *d)
+Nat phyreg::eval(compiler *d)
 {
 	auto ri = d->reg_values.find(l);
 	return ri != d->reg_values.end() ? ri->second : Nat(0);
 }
 
-Nat setreg::eval(nat_compiler *d)
+Nat setreg::eval(compiler *d)
 {
 	Nat val = r->eval(d);
 	d->reg_values[l->l] = val;
 	return val;
 }
 
-Nat imm::eval(nat_compiler *d)
+Nat imm::eval(compiler *d)
 {
 	return Nat(r);
 }
@@ -246,12 +248,12 @@ Nat imm::eval(nat_compiler *d)
  * lower tree into single static assignment tuples
  */
 
-node_list node::lower(nat_compiler *)
+node_list node::lower(compiler *)
 {
 	return node_list();
 }
 
-node_list unaryop::lower(nat_compiler *d)
+node_list unaryop::lower(compiler *d)
 {
 	/* get register of operand */
 	node_list ll = l->lower(d);
@@ -269,7 +271,7 @@ node_list unaryop::lower(nat_compiler *d)
 	return nodes;
 }
 
-node_list binaryop::lower(nat_compiler *d)
+node_list binaryop::lower(compiler *d)
 {
 	/* lower const_int operand as immediate where possible */
 	switch (opcode) {
@@ -323,7 +325,7 @@ node_list binaryop::lower(nat_compiler *d)
 	return nodes;
 }
 
-node_list const_int::lower(nat_compiler *d)
+node_list const_int::lower(compiler *d)
 {
 	/* move the number into a register */
 	imm *op_imm = new imm(r->limb_at(0));
@@ -333,14 +335,14 @@ node_list const_int::lower(nat_compiler *d)
 	return node_list{sr};
 }
 
-node_list var::lower(nat_compiler *d)
+node_list var::lower(compiler *d)
 {
 	/* return most recent register for this variable */
 	size_t ssaregnum = d->varssa[*l];
 	return node_list{new ssareg(ssaregnum)};
 }
 
-node_list setvar::lower(nat_compiler *d)
+node_list setvar::lower(compiler *d)
 {
 	/* store most recent register for this variable */
 	node_list rl = r->lower(d);
@@ -356,47 +358,47 @@ node_list setvar::lower(nat_compiler *d)
  * convert nodes to string
  */
 
-std::string unaryop::to_string(nat_compiler *d)
+std::string unaryop::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " " + l->to_string(d) + ")";
 }
 
-std::string binaryop::to_string(nat_compiler *d)
+std::string binaryop::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " " + l->to_string(d) + ", " + r->to_string(d) + ")";
 }
 
-std::string const_int::to_string(nat_compiler *d)
+std::string const_int::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " " + r->to_string(16) + ")";
 }
 
-std::string var::to_string(nat_compiler *d)
+std::string var::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " '" + *l + "')";
 }
 
-std::string setvar::to_string(nat_compiler *d)
+std::string setvar::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " '" + *l + "', " + r->to_string(d) + ")";
 }
 
-std::string ssareg::to_string(nat_compiler *d)
+std::string ssareg::to_string(compiler *d)
 {
 	return std::string("_") + std::to_string(reg::l);
 }
 
-std::string phyreg::to_string(nat_compiler *d)
+std::string phyreg::to_string(compiler *d)
 {
 	return reg_name[reg::l];
 }
 
-std::string setreg::to_string(nat_compiler *d)
+std::string setreg::to_string(compiler *d)
 {
 	return std::string("(") + op_name[opcode] + " " + l->to_string(d) + ", " + r->to_string(d) + ")";
 }
 
-std::string imm::to_string(nat_compiler *d)
+std::string imm::to_string(compiler *d)
 {
 	return Nat(r).to_string(16);
 }
@@ -406,31 +408,31 @@ std::string imm::to_string(nat_compiler *d)
  * parser interface
  */
 
-nat_compiler::nat_compiler() : ssaregcount(0), phyregcount(31) {}
+compiler::compiler() : ssaregcount(0), phyregcount(31) {}
 
-node* nat_compiler::new_unary(op opcode, node *l)
+node* compiler::new_unary(op opcode, node *l)
 {
 	return new unaryop(opcode, l);
 }
 
-node* nat_compiler::new_binary(op opcode, node *l, node *r)
+node* compiler::new_binary(op opcode, node *l, node *r)
 {
 	return new binaryop(opcode, l, r);
 }
 
-node* nat_compiler::new_const_int(std::string num)
+node* compiler::new_const_int(std::string num)
 {
 	return new const_int(num);
 }
 
-node* nat_compiler::set_variable(std::string name, node *r)
+node* compiler::set_variable(std::string name, node *r)
 {
 	setvar *a = new setvar(name, r);
 	variables[name] = a;
 	return a;
 }
 
-node* nat_compiler::get_variable(std::string name)
+node* compiler::get_variable(std::string name)
 {
 	auto vi = variables.find(name);
 	if (vi == variables.end()) error("unknown variable: " + name);
@@ -438,18 +440,18 @@ node* nat_compiler::get_variable(std::string name)
 	return a;
 }
 
-void nat_compiler::add_toplevel(node *n)
+void compiler::add_toplevel(node *n)
 {
 	nodes.push_back(n);
 }
 
-void nat_compiler::error(const yy::location& l, const std::string& m)
+void compiler::error(const location& l, const std::string& m)
 {
 	std::cerr << l << ": " << m << std::endl;
 	exit(1);
 }
 
-void nat_compiler::error(const std::string& m)
+void compiler::error(const std::string& m)
 {
 	std::cerr << m << std::endl;
 	exit(1);
@@ -460,15 +462,15 @@ void nat_compiler::error(const std::string& m)
  * compiler interface
  */
 
-int nat_compiler::parse(std::istream &in)
+int compiler::parse(std::istream &in)
 {
-	nat_scanner scanner;
+	lexer scanner;
 	scanner.yyrestart(&in);
-	yy::nat_parser parser(scanner, *this);
-	return parser.parse();
+	parser nat_parser(scanner, *this);
+	return nat_parser.parse();
 }
 
-void nat_compiler::use_ssa_scan(std::unique_ptr<node> &nr,
+void compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 	size_t i, size_t j, size_t defreg)
 {
 	node *l = nr.get();
@@ -485,7 +487,7 @@ void nat_compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 	}
 }
 
-void nat_compiler::def_use_ssa_analysis()
+void compiler::def_use_ssa_analysis()
 {
 	size_t def_use_ssa_size = nodes.size() * ssaregcount;
 	def_use_ssa = std::unique_ptr<char[]>(new char[def_use_ssa_size]());
@@ -512,7 +514,7 @@ void nat_compiler::def_use_ssa_analysis()
 	}
 }
 
-void nat_compiler::allocate_registers()
+void compiler::allocate_registers()
 {
 	/* create physical registers */
 	size_t def_use_phy_size = nodes.size() * phyregcount;
@@ -582,7 +584,7 @@ void nat_compiler::allocate_registers()
 	}
 }
 
-void nat_compiler::lower(bool regalloc)
+void compiler::lower(bool regalloc)
 {
 	/* recursively lower setvar expressions to setreg tuples in SSA form */
 	node_list new_nodes;
@@ -609,7 +611,7 @@ void nat_compiler::lower(bool regalloc)
 	}
 }
 
-size_t nat_compiler::lower_reg(node_list &l)
+size_t compiler::lower_reg(node_list &l)
 {
 	size_t ssaregnum;
 	node *n = static_cast<node*>(l.back());
@@ -629,7 +631,7 @@ size_t nat_compiler::lower_reg(node_list &l)
 	return ssaregnum;
 }
 
-void nat_compiler::run(op opcode)
+void compiler::run(op opcode)
 {
 	Nat num;
 	for (auto n : nodes) {
@@ -655,7 +657,7 @@ void nat_compiler::run(op opcode)
 	}
 }
 
-void nat_compiler::dump_ast(op opcode, bool regalloc)
+void compiler::dump_ast(op opcode, bool regalloc)
 {
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
@@ -687,7 +689,7 @@ void nat_compiler::dump_ast(op opcode, bool regalloc)
 	}
 }
 
-void nat_compiler::emit_asm()
+void compiler::emit_asm()
 {
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
