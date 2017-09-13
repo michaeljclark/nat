@@ -277,48 +277,39 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 			l.push_back(riscv::machineinst::make_i(instcode, op_rd->l, op_rs1->l, op_imm->r));
 			break;
 		}
-		case op_seq: {
+		case op_seq:
+		case op_sne:
+		case op_slte:
+		case op_sgt:
+		case op_sgte:
+		{
 			auto op = static_cast<binaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
 			auto op_rs1 = static_cast<phyreg*>(op->l.get());
 			auto op_rs2 = static_cast<phyreg*>(op->r.get());
-			l.push_back(riscv::machineinst::make_r(inst_sub, op_rd->l, op_rs1->l, op_rs2->l));
-			l.push_back(riscv::machineinst::make_i(inst_sltiu, op_rd->l, op_rd->l, 1));
-			break;
-		}
-		case op_sne: {
-			auto op = static_cast<binaryop*>(sr_op);
-			auto op_rd = static_cast<phyreg*>(sr->l.get());
-			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			auto op_rs2 = static_cast<phyreg*>(op->r.get());
-			l.push_back(riscv::machineinst::make_r(inst_sub, op_rd->l, op_rs1->l, op_rs2->l));
-			l.push_back(riscv::machineinst::make_r(inst_sltu, op_rd->l, 0, op_rd->l));
-			break;
-		}
-		case op_slte: {
-			auto op = static_cast<binaryop*>(sr_op);
-			auto op_rd = static_cast<phyreg*>(sr->l.get());
-			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			auto op_rs2 = static_cast<phyreg*>(op->r.get());
-			l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
-			l.push_back(riscv::machineinst::make_i(inst_xori, op_rd->l, op_rd->l, 1));
-			break;
-		}
-		case op_sgt: {
-			auto op = static_cast<binaryop*>(sr_op);
-			auto op_rd = static_cast<phyreg*>(sr->l.get());
-			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			auto op_rs2 = static_cast<phyreg*>(op->r.get());
-			l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
-			break;
-		}
-		case op_sgte: {
-			auto op = static_cast<binaryop*>(sr_op);
-			auto op_rd = static_cast<phyreg*>(sr->l.get());
-			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			auto op_rs2 = static_cast<phyreg*>(op->r.get());
-			l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs1->l, op_rs2->l));
-			l.push_back(riscv::machineinst::make_i(inst_xori, op_rd->l, op_rd->l, 1));
+			switch (opcode) {
+				case op_seq:
+					l.push_back(riscv::machineinst::make_r(inst_sub, op_rd->l, op_rs1->l, op_rs2->l));
+					l.push_back(riscv::machineinst::make_i(inst_sltiu, op_rd->l, op_rd->l, 1));
+					break;
+				case op_sne:
+					l.push_back(riscv::machineinst::make_r(inst_sub, op_rd->l, op_rs1->l, op_rs2->l));
+					l.push_back(riscv::machineinst::make_r(inst_sltu, op_rd->l, 0, op_rd->l));
+					break;
+				case op_slte:
+					l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
+					l.push_back(riscv::machineinst::make_i(inst_xori, op_rd->l, op_rd->l, 1));
+					break;
+				case op_sgt:
+					l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
+					break;
+				case op_sgte:
+					l.push_back(riscv::machineinst::make_r(inst_slt, op_rd->l, op_rs1->l, op_rs2->l));
+					l.push_back(riscv::machineinst::make_i(inst_xori, op_rd->l, op_rd->l, 1));
+					break;
+				default:
+					break;
+			}
 			break;
 		}
 		default: {
