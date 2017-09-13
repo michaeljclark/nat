@@ -55,10 +55,6 @@ namespace riscv {
 
 		virtual void execute(nat::target::backend *);
 		virtual std::string to_string(nat::compiler *);
-
-		static nat::target::machineinst* make_r(inst instcode, reg_s rd, reg_s rs1, reg_s rs2);
-		static nat::target::machineinst* make_i(inst instcode, reg_s rd, reg_s rs1, int imm);
-		static nat::target::machineinst* make_u(inst instcode, reg_s rd, int imm);
 	};
 
 	struct target : nat::target::backend
