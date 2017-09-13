@@ -217,25 +217,30 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 
 	switch (opcode)
 	{
-		case op_li: {
+		case op_li:
+		{
 			auto op = static_cast<unaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
 			auto op_imm = static_cast<imm*>(op->l.get());
 			l.push_back(make_u(inst_li, op_rd->l, op_imm->r));
 			break;
 		}
-		case op_not: {
+		case op_not:
+		case op_neg:
+		{
 			auto op = static_cast<unaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
 			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			l.push_back(make_i(inst_xori, op_rd->l, op_rs1->l, -1));
-			break;
-		}
-		case op_neg: {
-			auto op = static_cast<unaryop*>(sr_op);
-			auto op_rd = static_cast<phyreg*>(sr->l.get());
-			auto op_rs1 = static_cast<phyreg*>(op->l.get());
-			l.push_back(make_r(inst_sub, op_rd->l, 0, op_rs1->l));
+			switch (opcode) {
+				case op_not:
+					l.push_back(make_i(inst_xori, op_rd->l, op_rs1->l, -1));
+					break;
+				case op_neg:
+					l.push_back(make_r(inst_sub, op_rd->l, 0, op_rs1->l));
+					break;
+				default:
+					break;
+			}
 			break;
 		}
 		case op_and:
@@ -248,7 +253,8 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 		case op_sub:
 		case op_mul:
 		case op_div:
-		case op_rem: {
+		case op_rem:
+		{
 			auto op = static_cast<binaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
 			auto op_rs1 = static_cast<phyreg*>(op->l.get());
@@ -273,7 +279,8 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 		}
 		case op_srli:
 		case op_slli:
-		case op_addi: {
+		case op_addi:
+		{
 			auto op = static_cast<binaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
 			auto op_rs1 = static_cast<phyreg*>(op->l.get());
@@ -283,7 +290,7 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 				case op_srli: instcode = inst_srli; break;
 				case op_slli: instcode = inst_slli; break;
 				case op_addi: instcode = inst_addi; break;
-				default: instcode = inst_illegal; break;
+				default: instcode = inst_illegal;   break;
 			}
 			l.push_back(make_i(instcode, op_rd->l, op_rs1->l, op_imm->r));
 			break;
@@ -323,7 +330,8 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 			}
 			break;
 		}
-		default: {
+		default:
+		{
 			std::string msg = "unimplemented op: ";
 			msg += op_name[sr_op->opcode];
 			driver->error(msg);
