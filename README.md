@@ -166,7 +166,7 @@ $ ./build/bin/nat-repl --regalloc examples/bswap.nat
 ```
 
 
-### Outputting RISC-V like assembly language
+### Outputting RISC-V assembly language
 
 ```
 $ ./build/bin/nat-repl --asm examples/bswap.nat
