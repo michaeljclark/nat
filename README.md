@@ -21,6 +21,8 @@ demo/nat-compiler.cc   | simple compiler implementation
 demo/nat-parser.yy     | simple compiler grammar specification
 demo/nat-scanner.h     | simple compiler scanner interface
 demo/nat-scanner.ll    | simple compiler lexical analyser specification
+demo/nat-target[-*].h  | simple compiler target interface
+demo/nat-target[-*].cc | simple compiler target implementation
 
 ## Building
 
