@@ -219,6 +219,9 @@ Nat& Nat::operator>>=(size_t shamt)
 		limbs.erase(limbs.begin(), limbs.begin() + limb_shamt);
 		shamt -= (limb_shamt << limb_shift);
 	}
+	if (limbs.size() == 0) {
+		limbs.push_back(0);
+	}
 	if (!shamt) return *this;
 
 	limb_t carry = 0;
