@@ -18,6 +18,12 @@ namespace nat {
 	typedef std::map<size_t,Nat> reg_value_map;
 	struct compiler;
 
+	namespace target {
+		struct backend;
+		struct machineinst;
+	}
+
+	extern const char* op_name[];
 
 	/*
 	 * tree node typecodes and opcodes
@@ -35,6 +41,7 @@ namespace nat {
 		type_phyreg,
 		type_setreg,
 		type_imm,
+		type_mi,
 	};
 
 	enum op : char
@@ -47,6 +54,7 @@ namespace nat {
 		op_phyreg,
 		op_setreg,
 		op_imm,
+		op_mi,
 		op_li,
 		op_and,
 		op_or,
@@ -84,7 +92,7 @@ namespace nat {
 		node(type typecode, op opcode);
 
 		virtual ~node() {}
-		virtual Nat eval(compiler *) = 0;
+		virtual Nat eval(compiler *);
 		virtual node_list lower(compiler *);
 		virtual std::string to_string(compiler *) = 0;
 	};
@@ -157,7 +165,6 @@ namespace nat {
 	{
 		ssareg(size_t l);
 
-		virtual Nat eval(compiler *);
 		virtual std::string to_string(compiler *);
 	};
 
@@ -191,6 +198,12 @@ namespace nat {
 		virtual std::string to_string(compiler *);
 	};
 
+	struct target::machineinst : node
+	{
+		machineinst();
+
+		virtual void execute(target::backend*) = 0;		
+	};
 
 	/*
 	 * compiler
@@ -208,6 +221,7 @@ namespace nat {
 		size_t                  phyregcount;
 		std::unique_ptr<char[]> def_use_ssa;
 		std::unique_ptr<char[]> def_use_phy;
+		target::backend*        target;
 
 		compiler();
 
@@ -232,6 +246,7 @@ namespace nat {
 		void run(op opcode);
 		void dump_ast(op opcode, bool regalloc = false);
 		void emit_asm();
+		void print_asm();
 	};
 
 }

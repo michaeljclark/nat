@@ -12,6 +12,17 @@ CXXFLAGS    = $(DEBUG_FLAGS) $(OPT_FLAGS) $(WARN_FLAGS) $(INCLUDES) -std=c++11
 LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lnat
 
 
+NAT_OBJS    = \
+			build/obj/nat.o \
+			build/obj/int.o
+
+NATC_OBJS	= \
+			build/obj/nat-compiler.o \
+			build/obj/nat-parser.o \
+			build/obj/nat-scanner.o \
+			build/obj/nat-target.o \
+			build/obj/nat-target-riscv.o
+
 # build targets
 
 all: libs tests demo
@@ -47,10 +58,10 @@ build/obj/%.o: tests/%.cc
 build/obj/%.o: demo/%.cc
 	@echo CXX $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) $(EDIT_CFLAGS) -c -o $@ $<
 
-build/lib/libnat.a: build/obj/nat.o build/obj/int.o
+build/lib/libnat.a: $(NAT_OBJS)
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
-build/lib/libnatc.a: build/obj/nat-compiler.o build/obj/nat-parser.o build/obj/nat-scanner.o 
+build/lib/libnatc.a: $(NATC_OBJS)
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/bin/nat-tests: build/obj/nat-tests.o libs

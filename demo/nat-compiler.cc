@@ -11,6 +11,7 @@
 #include "nat-compiler.h"
 #include "FlexLexer.h"
 #include "nat-scanner.h"
+#include "nat-target.h"
 
 
 using namespace nat;
@@ -19,7 +20,7 @@ using namespace nat;
  * constants
  */
 
-static const char* op_name[] = {
+const char* nat::op_name[] = {
 	"none",
 	"const_int",
 	"var",
@@ -28,6 +29,7 @@ static const char* op_name[] = {
 	"phyreg",
 	"setreg",
 	"imm",
+	"mi",
 	"li",
 	"and",
 	"or",
@@ -50,62 +52,6 @@ static const char* op_name[] = {
 	"rem",
 	"not",
 	"neg",
-};
-
-static const char* reg_name[] = {
-	"zero",
-	"ra",
-	"sp",
-	"gp",
-	"tp",
-	"t0",
-	"t1",
-	"t2",
-	"s0",
-	"s1",
-	"a0",
-	"a1",
-	"a2",
-	"a3",
-	"a4",
-	"a5",
-	"a6",
-	"a7",
-	"s2",
-	"s3",
-	"s4",
-	"s5",
-	"s6",
-	"s7",
-	"s8",
-	"s9",
-	"s10",
-	"s11",
-	"t3",
-	"t4",
-	"t5",
-	"t6"
-};
-
-enum reg_class
-{
-	rs, /* reserved */
-	cr, /* caller saved */
-	ce, /* callee saved */
-};
-
-static const size_t reg_avail[] = {
-	cr, cr, cr, cr, cr, cr, cr, cr,
-	cr, cr, cr, cr, cr, cr, cr, ce,
-	ce, ce, ce, ce, ce, ce, ce, ce,
-	ce, ce, ce, rs, rs, rs, rs, rs
-};
-
-static const size_t reg_order[] = {
-	10, 11, 12, 13, 14, 15, 16, 17,
-	5,  6,  7,  28, 29, 30, 31, 8,
-	9,  18, 19, 20, 21, 22, 23, 24,
-	25, 26, 27, 1,  2,  3,  4,  0
 };
 
 
@@ -159,10 +105,18 @@ setreg::setreg(reg *l, node *r)
 imm::imm(int r)
 	: node(type_imm, op_imm), r(r) {}
 
+target::machineinst::machineinst()
+	: node(type_mi, op_mi) {}
+
 
 /*
  * evalulate expressions recursively
  */
+
+Nat node::eval(compiler *d)
+{
+	return Nat(0);
+}
 
 Nat unaryop::eval(compiler *d)
 {
@@ -218,11 +172,6 @@ Nat setvar::eval(compiler *d)
 {
 	d->var_name[*l] = r.get();
 	return r->eval(d);
-}
-
-Nat ssareg::eval(compiler *d)
-{
-	return Nat(0);
 }
 
 Nat phyreg::eval(compiler *d)
@@ -390,7 +339,7 @@ std::string ssareg::to_string(compiler *d)
 
 std::string phyreg::to_string(compiler *d)
 {
-	return reg_name[reg::l];
+	return d->target->get_reg_name()[reg::l];
 }
 
 std::string setreg::to_string(compiler *d)
@@ -408,7 +357,7 @@ std::string imm::to_string(compiler *d)
  * parser interface
  */
 
-compiler::compiler() : ssaregcount(0), phyregcount(31) {}
+compiler::compiler() : ssaregcount(0), phyregcount(31), target(target::backend::get_default()) {}
 
 node* compiler::new_unary(op opcode, node *l)
 {
@@ -519,7 +468,7 @@ void compiler::allocate_registers()
 	/* create physical registers */
 	size_t def_use_phy_size = nodes.size() * phyregcount;
 	def_use_phy = std::unique_ptr<char[]>(new char[def_use_phy_size]());
-	const size_t *reg = reg_order;
+	const size_t *reg = target->get_reg_order();
 	while (*reg != 0) {
 		reg_values[*reg] = 0;
 		reg_free.push_back(*reg++);
@@ -573,7 +522,7 @@ void compiler::allocate_registers()
 		}
 		size_t ssaregnum = srdef->l->l;
 		size_t phyregnum = reg_free.front();
-		if (reg_avail[phyregnum] == rs) {
+		if (target->get_reg_class()[phyregnum] == target::rs) {
 			error("register spilling not implemented");
 		}
 		reg_free.pop_front();
@@ -659,6 +608,7 @@ void compiler::run(op opcode)
 
 void compiler::dump_ast(op opcode, bool regalloc)
 {
+	/* print abstract syntax tree (op_setvar) or lowered form (op_setreg) */
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
 		if (n->opcode != opcode) continue;
@@ -691,26 +641,29 @@ void compiler::dump_ast(op opcode, bool regalloc)
 
 void compiler::emit_asm()
 {
+	/* convert lowered form to machine instructions */
+	node_list new_nodes;
+	for (auto ni = nodes.begin(); ni != nodes.end(); ni++) {
+		new_nodes.insert(new_nodes.end(), *ni);
+		switch ((*ni)->opcode) {
+			case op_setreg: {
+				node_list minst = target->emit(this, *ni);
+				new_nodes.insert(new_nodes.end(), minst.begin(), minst.end());
+				break;
+			}
+			default:
+				break;
+		}
+	}
+	nodes = std::move(new_nodes);
+}
+
+void compiler::print_asm()
+{
+	/* print machine instructions */
 	for (size_t i = 0; i < nodes.size(); i++) {
 		node *n = nodes[i];
-		if (n->opcode != op_setreg) continue;
-		setreg *sr = static_cast<setreg*>(n);
-		node *sr_op = sr->r.get();
-		std::cout
-			<< "\t"
-			<< op_name[sr_op->opcode]
-			<< "\t"
-			<< sr->l->to_string(this)
-			<< ", ";
-		if (sr_op->typecode == type_unaryop) {
-			std::cout
-				<< static_cast<unaryop*>(sr_op)->l->to_string(this);
-		} else if (sr_op->typecode == type_binaryop) {
-			std::cout
-				<< static_cast<binaryop*>(sr_op)->l->to_string(this)
-				<< ", "
-				<< static_cast<binaryop*>(sr_op)->r->to_string(this);
-		}
-		std::cout << std::endl;
+		if (n->opcode != op_mi) continue;
+		std::cout << "\t" << n->to_string(this) << std::endl;
 	}
 }

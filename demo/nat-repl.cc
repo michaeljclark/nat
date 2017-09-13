@@ -105,6 +105,7 @@ void interp(int argc, char **argv)
 	else if (toyasm) {
 		compiler.lower(true);
 		compiler.emit_asm();
+		compiler.print_asm();
 	}
 	else if (run) {
 		compiler.lower(true);
