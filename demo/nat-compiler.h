@@ -1,13 +1,14 @@
 #pragma once
 
-/*
- * forward declarations
- */
-
-#undef YY_DECL
-#define YY_DECL parser::symbol_type lexer::yylex(compiler &driver)
-
 namespace nat {
+
+
+	/*----------------------.
+	| forward declarations. |
+	`----------------------*/
+
+	#undef YY_DECL
+	#define YY_DECL parser::symbol_type lexer::yylex(compiler &driver)
 
 	struct node;
 	typedef std::vector<node*> node_list;
@@ -25,9 +26,10 @@ namespace nat {
 
 	extern const char* op_name[];
 
-	/*
-	 * tree node typecodes and opcodes
-	 */
+
+	/*---------------------------------.
+	| tree node typecodes and opcodes. |
+	`---------------------------------*/
 
 	enum type : char
 	{
@@ -80,9 +82,9 @@ namespace nat {
 	};
 
 
-	/*
-	 * tree node types
-	 */
+	/*-----------------.
+	| tree node types. |
+	`-----------------*/
 
 	struct node
 	{
@@ -205,9 +207,10 @@ namespace nat {
 		virtual void execute(target::backend*) = 0;		
 	};
 
-	/*
-	 * compiler
-	 */
+
+	/*--------------------.
+	| compiler interface. |
+	`--------------------*/
 
 	struct compiler
 	{
@@ -225,6 +228,8 @@ namespace nat {
 
 		compiler();
 
+		/* parser interface */
+
 		node* new_unary(op opcode, node *l);
 		node* new_binary(op opcode, node *l, node *r);
 		node* new_const_int(std::string num);
@@ -234,14 +239,14 @@ namespace nat {
 		void error(const location& l, const std::string& m);
 		void error(const std::string& m);
 
-		int parse(std::istream &in);
+		/* compiler interface */
 
+		int parse(std::istream &in);
 		void use_ssa_scan(std::unique_ptr<node> &nr,
 			size_t i, size_t j, size_t defreg);
 		void def_use_ssa_analysis();
 		void allocate_registers();
 		void lower(bool regalloc);
-
 		size_t lower_reg(node_list &l);
 		void run(op opcode);
 		void dump_ast(op opcode, bool regalloc = false);

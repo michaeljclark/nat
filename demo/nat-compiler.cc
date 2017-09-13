@@ -16,9 +16,10 @@
 
 using namespace nat;
 
-/*
- * constants
- */
+
+/*-----------.
+| constants. |
+`-----------*/
 
 const char* nat::op_name[] = {
 	"none",
@@ -55,9 +56,9 @@ const char* nat::op_name[] = {
 };
 
 
-/*
- * node constructors
- */
+/*-------------------.
+| node constructors. |
+`-------------------*/
 
 node::node(type typecode, op opcode)
 	: typecode(typecode), opcode(opcode) {}
@@ -109,9 +110,9 @@ target::machineinst::machineinst()
 	: node(type_mi, op_mi) {}
 
 
-/*
- * evalulate expressions recursively
- */
+/*-----------------------------------.
+| evalulate expressions recursively. |
+`-----------------------------------*/
 
 Nat node::eval(compiler *d)
 {
@@ -193,9 +194,9 @@ Nat imm::eval(compiler *d)
 }
 
 
-/*
- * lower tree into single static assignment tuples
- */
+/*-------------------------------------------------------.
+| lower nodes into single static assignment form tuples. |
+`-------------------------------------------------------*/
 
 node_list node::lower(compiler *)
 {
@@ -303,9 +304,9 @@ node_list setvar::lower(compiler *d)
 }
 
 
-/*
- * convert nodes to string
- */
+/*-------------------------.
+| convert nodes to string. |
+`-------------------------*/
 
 std::string unaryop::to_string(compiler *d)
 {
@@ -353,9 +354,9 @@ std::string imm::to_string(compiler *d)
 }
 
 
-/*
- * parser interface
- */
+/*------------------.
+| parser interface. |
+`------------------*/
 
 compiler::compiler() : ssaregcount(0), phyregcount(31), target(target::backend::get_default()) {}
 
@@ -407,9 +408,9 @@ void compiler::error(const std::string& m)
 }
 
 
-/*
- * compiler interface
- */
+/*-------------------------.
+| compiler implementation. |
+`-------------------------*/
 
 int compiler::parse(std::istream &in)
 {
@@ -422,6 +423,7 @@ int compiler::parse(std::istream &in)
 void compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 	size_t i, size_t j, size_t defreg)
 {
+	/* scan backwards for register and mark use */
 	node *l = nr.get();
 	if (l->typecode != type_ssareg) return;
 	size_t usereg = static_cast<ssareg*>(l)->l;
@@ -438,6 +440,7 @@ void compiler::use_ssa_scan(std::unique_ptr<node> &nr,
 
 void compiler::def_use_ssa_analysis()
 {
+	/* construct def use matrix */
 	size_t def_use_ssa_size = nodes.size() * ssaregcount;
 	def_use_ssa = std::unique_ptr<char[]>(new char[def_use_ssa_size]());
 	memset(def_use_ssa.get(), ' ', def_use_ssa_size);
@@ -562,6 +565,7 @@ void compiler::lower(bool regalloc)
 
 size_t compiler::lower_reg(node_list &l)
 {
+	/* helper function to get register of last node */
 	size_t ssaregnum;
 	node *n = static_cast<node*>(l.back());
 	switch(n->opcode) {
@@ -582,6 +586,7 @@ size_t compiler::lower_reg(node_list &l)
 
 void compiler::run(op opcode)
 {
+	/* evalulate abstract tree nodes */
 	Nat num;
 	for (auto n : nodes) {
 		if (n->opcode != opcode) continue;
