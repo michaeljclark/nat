@@ -52,9 +52,9 @@ struct Nat
 	std::vector<limb_t> limbs;
 
 
-	/*
-	 * constructors
-	 */
+	/*--------------.
+	| constructors. |
+	`--------------*/
 
 	/*! default constructor */
 	Nat();
@@ -75,9 +75,9 @@ struct Nat
 	Nat(const Nat&& operand) noexcept;
 
 
-	/*
-	 * assignment operators
-	 */
+	/*----------------------.
+	| assignment operators. |
+	`----------------------*/
 
 	/*! integral copy assignment operator */
 	Nat& operator=(const limb_t l);
@@ -89,9 +89,9 @@ struct Nat
 	Nat& operator=(Nat &&operand);
 
 
-	/*
-	 * internal methods
-	 */
+	/*------------------.
+	| internal methods. |
+	`------------------*/
 
 	/*! expand limbs to match operand */
 	void _expand(const Nat &operand);
@@ -103,9 +103,9 @@ struct Nat
 	void _resize(size_t n);
 
 
-	/*
-	 * handy limb and bit accessor methods
-	 */
+	/*-------------------------------.
+	| limb and bit accessor methods. |
+	`-------------------------------*/
 
 	/*! return number of limbs */
 	size_t num_limbs() const;
@@ -120,9 +120,9 @@ struct Nat
 	void set_bit(size_t n);
 
 
-	/* 
-	 * add, subtract, shifts and logical operators
-	 */
+	/*---------------------------------------------.
+	| add, subtract, shifts and logical operators. |
+	`---------------------------------------------*/
 
 	/*! add with carry equals */
 	Nat& operator+=(const Nat &operand);
@@ -173,9 +173,9 @@ struct Nat
 	Nat operator-() const;
 
 
-	/*
-	 * comparison operators
-	 */
+	/*----------------------.
+	| comparison operators. |
+	`----------------------*/
 
 	/*! equals */
 	bool operator==(const Nat &operand) const;
@@ -199,9 +199,9 @@ struct Nat
 	bool operator!() const;
 
 
-	/*
-	 * multply, divide and pow
-	 */
+	/*-------------------------.
+	| multply, divide and pow. |
+	`-------------------------*/
 
 	/*! base 2^limb_bits multiply */
 	static void mult(const Nat &multiplicand, const Nat multiplier, Nat &result);
@@ -231,9 +231,9 @@ struct Nat
 	Nat pow(size_t exp) const;
 
 
-	/*
-	 * convert natural number to string
-	 */
+	/*-------------------.
+	| string conversion. |
+	`-------------------*/
 
 	/*! convert Nat to string */
 	std::string to_string(size_t radix = 10) const;

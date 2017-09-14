@@ -45,9 +45,9 @@ inline static unsigned long clz(unsigned int val)
 #endif
 
 
-/*
- * constructors
- */
+/*--------------.
+| constructors. |
+`--------------*/
 
 /*! default constructor */
 Nat::Nat() : limbs{ 0 } {}
@@ -68,9 +68,9 @@ Nat::Nat(const Nat &operand) : limbs(operand.limbs) {}
 Nat::Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) {}
 
 
-/*
- * assignment operators
- */
+/*----------------------.
+| assignment operators. |
+`----------------------*/
 
 /*! integral copy assignment operator */
 Nat& Nat::operator=(const limb_t l)
@@ -95,9 +95,9 @@ Nat& Nat::operator=(Nat &&operand)
 }
 
 
-/*
- * internal methods
- */
+/*------------------.
+| internal methods. |
+`------------------*/
 
 /*! expand limbs to match operand */
 void Nat::_expand(const Nat &operand)
@@ -120,9 +120,9 @@ void Nat::_resize(size_t n)
 }
 
 
-/*
- * handy limb and bit accessor methods
- */
+/*-------------------------------.
+| limb and bit accessor methods. |
+`-------------------------------*/
 
 /*! return number of limbs */
 size_t Nat::num_limbs() const { return limbs.size(); }
@@ -147,13 +147,9 @@ void Nat::set_bit(size_t n)
 }
 
 
-/* 
- * multiply and divide require add with carry, subtract  
- * with borrow, left and right shift logical operators
- */
-
-
-/* define self mutating operations */
+/*---------------------.
+| mutating operations. |
+`---------------------*/
 
 /*! add with carry equals */
 Nat& Nat::operator+=(const Nat &operand)
@@ -269,6 +265,10 @@ Nat& Nat::operator^=(const Nat &operand)
 }
 
 
+/*------------------.
+| const operations. |
+`------------------*/
+
 /* const operations copy and use the mutating operations */
 
 /*! add with carry */
@@ -337,9 +337,11 @@ Nat Nat::operator-() const
 }
 
 
-/*
- * comparison are defined in terms of "equals" and "less than"
- */
+/*----------------------.
+| comparison operators. |
+`----------------------*/
+
+/* comparison are defined in terms of "equals" and "less than" */
 
 /*! equals */
 bool Nat::operator==(const Nat &operand) const
@@ -363,10 +365,7 @@ bool Nat::operator<(const Nat &operand) const
 	return false;
 }
 
-
-/*
- * axiomatically define other comparisons in terms of "equals" and "less than"
- */
+/* axiomatically define other comparisons in terms of "equals" and "less than" */
 
 /*! not equals */
 bool Nat::operator!=(const Nat &operand) const { return !(*this == operand); }
@@ -383,11 +382,12 @@ bool Nat::operator>=(const Nat &operand) const { return !(*this < operand) || *t
 /*! not */
 bool Nat::operator!() const { return *this == 0; }
 
-/*
- * multply and divide
- *
- * These routines are derived from Hacker's Delight
- */
+
+/*--------------------.
+| multply and divide. |
+`--------------------*/
+
+/* These routines are derived from Hacker's Delight */
 
 /*! base 2^limb_bits multiply */
 void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result)
@@ -560,11 +560,10 @@ Nat& Nat::operator%=(const Nat &operand)
 	return *this;
 }
 
-/*
- * pow
- *
- * power via squaring
- */
+
+/*--------------------.
+| power via squaring. |
+`--------------------*/
 
 /*! raise to the power */
 Nat Nat::pow(size_t exp) const
@@ -584,10 +583,11 @@ Nat Nat::pow(size_t exp) const
 }
 
 
-/*
- * helpers for recursive divide and conquer conversion to string
- */
+/*-------------------.
+| string conversion. |
+`-------------------*/
 
+/*! helper for recursive divide and conquer conversion to string */
 static inline ptrdiff_t _to_string_c(const Nat &val, std::string &s, ptrdiff_t offset)
 {
 	limb2_t v = limb2_t(val.limb_at(0)) | (limb2_t(val.limb_at(1)) << Nat::limb_bits);
@@ -597,6 +597,7 @@ static inline ptrdiff_t _to_string_c(const Nat &val, std::string &s, ptrdiff_t o
 	return offset;
 }
 
+/*! helper for recursive divide and conquer conversion to string */
 static ptrdiff_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level,
 	std::string &s, size_t digits, ptrdiff_t offset)
 {
@@ -624,11 +625,7 @@ static ptrdiff_t _to_string_r(const Nat &val, std::vector<Nat> &sq, size_t level
 	return offset;
 }
 
-/*
- * convert natural number to string
- */
-
-/*! convert Nat to string */
+/*! convert from Nat to string */
 std::string Nat::to_string(size_t radix) const
 {
 	static const char* hexdigits = "0123456789abcdef";
@@ -706,6 +703,7 @@ std::string Nat::to_string(size_t radix) const
 	}
 }
 
+/*! convert to Nat from string */
 void Nat::from_string(const char *str, size_t len, size_t radix)
 {
 	static const Nat tenp18{0xa7640000, 0xde0b6b3};
