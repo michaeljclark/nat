@@ -3,6 +3,7 @@
 Arbitrary precision arithmetic library with simple expression
 compiler targetting a subset of the RISC-V ISA.
 
+
 ## Project
 
 The project includes the following files:
@@ -22,6 +23,7 @@ demo/nat-scanner.ll    | simple compiler lexical analyser specification
 demo/nat-target[-*].h  | simple compiler target interface
 demo/nat-target[-*].cc | simple compiler target implementation
 
+
 ## Building
 
 ### Packages required to build nat-repl
@@ -33,12 +35,14 @@ flex         | 2.6.4
 libedit      | 20170329
 ncurses      | 6.0
 
+
 ### Installation of build dependencies
 
 Operating System | Installation method
 :--              | :--
 macOS            | `brew install bison flex libedit ncurses`
 Debian or Ubuntu | `apt-get install bison flex libedit-dev libncurses-dev`
+
 
 ### Supported compilers and operating systems
 
