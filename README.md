@@ -11,8 +11,6 @@ File                   | Description
 :---                   | :---
 src/nat.h              | arbitrary precision unsigned natural number header
 src/nat.cc             | arbitrary precision unsigned natural number implementation
-src/int.h              | arbitrary precision integer with sign and magnitude header
-src/int.cc             | arbitrary precision integer with sign and magnitude implementation
 tests/nat-tests.cc     | unit tests for the Nat implementation
 tests/int-tests.cc     | unit tests for the Int implementation
 demo/nat-repl.cc       | simple compiler REPL

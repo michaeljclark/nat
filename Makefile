@@ -13,8 +13,7 @@ LDFLAGS     = -L/usr/local/lib -Lbuild/lib -lnat
 
 
 NAT_OBJS    = \
-			build/obj/nat.o \
-			build/obj/int.o
+			build/obj/nat.o
 
 NATC_OBJS	= \
 			build/obj/nat-compiler.o \
@@ -29,7 +28,7 @@ all: libs tests demo
 
 libs: build/lib/libnat.a build/lib/libnatc.a
 
-tests: build/bin/nat-tests build/bin/int-tests
+tests: build/bin/nat-tests
 
 demo: build/bin/nat-repl
 
@@ -65,9 +64,6 @@ build/lib/libnatc.a: $(NATC_OBJS)
 	@echo AR $@ ; mkdir -p $(@D) ; $(AR) cr $@ $^
 
 build/bin/nat-tests: build/obj/nat-tests.o libs
-	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
-
-build/bin/int-tests: build/obj/int-tests.o libs
 	@echo LD $@ ; mkdir -p $(@D) ; $(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS)
 
 build/bin/nat-repl: build/obj/nat-repl.o libs
