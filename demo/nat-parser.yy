@@ -95,7 +95,6 @@ assignment:
 %left "+" "-";
 %left "*" "/" "%";
 %left "~";
-%left "**";
 
 expr:
 	  expr "|" expr  { $$ = driver.new_binary(op_or,   $1, $3); }
