@@ -243,6 +243,10 @@ int main(int argc, char const *argv[])
 	assert(-Nat(1, Nat::_unsigned, 32) == Nat(-1, Nat::_unsigned, 32));
 	assert(-Nat(1, Nat::_unsigned, 64) == Nat({0xffffffff, 0xffffffff}, Nat::_unsigned, 64));
 	assert(-Nat(1, Nat::_unsigned, 65) == Nat({0xffffffff, 0xffffffff,1}, Nat::_unsigned, 65));
+	assert(Nat({0xffffffff, 0x7fffffff,1}, Nat::_unsigned, 65) >> 1 == Nat({0xffffffff, 0xbfffffff}, Nat::_unsigned, 65));
+	assert(-Nat(1, Nat::_signed, 65) >> 1 == Nat({0xffffffff, 0xffffffff,1}, Nat::_signed, 65));
+	assert(Nat({0xffffffff, 0x7fffffff,1}, Nat::_signed, 65) >> 1 == Nat({0xffffffff, 0xbfffffff,1}, Nat::_signed, 65));
+	assert(Nat({0xffffffff, 0xffffffff}, Nat::_signed, 65) >> 1 == Nat({0xffffffff, 0x7fffffff}, Nat::_signed, 65));
 	assert(-Nat(1, Nat::_unsigned, 65) >> 1 == Nat({0xffffffff, 0xffffffff}, Nat::_unsigned, 65));
 	assert(-Nat(1, Nat::_unsigned, 65) >> 2 == Nat({0xffffffff, 0x7fffffff}, Nat::_unsigned, 65));
 	assert(-Nat(1, Nat::_unsigned, 65) << 1 == Nat({0xfffffffe, 0xffffffff,1}, Nat::_unsigned, 65));

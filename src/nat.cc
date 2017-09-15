@@ -287,7 +287,7 @@ Nat& Nat::operator>>=(size_t shamt)
 	}
 	if (!shamt) return *this;
 
-	limb_t carry = 0;
+	limb_t carry = -(s.is_signed && sign_bit()) << (shamt-1);
 	for (size_t j = num_limbs(); j > 0; j--) {
 		limb_t old_val = limbs[j - 1];
 		limb_t new_val = (old_val >> shamt) | carry;
