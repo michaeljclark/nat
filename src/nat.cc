@@ -44,28 +44,66 @@ inline static unsigned long clz(unsigned int val)
 #error clz not defined
 #endif
 
+const Nat::signedness Nat::_unsigned = { false };  /* unsigned */
+const Nat::signedness Nat::_signed   = { true };   /* signed two's complement */
+
 
 /*--------------.
 | constructors. |
 `--------------*/
 
 /*! default constructor */
-Nat::Nat() : limbs{ 0 } {}
+Nat::Nat(signedness s, unsigned bits)
+	: limbs{0}, s(s), bits(bits) {}
 
 /*! integral constructor */
-Nat::Nat(const limb_t n) : limbs{ n } {}
+Nat::Nat(const limb_t n, signedness s, unsigned bits)
+	: limbs{n}, s(s), bits(bits)
+{
+	_contract();
+}
 
 /*! array constructor */
-Nat::Nat(const std::initializer_list<limb_t> l) : limbs(l) { _contract(); }
+Nat::Nat(const std::initializer_list<limb_t> l, signedness s, unsigned bits)
+	: limbs(l), s(s), bits(bits)
+{
+	_contract();
+}
 
 /*! string constructor */
-Nat::Nat(std::string str, size_t radix) : limbs{0} { from_string(str.c_str(), str.size(), radix); }
+Nat::Nat(std::string str, signedness s, unsigned bits)
+	: limbs{0}, s(s), bits(bits)
+{
+	from_string(str.c_str(), str.size(), 0);
+	this->s = s;
+	this->bits = bits;
+	_contract();
+}
+
+
+/*! string constructor with radix */
+Nat::Nat(std::string str, size_t radix, signedness s, unsigned bits)
+	: limbs{0}, s(s), bits(bits)
+{
+	from_string(str.c_str(), str.size(), radix);
+	this->s = s;
+	this->bits = bits;
+	_contract();
+}
 
 /*! copy constructor  */
-Nat::Nat(const Nat &operand) : limbs(operand.limbs) {}
+Nat::Nat(const Nat &operand)
+	: limbs(operand.limbs), s(operand.s), bits(operand.bits)
+{
+	_contract();
+}
 
 /*! move constructor  */
-Nat::Nat(const Nat&& operand) noexcept : limbs(std::move(operand.limbs)) {}
+Nat::Nat(const Nat&& operand) noexcept
+	: limbs(std::move(operand.limbs)), s(operand.s), bits(operand.bits)
+{
+	_contract();
+}
 
 
 /*----------------------.
@@ -84,6 +122,8 @@ Nat& Nat::operator=(const limb_t l)
 Nat& Nat::operator=(const Nat &operand)
 {
 	limbs = operand.limbs;
+	bits = operand.bits;
+	s = operand.s;
 	return *this;
 }
 
@@ -91,6 +131,8 @@ Nat& Nat::operator=(const Nat &operand)
 Nat& Nat::operator=(Nat &&operand)
 {
 	limbs = std::move(operand.limbs);
+	bits = operand.bits;
+	s = operand.s;
 	return *this;
 }
 
@@ -102,14 +144,20 @@ Nat& Nat::operator=(Nat &&operand)
 /*! expand limbs to match operand */
 void Nat::_expand(const Nat &operand)
 {
-	limbs.resize(std::max(num_limbs(), operand.num_limbs()));
+	limbs.resize(std::min(max_limbs(), std::max(num_limbs(), operand.num_limbs())));
 }
 
 /*! contract zero big end limbs */
 void Nat::_contract()
 {
+	while (bits > 0 && num_limbs() > max_limbs()) {
+		limbs.pop_back();
+	}
 	while(num_limbs() > 1 && limbs.back() == 0) {
 		limbs.pop_back();
+	}
+	if (bits > 0 && num_limbs() == max_limbs()) {
+		limbs.back() &= limb_mask(num_limbs() - 1);
 	}
 }
 
@@ -127,8 +175,20 @@ void Nat::_resize(size_t n)
 /*! return number of limbs */
 size_t Nat::num_limbs() const { return limbs.size(); }
 
+/*! return maximum number of limbs */
+size_t Nat::max_limbs() const { return ((bits - 1) >> limb_shift) + 1; }
+
 /*! access word at limb offset */
 limb_t Nat::limb_at(size_t n) const { return n < num_limbs() ? limbs[n] : 0; }
+
+/*! limb_mask at limb offset */
+limb_t Nat::limb_mask(size_t n) const
+{
+    if (bits == 0) return -1;
+    if (n < (bits >> limb_shift)) return -1;
+    if (n > (bits >> limb_shift)) return 0;
+	else return ((1 << (bits & ((1ULL << limb_bits) - 1))) - 1);
+}
 
 /*! test bit at bit offset */
 int Nat::test_bit(size_t n) const
@@ -144,6 +204,12 @@ void Nat::set_bit(size_t n)
 	size_t word = n >> limb_shift;
 	if (word >= num_limbs()) _resize(word + 1);
 	limbs[word] |= (1ULL << (n & (limb_bits-1)));
+}
+
+/*! test sign */
+bool Nat::sign_bit() const
+{
+	return s.is_signed && bits > 0 ? test_bit(bits - 1) : 0;
 }
 
 
@@ -162,7 +228,7 @@ Nat& Nat::operator+=(const Nat &operand)
 		limbs[i] = new_val;
 		carry = new_val < old_val;
 	}
-	if (carry) {
+	if (carry && num_limbs() < max_limbs()) {
 		limbs.push_back(1);
 	}
 	return *this;
@@ -179,7 +245,6 @@ Nat& Nat::operator-=(const Nat &operand)
 		limbs[i] = new_val;
 		borrow = new_val > old_val;
 	}
-	assert(borrow == 0); /* unsigned underflow */
 	_contract();
 	return *this;
 }
@@ -189,9 +254,10 @@ Nat& Nat::operator<<=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
-		limbs.insert(limbs.begin(), limb_shamt, 0);
+		limbs.insert(limbs.begin(), std::min(max_limbs(), limb_shamt), 0);
 		shamt -= (limb_shamt << limb_shift);
 	}
+	_contract();
 	if (!shamt) return *this;
 
 	limb_t carry = 0;
@@ -201,9 +267,10 @@ Nat& Nat::operator<<=(size_t shamt)
 		limbs[j] = new_val;
 		carry = old_val >> (limb_bits - shamt);
 	}
-	if (carry) {
+	if (carry && num_limbs() < max_limbs()) {
 		limbs.push_back(carry);
 	}
+	_contract();
 	return *this;
 }
 
@@ -212,7 +279,7 @@ Nat& Nat::operator>>=(size_t shamt)
 {
 	size_t limb_shamt = shamt >> limb_shift;
 	if (limb_shamt > 0) {
-		limbs.erase(limbs.begin(), limbs.begin() + limb_shamt);
+		limbs.erase(limbs.begin(), limbs.begin() + std::min(num_limbs(), limb_shamt));
 		shamt -= (limb_shamt << limb_shift);
 	}
 	if (num_limbs() == 0) {
@@ -333,7 +400,18 @@ Nat Nat::operator~() const
 /*! negate */
 Nat Nat::operator-() const
 {
-	return ~*this + 1;
+	Nat result(*this);
+	if (bits == 0) {
+		return result;
+	}
+	size_t n = std::max(max_limbs(), num_limbs());
+	result._resize(n);
+	for (size_t i = 0; i < result.num_limbs(); i++) {
+		result.limbs[i] = ~limb_at(i);
+	}
+	result += 1;
+	result._contract();
+	return result;
 }
 
 
@@ -356,6 +434,17 @@ bool Nat::operator==(const Nat &operand) const
 /*! less than */
 bool Nat::operator<(const Nat &operand) const
 {
+	/* handle signed comparison if both operands are signed */
+	if (bits > 0 && s.is_signed && operand.s.is_signed) {
+		bool sign = sign_bit();
+		if (sign ^ operand.sign_bit()) {
+			return sign;
+		} else if (sign) {
+			return operand < *this;
+		}
+	}
+
+	/* unsigned comparison */
 	if (num_limbs() > operand.num_limbs()) return false;
 	else if (num_limbs() < operand.num_limbs()) return true;
 	for (ptrdiff_t i = num_limbs()-1; i >= 0; i--) {
@@ -393,24 +482,29 @@ bool Nat::operator!() const { return *this == 0; }
 void Nat::mult(const Nat &multiplicand, const Nat multiplier, Nat &result)
 {
 	size_t m = multiplicand.num_limbs(), n = multiplier.num_limbs();
-	result._resize(m + n);
+	size_t k = std::min(multiplicand.max_limbs(), m + n);
+	result._resize(k);
 	limb_t carry = 0;
 	limb2_t mj = multiplier.limbs[0];
-	for (size_t i = 0; i < m; i++) {
+	for (size_t i = 0; i < m && i < k; i++) {
 		limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + carry;
 		result.limbs[i] = limb_t(t);
 		carry = t >> limb_bits;
 	}
-	result.limbs[m] = carry;
+	if (m < k) {
+		result.limbs[m] = carry;
+	}
 	for (size_t j = 1; j < n; j++) {
 		carry = 0;
 		mj = multiplier.limbs[j];
-		for (size_t i = 0; i < m; i++) {
+		for (size_t i = 0; i < m && i + j < k; i++) {
 			limb2_t t = limb2_t(multiplicand.limbs[i]) * mj + limb2_t(result.limbs[i + j]) + carry;
 			result.limbs[i + j] = limb_t(t);
 			carry = t >> limb_bits;
 		}
-		result.limbs[j + m] = carry;
+		if (j + m < k) {
+			result.limbs[j + m] = carry;
+		}
 	}
 	result._contract();
 }
@@ -515,15 +609,16 @@ void Nat::divrem(const Nat &dividend, const Nat &divisor, Nat &quotient, Nat &re
 /*! multiply */
 Nat Nat::operator*(const Nat &operand) const
 {
-	Nat result(0);
+	Nat result(0, s, bits);
 	mult(*this, operand, result);
+	result._contract();
 	return result;
 }
 
 /*! division quotient */
 Nat Nat::operator/(const Nat &divisor) const
 {
-	Nat quotient(0), remainder(0);
+	Nat quotient(0, s, bits), remainder(0, s, bits);
 	divrem(*this, divisor, quotient, remainder);
 	return quotient;
 }

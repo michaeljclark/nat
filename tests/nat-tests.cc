@@ -230,5 +230,35 @@ int main(int argc, char const *argv[])
 	assert(Nat("3249094308290873429032409832424398902348094329803249083249089802349809430822903").to_string()
 		== "3249094308290873429032409832424398902348094329803249083249089802349809430822903");
 
+	/* fixed width tests */
+	assert(Nat(0xffffffff, Nat::_unsigned, 32) + 2 == 1);
+	assert(Nat(0xffffffff, Nat::_unsigned, 31) == 0x7fffffff);
+	assert(Nat(0x7fffffff, Nat::_unsigned, 31) + 2 == 1);
+	assert(Nat("0xffffffff", Nat::_unsigned, 31) == 0x7fffffff);
+	assert(Nat(100000) * Nat(100000) == (Nat{0x540be400, 0x2}));
+	assert(Nat(100000, Nat::_unsigned, 34) * Nat(100000, Nat::_unsigned, 34) == (Nat{0x540be400, 0x2}));
+	assert(Nat(100000, Nat::_unsigned, 33) * Nat(100000, Nat::_unsigned, 33) == Nat(0x540be400));
+	assert(Nat(100000, Nat::_unsigned, 32) * Nat(100000, Nat::_unsigned, 32) == Nat(0x540be400));
+	assert(Nat(100000, Nat::_unsigned, 20) * Nat(100000, Nat::_unsigned, 20) == Nat(0xbe400));
+	assert(-Nat(1, Nat::_unsigned, 32) == Nat(-1, Nat::_unsigned, 32));
+	assert(-Nat(1, Nat::_unsigned, 64) == Nat({0xffffffff, 0xffffffff}, Nat::_unsigned, 64));
+	assert(-Nat(1, Nat::_unsigned, 65) == Nat({0xffffffff, 0xffffffff,1}, Nat::_unsigned, 65));
+	assert(-Nat(1, Nat::_unsigned, 65) >> 1 == Nat({0xffffffff, 0xffffffff}, Nat::_unsigned, 65));
+	assert(-Nat(1, Nat::_unsigned, 65) >> 2 == Nat({0xffffffff, 0x7fffffff}, Nat::_unsigned, 65));
+	assert(-Nat(1, Nat::_unsigned, 65) << 1 == Nat({0xfffffffe, 0xffffffff,1}, Nat::_unsigned, 65));
+	assert(-Nat(1, Nat::_unsigned, 65) << 2 == Nat({0xfffffffc, 0xffffffff,1}, Nat::_unsigned, 65));
+
+	/* unsigned comparison */
+	assert(Nat(-1, Nat::_unsigned, 32) > Nat(1, Nat::_unsigned, 32));
+	assert(Nat(0, Nat::_unsigned, 32) < Nat(1, Nat::_unsigned, 32));
+	assert(Nat(1, Nat::_unsigned, 32) > Nat(0, Nat::_unsigned, 32));
+	assert(Nat(1, Nat::_unsigned, 32) < Nat(-1, Nat::_unsigned, 32));
+
+	/* signed comparison */
+	assert(Nat(-1, Nat::_signed, 32) < Nat(1, Nat::_signed, 32));
+	assert(Nat(0, Nat::_signed, 32) < Nat(1, Nat::_signed, 32));
+	assert(Nat(1, Nat::_signed, 32) > Nat(0, Nat::_signed, 32));
+	assert(Nat(1, Nat::_signed, 32) > Nat(-1, Nat::_signed, 32));
+
 	return 0;
 }

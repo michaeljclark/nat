@@ -34,22 +34,44 @@
 #include <limits>
 #include <iostream>
 #include <algorithm>
-#include <initializer_list>
+#include <initializer_list> 
 
 struct Nat
 {
+	/*------------------.
+	| type definitions. |
+	`------------------*/
+
+	/*! configuration flags */
+	struct signedness { bool is_signed; };
+
+	static const signedness _unsigned;  /* unsigned */
+	static const signedness _signed;    /* signed two's complement */
+
+	/*! limb bit width and bit shift */
+	enum {
+		limb_bits = 32,
+		limb_shift = 5,
+	};
+
 	/*! limb type */
 	typedef unsigned int limb_t;
 	typedef unsigned long long limb2_t;
 	typedef signed long long slimb2_t;
 
-	/*! limb bit width and bit shift */
-	enum { limb_bits = 32, limb_shift = 5 };
 
-	/*!
-	 * limbs is a vector of words with the little end at offset 0
-	 */
+	/*------------------.
+	| member variables. |
+	`------------------*/
+
+	/* limbs is a vector of words with the little end at offset 0 */
 	std::vector<limb_t> limbs;
+
+	/*! flags indicating unsigned or signed two's complement */
+	signedness s;
+
+	/*! contains the width of the natural in bits (variable width = 0) */
+	unsigned bits;
 
 
 	/*--------------.
@@ -57,21 +79,24 @@ struct Nat
 	`--------------*/
 
 	/*! default constructor */
-	Nat();
+	Nat(signedness s = _unsigned, unsigned bits = 0);
 
 	/*! integral constructor */
-	Nat(const limb_t n);
+	Nat(const limb_t n, signedness s = _unsigned, unsigned bits = 0);
 
 	/*! array constructor */
-	Nat(const std::initializer_list<limb_t> l);
+	Nat(const std::initializer_list<limb_t> l, signedness s = _unsigned, unsigned bits = 0);
 
 	/*! string constructor */
-	Nat(std::string str, size_t radix = 0);
+	Nat(std::string str, signedness s = _unsigned, unsigned bits = 0);
 
-	/*! copy constructor  */
+	/*! string constructor with radix */
+	Nat(std::string str, size_t radix, signedness s = _unsigned, unsigned bits = 0);
+
+	/*! copy constructor */
 	Nat(const Nat &operand);
 
-	/*! move constructor  */
+	/*! move constructor */
 	Nat(const Nat&& operand) noexcept;
 
 
@@ -110,14 +135,23 @@ struct Nat
 	/*! return number of limbs */
 	size_t num_limbs() const;
 
+	/*! return maximum number of limbs */
+	size_t max_limbs() const;
+
 	/*! access word at limb offset */
 	limb_t limb_at(size_t n) const;
+
+	/*! limb_mask at limb offset */
+	limb_t limb_mask(size_t n) const;
 
 	/*! test bit at bit offset */
 	int test_bit(size_t n) const;
 
 	/*! set bit at bit offset */
 	void set_bit(size_t n);
+
+	/*! test sign */
+	bool sign_bit() const;
 
 
 	/*---------------------------------------------.
