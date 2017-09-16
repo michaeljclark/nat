@@ -264,5 +264,14 @@ int main(int argc, char const *argv[])
 	assert(Nat(1, Nat::_signed, 32) > Nat(0, Nat::_signed, 32));
 	assert(Nat(1, Nat::_signed, 32) > Nat(-1, Nat::_signed, 32));
 
+	assert(Nat(0).num_bits() == 0);
+	assert(Nat(1).num_bits() == 1);
+	assert(Nat(2).num_bits() == 2);
+	assert(Nat(3).num_bits() == 2);
+	assert(Nat(4).num_bits() == 3);
+	assert(Nat(5).num_bits() == 3);
+	assert(Nat(6).num_bits() == 3);
+	assert(Nat(7).num_bits() == 3);
+
 	return 0;
 }

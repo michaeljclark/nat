@@ -150,6 +150,9 @@ struct Nat
 	/*! set bit at bit offset */
 	void set_bit(size_t n);
 
+	/*! return number of bits */
+	size_t num_bits() const;
+
 	/*! test sign */
 	bool sign_bit() const;
 

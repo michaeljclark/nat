@@ -206,6 +206,14 @@ void Nat::set_bit(size_t n)
 	limbs[word] |= (1ULL << (n & (limb_bits-1)));
 }
 
+/*! return number of bits */
+size_t Nat::num_bits() const
+{
+	if (bits > 0) return bits;
+	if (limbs.size() == 1 && limbs[0] == 0) return 0;
+	return (limb_bits - clz(limbs.back())) + (num_limbs() - 1) * limb_bits;
+}
+
 /*! test sign */
 bool Nat::sign_bit() const
 {
