@@ -115,6 +115,7 @@ Nat& Nat::operator=(const limb_t l)
 {
 	_resize(1);
 	limbs[0] = l;
+	_contract();
 	return *this;
 }
 
