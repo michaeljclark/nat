@@ -1,4 +1,10 @@
-## Nat Interface
+## Nat
+
+C++ class for arbitrary precision arithmetic on natural numbers.
+
+- supports static or dynamic width.
+- supports arbitrary precision signed and unsigned arithmetic.
+- supports operator overloads for C++ math, logical and bitwise operators.
 
 struct Nat implements the following operators and methods:
 
