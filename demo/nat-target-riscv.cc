@@ -297,9 +297,9 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 		}
 		case op_seq:
 		case op_sne:
-		case op_slte:
+		case op_sle:
 		case op_sgt:
-		case op_sgte:
+		case op_sge:
 		{
 			auto op = static_cast<binaryop*>(sr_op);
 			auto op_rd = static_cast<phyreg*>(sr->l.get());
@@ -314,14 +314,14 @@ nat::node_list riscv::target::emit(nat::compiler *driver, nat::node *n)
 					l.push_back(make_r(inst_sub, op_rd->l, op_rs1->l, op_rs2->l));
 					l.push_back(make_r(inst_sltu, op_rd->l, 0, op_rd->l));
 					break;
-				case op_slte:
+				case op_sle:
 					l.push_back(make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
 					l.push_back(make_i(inst_xori, op_rd->l, op_rd->l, 1));
 					break;
 				case op_sgt:
 					l.push_back(make_r(inst_slt, op_rd->l, op_rs2->l, op_rs1->l));
 					break;
-				case op_sgte:
+				case op_sge:
 					l.push_back(make_r(inst_slt, op_rd->l, op_rs1->l, op_rs2->l));
 					l.push_back(make_i(inst_xori, op_rd->l, op_rd->l, 1));
 					break;

@@ -38,9 +38,9 @@ const char* nat::op_name[] = {
 	"seq",
 	"sne",
 	"slt",
-	"slte",
+	"sle",
 	"sgt",
-	"sgte",
+	"sge",
 	"srl",
 	"srli",
 	"sll",
@@ -141,9 +141,9 @@ Nat binaryop::eval(compiler *d)
 		case op_seq:  v = l->eval(d) == r->eval(d); break;
 		case op_sne:  v = l->eval(d) != r->eval(d); break;
 		case op_slt:  v = l->eval(d) <  r->eval(d); break;
-		case op_slte: v = l->eval(d) <= r->eval(d); break;
+		case op_sle:  v = l->eval(d) <= r->eval(d); break;
 		case op_sgt:  v = l->eval(d) >  r->eval(d); break;
-		case op_sgte: v = l->eval(d) >= r->eval(d); break;
+		case op_sge:  v = l->eval(d) >= r->eval(d); break;
 		case op_srl:  v = l->eval(d) >> r->eval(d).limb_at(0); break;
 		case op_srli: v = l->eval(d) >> r->eval(d).limb_at(0); break;
 		case op_sll:  v = l->eval(d) << r->eval(d).limb_at(0); break;
